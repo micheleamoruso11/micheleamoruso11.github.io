@@ -4,20 +4,63 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 <title>Flussi Economici</title>
-<meta name="theme-color" content="#020617" />
+<meta name="theme-color" content="#ECF0EA" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#111B1B" media="(prefers-color-scheme: dark)" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Flussi" />
-<link rel="manifest" href='data:application/manifest+json,{"name":"Flussi Economici","short_name":"Flussi","display":"standalone","start_url":".","background_color":"%23020617","theme_color":"%23020617"}' />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Flussi Economici","short_name":"Flussi","display":"standalone","start_url":".","background_color":"%23ECF0EA","theme_color":"%23ECF0EA"}' />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet" />
 <style>
-  html, body { background: #020617; margin: 0; -webkit-tap-highlight-color: transparent; }
-  body { overscroll-behavior-y: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; }
-  select { -webkit-appearance: none; appearance: none; }
-  #boot { color: #94a3b8; font-size: 14px; text-align: center; padding: 40vh 24px 0; line-height: 1.5; }
-  #boot button { margin-top: 16px; background: #8b5cf6; color: #fff; border: 0; border-radius: 12px; padding: 10px 20px; font-size: 15px; }
-  #boot .err { color: #fb7185; font-size: 12px; margin-top: 10px; word-break: break-word; }
+  :root {
+    --paper: #ECF0EA; --surface: #F7F9F5; --surface2: #E2E8DF; --ink: #16232B; --muted: #5A686A; --line: #D2DACF;
+    --green: #2E6A4E; --red: #A63249; --ochre: #9E680C; --blue: #2C5C8A;
+    --note: #1E4637; --note-ink: #EEF4EC; --note-soft: #A9CBB8; --note-line: #4F8A6E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #111B1B; --surface: #192626; --surface2: #213030; --ink: #E3EAE4; --muted: #8FA09B; --line: #2A3A39;
+      --green: #6DBE91; --red: #EC8096; --ochre: #E3AA4A; --blue: #8AB6E0;
+      --note: #1D4434; --note-ink: #EEF4EC; --note-soft: #9DC4AE; --note-line: #4C8A6B;
+    }
+  }
+  html, body { background: var(--paper); color: var(--ink); margin: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: "Schibsted Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+  button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .serif { font-family: "Young Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+  .num { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  .c-green { color: var(--green); } .c-red { color: var(--red); } .c-ochre { color: var(--ochre); } .c-blue { color: var(--blue); }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+  .inp { width: 100%; box-sizing: border-box; background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; color: var(--ink); font: inherit; font-size: 16px; min-height: 46px; -webkit-appearance: none; appearance: none; }
+  .inp:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  .lbl { display: block; font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+  .chip { border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 7px 13px; font-size: 13px; white-space: nowrap; }
+  .chip-on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn { display: block; width: 100%; border-radius: 12px; padding: 13px 16px; font-weight: 600; font-size: 15px; text-align: center; }
+  .btn-ink { background: var(--ink); color: var(--paper); }
+  .btn-ink:disabled { opacity: .3; }
+  .btn-ghost { border: 1px solid var(--line); }
+  .btn-danger { color: var(--red); }
+  .btn-danger-on { color: var(--red); background: color-mix(in srgb, var(--red) 14%, transparent); }
+  .seg { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; gap: 3px; }
+  .seg button { flex: 1; padding: 9px 6px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .noscroll::-webkit-scrollbar { display: none; }
+  .noscroll { scrollbar-width: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .sheet { animation: sheetUp .22s ease-out; }
+    .fade { animation: fadeIn .18s ease-out; }
+    @keyframes sheetUp { from { transform: translateY(28px); opacity: .6; } to { transform: none; opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  }
+  #boot { color: var(--muted); font-size: 14px; text-align: center; padding: 40vh 24px 0; line-height: 1.5; }
+  #boot button { margin-top: 16px; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 10px 20px; font-size: 15px; }
+  #boot .err { color: var(--red); font-size: 12px; margin-top: 10px; word-break: break-word; }
 </style>
 <script>
   window.__appStarted = false;
@@ -33,31 +76,35 @@
   window.addEventListener("error", function (e) {
     var t = e && e.target;
     if (t && t.tagName === "SCRIPT" && t.src) {
-      var optional = t.getAttribute("data-optional") === "1";
-      if (!optional) window.__bootFail("Libreria non caricata: " + t.src);
+      if (t.getAttribute("data-optional") !== "1") window.__bootFail("Libreria non caricata: " + t.src);
       return;
     }
     if (e && e.message) window.__bootFail(e.message);
   }, true);
-  setTimeout(function () {
-    if (!window.__appStarted) window.__bootFail("Tempo di caricamento scaduto");
-  }, 25000);
+  setTimeout(function () { if (!window.__appStarted) window.__bootFail("Tempo di caricamento scaduto"); }, 25000);
 
   (function () {
     try {
       var c = document.createElement("canvas");
       c.width = 180; c.height = 180;
       var x = c.getContext("2d");
-      var g = x.createLinearGradient(0, 0, 180, 180);
-      g.addColorStop(0, "#7c3aed");
-      g.addColorStop(1, "#0e7490");
-      x.fillStyle = g;
+      x.fillStyle = "#1E4637";
       x.fillRect(0, 0, 180, 180);
-      x.fillStyle = "#ffffff";
-      x.font = "bold 104px -apple-system, Helvetica, Arial, sans-serif";
+      x.strokeStyle = "#3F7A5E";
+      x.lineWidth = 1.2;
+      for (var i = 0; i < 12; i++) {
+        x.beginPath();
+        for (var px = 0; px <= 180; px += 3) {
+          var py = 12 + i * 15 + 5 * Math.sin(px / 14 + i * 0.6);
+          if (px === 0) x.moveTo(px, py); else x.lineTo(px, py);
+        }
+        x.stroke();
+      }
+      x.fillStyle = "#EEF4EC";
+      x.font = "bold 100px Georgia, serif";
       x.textAlign = "center";
       x.textBaseline = "middle";
-      x.fillText("€", 90, 98);
+      x.fillText("€", 90, 96);
       var url = c.toDataURL("image/png");
       ["apple-touch-icon", "icon"].forEach(function (rel) {
         var l = document.createElement("link");
@@ -81,20 +128,18 @@
 const { useState, useEffect, useMemo, useRef } = React;
 const RC = window.Recharts || null;
 
+/* ---------- Icone ---------- */
 const mkIcon = (children) => ({ size = 24, className = "", style }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-    strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+    strokeLinecap="round" strokeLinejoin="round" className={className} style={style} aria-hidden="true">
     {children}
   </svg>
 );
-
 const Plus = mkIcon(<><path d="M5 12h14" /><path d="M12 5v14" /></>);
 const X = mkIcon(<><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>);
-const Trash2 = mkIcon(<><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><path d="M10 11v6" /><path d="M14 11v6" /></>);
 const Check = mkIcon(<path d="M20 6 9 17l-5-5" />);
 const Wallet = mkIcon(<><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></>);
 const TrendingUp = mkIcon(<><path d="M22 7 13.5 15.5 8.5 10.5 2 17" /><path d="M16 7h6v6" /></>);
-const AlertCircle = mkIcon(<><circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" /></>);
 const RefreshCw = mkIcon(<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></>);
 const ChevronLeft = mkIcon(<path d="m15 18-6-6 6-6" />);
 const ChevronRight = mkIcon(<path d="m9 18 6-6-6-6" />);
@@ -105,89 +150,103 @@ const BookOpen = mkIcon(<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><
 const ShoppingCart = mkIcon(<><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></>);
 const Film = mkIcon(<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" /></>);
 const MoreHorizontal = mkIcon(<><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></>);
-const ArrowUpRight = mkIcon(<><path d="M7 7h10v10" /><path d="M7 17 17 7" /></>);
-const ArrowDownRight = mkIcon(<><path d="m7 7 10 10" /><path d="M17 7v10H7" /></>);
 const Gift = mkIcon(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13" /><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5" /></>);
 const Landmark = mkIcon(<><path d="M3 22h18" /><path d="M6 18v-7" /><path d="M10 18v-7" /><path d="M14 18v-7" /><path d="M18 18v-7" /><path d="M12 2l8 5H4z" /></>);
-const Pencil = mkIcon(<><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></>);
 const Download = mkIcon(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /><path d="M12 15V3" /></>);
 const Upload = mkIcon(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" /></>);
+const CalendarIcon = mkIcon(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></>);
+const BarIcon = mkIcon(<><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>);
+const ListIcon = mkIcon(<><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></>);
+const Search = mkIcon(<><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></>);
+const ArrowLeftRight = mkIcon(<><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></>);
+const Utensils = mkIcon(<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></>);
+const Shirt = mkIcon(<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />);
 
+/* ---------- Costanti ---------- */
 const STORAGE_KEY = "flussi-economici-v1";
 const BACKUP_KEY = "flussi-economici-last-backup";
 
 const EXPENSE_CATEGORIES = [
-  { id: "alimentari", label: "Alimentari", color: "#f97316", Icon: ShoppingCart },
-  { id: "trasporti", label: "Trasporti", color: "#3b82f6", Icon: Car },
-  { id: "casa", label: "Casa & Bollette", color: "#eab308", Icon: Home },
-  { id: "svago", label: "Svago", color: "#ec4899", Icon: Film },
-  { id: "salute", label: "Salute", color: "#ef4444", Icon: Heart },
-  { id: "istruzione", label: "Istruzione", color: "#8b5cf6", Icon: BookOpen },
-  { id: "abbonamenti", label: "Abbonamenti", color: "#a855f7", Icon: RefreshCw },
-  { id: "altro-u", label: "Altro", color: "#64748b", Icon: MoreHorizontal },
+  { id: "alimentari", label: "Spesa alimentare", color: "#C2862B", Icon: ShoppingCart },
+  { id: "ristoranti", label: "Ristoranti e bar", color: "#9A5B2C", Icon: Utensils },
+  { id: "trasporti", label: "Trasporti", color: "#3C6E9E", Icon: Car },
+  { id: "casa", label: "Casa e bollette", color: "#7D7A3A", Icon: Home },
+  { id: "svago", label: "Svago", color: "#8E4A84", Icon: Film },
+  { id: "abbigliamento", label: "Abbigliamento", color: "#C26F8E", Icon: Shirt },
+  { id: "salute", label: "Salute", color: "#B4495B", Icon: Heart },
+  { id: "istruzione", label: "Studio", color: "#3E8A99", Icon: BookOpen },
+  { id: "abbonamenti", label: "Abbonamenti", color: "#6E5BA0", Icon: RefreshCw },
+  { id: "altro-u", label: "Altro", color: "#7A8580", Icon: MoreHorizontal },
 ];
 
 const INCOME_CATEGORIES = [
-  { id: "stipendio", label: "Stipendio", color: "#10b981", Icon: Wallet },
-  { id: "extra", label: "Extra / Freelance", color: "#14b8a6", Icon: TrendingUp },
-  { id: "regalo", label: "Regalo", color: "#06b6d4", Icon: Gift },
-  { id: "altro-e", label: "Altro", color: "#64748b", Icon: MoreHorizontal },
+  { id: "stipendio", label: "Stipendio", color: "#2E6A4E", Icon: Wallet },
+  { id: "extra", label: "Extra e lavoretti", color: "#4E9A72", Icon: TrendingUp },
+  { id: "regalo", label: "Regali", color: "#3E8A99", Icon: Gift },
+  { id: "altro-e", label: "Altro", color: "#7A8580", Icon: MoreHorizontal },
 ];
 
 const SUB_CATEGORIES = [
   { id: "streaming", label: "Streaming" },
-  { id: "palestra", label: "Palestra / Sport" },
-  { id: "software", label: "Software / Cloud" },
+  { id: "palestra", label: "Palestra e sport" },
+  { id: "software", label: "Software e cloud" },
   { id: "musica", label: "Musica" },
+  { id: "affitto", label: "Affitto e utenze" },
   { id: "altro-s", label: "Altro" },
 ];
 
 const FREQ_LABEL = { settimanale: "Settimanale", mensile: "Mensile", annuale: "Annuale" };
+const ACCOUNT_COLORS = ["var(--green)", "var(--blue)", "var(--ochre)", "#8E4A84", "#3E8A99", "#B4495B"];
 
-const fmtEUR = (n) =>
-  new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(n || 0);
+const TABS = [
+  { id: "overview", label: "Oggi", Icon: Home },
+  { id: "movements", label: "Movimenti", Icon: ListIcon },
+  { id: "schedule", label: "Scadenze", Icon: CalendarIcon },
+  { id: "analysis", label: "Analisi", Icon: BarIcon },
+  { id: "accounts", label: "Conti", Icon: Landmark },
+];
 
+/* ---------- Utilità ---------- */
+const fmtEUR = (n) => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(n || 0);
+const fmtSigned = (n) => (n > 0.004 ? "+" : n < -0.004 ? "−" : "") + fmtEUR(Math.abs(n));
+const round2 = (n) => Math.round(n * 100) / 100;
+const compactEUR = (v) => (Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(1).replace(".", ",")}k` : `${Math.round(v)}`);
 const localISODate = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
 const isoToDate = (iso) => new Date(iso + "T00:00:00");
-
-const addDaysISO = (iso, n) => {
-  const d = isoToDate(iso);
-  d.setDate(d.getDate() + n);
-  return localISODate(d);
-};
-
+const addDaysISO = (iso, n) => { const d = isoToDate(iso); d.setDate(d.getDate() + n); return localISODate(d); };
 const maxISO = (a, b) => (a > b ? a : b);
-
-const monthKeyOf = (dateStr) => dateStr.slice(0, 7);
-
-const monthLabel = (key) => {
-  const [y, m] = key.split("-").map(Number);
-  return new Intl.DateTimeFormat("it-IT", { month: "long", year: "numeric" }).format(new Date(y, m - 1, 1));
-};
-
+const monthKeyOf = (s) => s.slice(0, 7);
+const keyToDate = (key) => { const [y, m] = key.split("-").map(Number); return new Date(y, m - 1, 1); };
+const shiftMonth = (key, delta) => { const d = keyToDate(key); d.setMonth(d.getMonth() + delta); return localISODate(d).slice(0, 7); };
+const daysInMonth = (key) => { const [y, m] = key.split("-").map(Number); return new Date(y, m, 0).getDate(); };
+const monthStartISO = (key) => `${key}-01`;
+const monthEndISO = (key) => `${key}-${String(daysInMonth(key)).padStart(2, "0")}`;
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
-
-const fmtDateShort = (d) =>
-  new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short" }).format(isoToDate(d));
-
-const shiftMonth = (key, delta) => {
-  const [y, m] = key.split("-").map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-};
-
-const parseAmount = (s) => parseFloat(String(s).replace(",", "."));
-
+const intl = (opts) => new Intl.DateTimeFormat("it-IT", opts);
+const monthLabel = (key) => intl({ month: "long", year: "numeric" }).format(keyToDate(key));
+const monthName = (key) => intl({ month: "long" }).format(keyToDate(key));
+const shortMonth = (key) => intl({ month: "short" }).format(keyToDate(key)).replace(".", "");
+const fmtDateShort = (iso) => intl({ day: "numeric", month: "short" }).format(isoToDate(iso));
+const fmtDayLong = (iso) => intl({ weekday: "long", day: "numeric", month: "long" }).format(isoToDate(iso));
+const fmtDayShortW = (iso) => intl({ weekday: "short", day: "numeric", month: "short" }).format(isoToDate(iso));
+const weekdayShort = (iso) => intl({ weekday: "short" }).format(isoToDate(iso)).replace(".", "");
+const parseAmount = (s) => parseFloat(String(s).replace(/\s/g, "").replace(",", "."));
 const uid = (p) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const daysUntil = (date, todayISO) => Math.round((date - isoToDate(todayISO)) / 86400000);
+const catMeta = (type, id) => {
+  const list = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  return list.find((c) => c.id === id) || list[list.length - 1];
+};
+const dueText = (days) =>
+  days < 0 ? `Scaduto da ${-days} ${days === -1 ? "giorno" : "giorni"}` : days === 0 ? "Oggi" : days === 1 ? "Domani" : `Tra ${days} giorni`;
 
 const freqHelpText = (frequency, refDate) => {
   if (!refDate) return "";
   const d = isoToDate(refDate);
-  if (frequency === "settimanale") return `Si ripete ogni ${new Intl.DateTimeFormat("it-IT", { weekday: "long" }).format(d)}`;
+  if (frequency === "settimanale") return `Si ripete ogni ${intl({ weekday: "long" }).format(d)}`;
   if (frequency === "mensile") return `Si ripete ogni mese il giorno ${d.getDate()}`;
-  return "Si ripete ogni anno in questa data";
+  return `Si ripete ogni anno il ${intl({ day: "numeric", month: "long" }).format(d)}`;
 };
 
 const monthlyEquivalent = (item) => {
@@ -196,37 +255,33 @@ const monthlyEquivalent = (item) => {
   return (item.amount * 52) / 12;
 };
 
+/* ---------- Ricorrenze ---------- */
 function nextRenewal(item, from) {
   const ref = isoToDate(item.refDate);
   const start = new Date(from);
   start.setHours(0, 0, 0, 0);
   if (item.frequency === "settimanale") {
-    const diff = (ref.getDay() - start.getDay() + 7) % 7;
     const cand = new Date(start);
-    cand.setDate(cand.getDate() + diff);
+    cand.setDate(cand.getDate() + ((ref.getDay() - start.getDay() + 7) % 7));
     return cand;
   }
   const day = ref.getDate();
   if (item.frequency === "mensile") {
     let y = start.getFullYear(), m = start.getMonth();
-    let last = new Date(y, m + 1, 0).getDate();
-    let cand = new Date(y, m, Math.min(day, last));
+    let cand = new Date(y, m, Math.min(day, new Date(y, m + 1, 0).getDate()));
     if (cand < start) {
       m += 1;
       if (m > 11) { m = 0; y += 1; }
-      last = new Date(y, m + 1, 0).getDate();
-      cand = new Date(y, m, Math.min(day, last));
+      cand = new Date(y, m, Math.min(day, new Date(y, m + 1, 0).getDate()));
     }
     return cand;
   }
   const month = ref.getMonth();
   let y = start.getFullYear();
-  let last = new Date(y, month + 1, 0).getDate();
-  let cand = new Date(y, month, Math.min(day, last));
+  let cand = new Date(y, month, Math.min(day, new Date(y, month + 1, 0).getDate()));
   if (cand < start) {
     y += 1;
-    last = new Date(y, month + 1, 0).getDate();
-    cand = new Date(y, month, Math.min(day, last));
+    cand = new Date(y, month, Math.min(day, new Date(y, month + 1, 0).getDate()));
   }
   return cand;
 }
@@ -235,6 +290,16 @@ function occurrenceAfter(item, date) {
   const next = new Date(date);
   next.setDate(next.getDate() + 1);
   return nextRenewal(item, next);
+}
+
+function occurrencesInRange(item, fromISO, toISO) {
+  const out = [];
+  if (fromISO > toISO) return out;
+  const end = isoToDate(toISO);
+  let d = nextRenewal(item, isoToDate(fromISO));
+  let guard = 0;
+  while (d <= end && guard < 400) { out.push(localISODate(d)); d = occurrenceAfter(item, d); guard++; }
+  return out;
 }
 
 function nextDue(item, todayISO) {
@@ -246,13 +311,17 @@ function nextDue(item, todayISO) {
   return nextRenewal(item, isoToDate(startISO));
 }
 
-function daysUntil(date, todayISO) {
-  return Math.round((date - isoToDate(todayISO)) / 86400000);
-}
-
+/* ---------- Saldi ---------- */
 function applyBalance(accounts, accountId, delta) {
   if (!accountId) return accounts;
-  return accounts.map((a) => (a.id === accountId ? { ...a, balance: Math.round((a.balance + delta) * 100) / 100 } : a));
+  return accounts.map((a) => (a.id === accountId ? { ...a, balance: round2(a.balance + delta) } : a));
+}
+function txEffects(t) {
+  if (t.type === "transfer") return [[t.accountId, -t.amount], [t.toAccountId, t.amount]];
+  return [[t.accountId, t.type === "income" ? t.amount : -t.amount]];
+}
+function applyEffects(accounts, effects, sign) {
+  return effects.reduce((acc, [id, delta]) => applyBalance(acc, id, sign * delta), accounts);
 }
 
 function applyCatchUp(data, todayISO) {
@@ -269,13 +338,9 @@ function applyCatchUp(data, todayISO) {
     while (occ <= end && guard < 520) {
       const isIncome = item.kind === "income";
       transactions = [...transactions, {
-        id: uid("t"),
-        type: item.kind,
-        amount: item.amount,
+        id: uid("t"), type: item.kind, amount: item.amount,
         category: isIncome ? item.category : "abbonamenti",
-        description: item.name,
-        date: localISODate(occ),
-        accountId: item.accountId || null,
+        description: item.name, date: localISODate(occ), accountId: item.accountId || null,
       }];
       accounts = applyBalance(accounts, item.accountId, isIncome ? item.amount : -item.amount);
       count++;
@@ -285,124 +350,119 @@ function applyCatchUp(data, todayISO) {
     }
     return processed ? { ...item, processedThrough: todayISO } : item;
   });
-  return { data: { transactions, recurring, accounts }, count };
+  return { data: { ...data, transactions, recurring, accounts }, count };
+}
+
+const EMPTY_DATA = { transactions: [], recurring: [], accounts: [], budgets: {} };
+
+function normalize(p) {
+  return {
+    transactions: Array.isArray(p.transactions) ? p.transactions : [],
+    recurring: Array.isArray(p.recurring) ? p.recurring : [],
+    accounts: Array.isArray(p.accounts) ? p.accounts : [],
+    budgets: p.budgets && typeof p.budgets === "object" && !Array.isArray(p.budgets) ? p.budgets : {},
+  };
 }
 
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const p = JSON.parse(raw);
-      return {
-        transactions: Array.isArray(p.transactions) ? p.transactions : [],
-        recurring: Array.isArray(p.recurring) ? p.recurring : [],
-        accounts: Array.isArray(p.accounts) ? p.accounts : [],
-      };
-    }
+    if (raw) return normalize(JSON.parse(raw));
   } catch (e) {}
-  return { transactions: [], recurring: [], accounts: [] };
+  return { ...EMPTY_DATA };
 }
 
-const autoMsg = (n) => (n === 1 ? "1 movimento ricorrente registrato automaticamente" : `${n} movimenti ricorrenti registrati automaticamente`);
+/* ---------- Tema per i grafici ---------- */
+function readTheme() {
+  const s = getComputedStyle(document.documentElement);
+  const g = (n) => s.getPropertyValue(n).trim();
+  return { ink: g("--ink"), muted: g("--muted"), line: g("--line"), green: g("--green"), red: g("--red"), ochre: g("--ochre"), blue: g("--blue"), surface: g("--surface") };
+}
+function useTheme() {
+  const [t, setT] = useState(readTheme);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const h = () => setT(readTheme());
+    if (mq.addEventListener) mq.addEventListener("change", h); else mq.addListener(h);
+    return () => { if (mq.removeEventListener) mq.removeEventListener("change", h); else mq.removeListener(h); };
+  }, []);
+  return t;
+}
 
-const inputCls = "w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:border-violet-500";
-
-function Toggle({ checked, onChange }) {
+/* ---------- Componenti base ---------- */
+function Toggle({ checked, onChange, label }) {
   return (
     <button
-      onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${checked ? "bg-emerald-500" : "bg-slate-700"}`}
-      aria-label="Attiva o disattiva"
+      role="switch" aria-checked={checked} aria-label={label}
+      onClick={(e) => { e.stopPropagation(); onChange(!checked); }}
+      style={{ position: "relative", width: 44, height: 26, borderRadius: 999, flexShrink: 0, background: checked ? "var(--green)" : "var(--line)", transition: "background .15s" }}
     >
-      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${checked ? "translate-x-5" : ""}`} />
+      <span style={{ position: "absolute", top: 3, left: 3, width: 20, height: 20, borderRadius: 999, background: "#fff", transform: checked ? "translateX(18px)" : "none", transition: "transform .15s" }} />
     </button>
   );
 }
 
-function SummaryCard({ label, value, sub, icon: Icon, tone }) {
-  const tones = {
-    emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-    rose: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-    violet: "text-violet-400 bg-violet-500/10 border-violet-500/20",
-    cyan: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-    amber: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  };
+function Delta({ cur, prev, upIsGood }) {
+  if (!prev && !cur) return null;
+  if (!prev) return <span className="text-xs muted">nessun confronto</span>;
+  const p = ((cur - prev) / Math.abs(prev)) * 100;
+  if (Math.abs(p) < 1) return <span className="text-xs muted">stabile</span>;
+  const up = p > 0;
+  const good = upIsGood ? up : !up;
+  return <span className={`text-xs font-medium num ${good ? "c-green" : "c-red"}`}>{up ? "▲" : "▼"} {Math.abs(p).toFixed(0)}%</span>;
+}
+
+function DiffAmount({ cur, prev, upIsGood }) {
+  const diff = cur - prev;
+  if (Math.abs(diff) < 0.5) return <span className="text-xs muted">stabile</span>;
+  const good = upIsGood ? diff > 0 : diff < 0;
+  return <span className={`text-xs font-medium num ${good ? "c-green" : "c-red"}`}>{diff > 0 ? "▲" : "▼"} {fmtEUR(Math.abs(diff))}</span>;
+}
+
+function Section({ title, action, children, className = "" }) {
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-slate-400">{label}</span>
-        <div className={`p-1.5 rounded-lg border ${tones[tone]}`}>
-          <Icon size={14} />
-        </div>
+    <section className={`mt-8 ${className}`}>
+      <div className="flex items-baseline justify-between gap-3 mb-3">
+        <h2 className="text-[17px] font-semibold">{title}</h2>
+        {action}
       </div>
-      <div className="text-xl font-semibold text-slate-50">{value}</div>
-      {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
+      {children}
+    </section>
+  );
+}
+
+function Rows({ children }) {
+  const items = React.Children.toArray(children).filter(Boolean);
+  return (
+    <div className="panel px-4">
+      {items.map((c, i) => <div key={i} style={i ? { borderTop: "1px solid var(--line)" } : null}>{c}</div>)}
     </div>
   );
 }
 
-function RenewalBadge({ days }) {
-  let text, cls;
-  if (days < 0) { text = `Scaduto da ${-days} g`; cls = "bg-rose-500/15 text-rose-400 border-rose-500/30"; }
-  else if (days === 0) { text = "Oggi"; cls = "bg-rose-500/15 text-rose-400 border-rose-500/30"; }
-  else if (days === 1) { text = "Domani"; cls = "bg-amber-500/15 text-amber-400 border-amber-500/30"; }
-  else if (days <= 7) { text = `Tra ${days} giorni`; cls = "bg-amber-500/15 text-amber-400 border-amber-500/30"; }
-  else { text = `Tra ${days} giorni`; cls = "bg-slate-500/15 text-slate-400 border-slate-500/30"; }
-  return <span className={`text-xs px-2 py-1 rounded-full border whitespace-nowrap ${cls}`}>{text}</span>;
-}
-
-function EmptyChart({ text }) {
+function MonthNav({ monthKey, onChange, max }) {
+  const canNext = !max || monthKey < max;
   return (
-    <div style={{ height: 180 }} className="flex flex-col items-center justify-center text-center gap-2">
-      <AlertCircle size={22} className="text-slate-700" />
-      <p className="text-xs text-slate-600">{text}</p>
-    </div>
-  );
-}
-
-function EmptyState({ text, cta, onClick }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-      <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-full">
-        <Wallet size={20} className="text-slate-600" />
-      </div>
-      <p className="text-sm text-slate-500">{text}</p>
-      {cta && (
-        <button onClick={onClick} className="text-sm px-4 py-2 bg-violet-500/15 border border-violet-500/30 text-violet-400 rounded-full">
-          {cta}
-        </button>
-      )}
-    </div>
-  );
-}
-
-function MonthNav({ label, onPrev, onNext, canNext }) {
-  return (
-    <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-      <button onClick={onPrev} className="p-1.5 text-slate-400" aria-label="Mese precedente">
-        <ChevronLeft size={18} />
-      </button>
-      <span className="text-sm font-medium text-slate-200">{label}</span>
-      <button onClick={onNext} disabled={!canNext} className={`p-1.5 ${canNext ? "text-slate-400" : "text-slate-700"}`} aria-label="Mese successivo">
-        <ChevronRight size={18} />
-      </button>
+    <div className="flex items-center justify-between">
+      <button onClick={() => onChange(shiftMonth(monthKey, -1))} className="p-2 -ml-2 muted" aria-label="Mese precedente"><ChevronLeft size={20} /></button>
+      <span className="text-[15px] font-semibold">{cap(monthLabel(monthKey))}</span>
+      <button onClick={() => canNext && onChange(shiftMonth(monthKey, 1))} disabled={!canNext} className="p-2 -mr-2" style={{ color: canNext ? "var(--muted)" : "var(--line)" }} aria-label="Mese successivo"><ChevronRight size={20} /></button>
     </div>
   );
 }
 
 function Sheet({ title, onClose, children }) {
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-40" onClick={onClose}>
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center fade" style={{ background: "rgba(10,18,18,.45)" }} onClick={onClose}>
       <div
-        className="bg-slate-900 border border-slate-800 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm px-5 pt-5 overflow-y-auto"
-        style={{ maxHeight: "90vh", paddingBottom: "calc(env(safe-area-inset-bottom) + 20px)" }}
+        className="sheet w-full sm:max-w-md px-5 pt-3 overflow-y-auto sm:rounded-3xl"
+        style={{ background: "var(--surface)", borderRadius: "22px 22px 0 0", maxHeight: "92vh", paddingBottom: "calc(env(safe-area-inset-bottom) + 20px)" }}
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="mx-auto mb-3 rounded-full" style={{ width: 36, height: 4, background: "var(--line)" }} />
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-100">{title}</h3>
-          <button onClick={onClose} className="text-slate-500" aria-label="Chiudi">
-            <X size={20} />
-          </button>
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <button onClick={onClose} className="p-1 muted" aria-label="Chiudi"><X size={20} /></button>
         </div>
         {children}
       </div>
@@ -410,160 +470,280 @@ function Sheet({ title, onClose, children }) {
   );
 }
 
-function TxRow({ tx, accounts, pending, onDelete, onConfirm }) {
-  const cats = tx.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-  const meta = cats.find((c) => c.id === tx.category) || cats[cats.length - 1];
-  const Icon = meta.Icon;
-  const accountName = accounts.find((a) => a.id === tx.accountId)?.name;
+function DeleteButton({ label = "Elimina", onConfirm }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return;
+    const t = setTimeout(() => setArmed(false), 3000);
+    return () => clearTimeout(t);
+  }, [armed]);
   return (
-    <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-xl p-3 gap-2">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="p-2 rounded-lg border shrink-0" style={{ background: `${meta.color}1A`, borderColor: `${meta.color}33` }}>
-          <Icon size={15} style={{ color: meta.color }} />
+    <button onClick={() => (armed ? onConfirm() : setArmed(true))} className={`btn mt-2 ${armed ? "btn-danger-on" : "btn-danger"}`}>
+      {armed ? "Tocca di nuovo per confermare" : label}
+    </button>
+  );
+}
+
+function ChartTip({ active, payload, label, labelPrefix = "" }) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div className="panel px-3 py-2 text-xs" style={{ boxShadow: "0 6px 18px rgba(0,0,0,.14)" }}>
+      {label != null && <div className="font-semibold mb-1">{labelPrefix}{label}</div>}
+      {payload.filter((p) => p.value != null).map((p) => (
+        <div key={p.dataKey} className="flex justify-between gap-4 num">
+          <span style={{ color: p.color || p.stroke }}>{p.name}</span>
+          <span>{fmtEUR(p.value)}</span>
         </div>
-        <div className="min-w-0">
-          <div className="text-sm text-slate-200 truncate">{tx.description || meta.label}</div>
-          <div className="text-xs text-slate-500 truncate">
-            {tx.description ? `${meta.label} · ${fmtDateShort(tx.date)}` : fmtDateShort(tx.date)}
-            {accountName ? ` · ${accountName}` : ""}
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <span className={`text-sm font-medium ${tx.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
-          {tx.type === "income" ? "+" : "-"}{fmtEUR(tx.amount)}
-        </span>
-        <button
-          onClick={() => (pending ? onConfirm() : onDelete())}
-          className={`p-1.5 rounded-lg ${pending ? "bg-rose-500 text-white" : "text-slate-600"}`}
-          aria-label="Elimina transazione"
-        >
-          {pending ? <Check size={14} /> : <Trash2 size={14} />}
-        </button>
-      </div>
+      ))}
     </div>
   );
 }
 
-function RecurringCard({ item, accounts, pending, onDelete, onConfirm, onToggleActive, onToggleAuto, onMarkPaid, onEdit }) {
-  const cats = item.kind === "expense" ? SUB_CATEGORIES : INCOME_CATEGORIES;
-  const catLabel = cats.find((c) => c.id === item.category)?.label || "Altro";
-  const accountName = accounts.find((a) => a.id === item.accountId)?.name;
-  const isIncome = item.kind === "income";
+/* ---------- Elemento distintivo: il biglietto ---------- */
+function Guilloche() {
+  const paths = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 16; i++) {
+      let d = "";
+      for (let x = 0; x <= 400; x += 5) {
+        const y = 24 + i * 11 + 6 * Math.sin(x / 23 + i * 0.6) + 3.5 * Math.sin(x / 9.5 - i * 0.35);
+        d += (x === 0 ? "M" : "L") + x + " " + y.toFixed(1);
+      }
+      out.push(d);
+    }
+    for (let k = 0; k < 7; k++) {
+      let d = "";
+      for (let t = 0; t <= 360; t += 2) {
+        const th = (t * Math.PI) / 180;
+        const r = 46 + 10 * Math.sin(14 * th + k * 0.45) + k * 1.2;
+        d += (t === 0 ? "M" : "L") + (330 + r * Math.cos(th)).toFixed(1) + " " + (64 + r * Math.sin(th)).toFixed(1);
+      }
+      out.push(d + "Z");
+    }
+    return out;
+  }, []);
   return (
-    <div className={`bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 ${!item.active ? "opacity-50" : ""}`}>
-      <div className="flex items-start justify-between mb-2.5">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className={`p-2 rounded-lg border shrink-0 ${isIncome ? "bg-emerald-500/10 border-emerald-500/20" : "bg-violet-500/10 border-violet-500/20"}`}>
-            {isIncome ? <TrendingUp size={15} className="text-emerald-400" /> : <RefreshCw size={15} className="text-violet-400" />}
-          </div>
+    <svg viewBox="0 0 400 210" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full" aria-hidden="true">
+      {paths.map((d, i) => <path key={i} d={d} fill="none" strokeWidth="0.7" style={{ stroke: "var(--note-line)", opacity: 0.55 }} />)}
+    </svg>
+  );
+}
+
+/* ---------- Righe ---------- */
+function TxRow({ tx, accounts, onClick }) {
+  const isT = tx.type === "transfer";
+  const meta = isT ? { label: "Giroconto", color: "#2C5C8A", Icon: ArrowLeftRight } : catMeta(tx.type, tx.category);
+  const accName = (id) => accounts.find((a) => a.id === id)?.name;
+  let sub;
+  if (isT) sub = `Da ${accName(tx.accountId) || "conto eliminato"} a ${accName(tx.toAccountId) || "conto eliminato"}`;
+  else {
+    const a = accName(tx.accountId);
+    sub = a ? `${meta.label}, ${tx.type === "income" ? "su" : "da"} ${a}` : meta.label;
+  }
+  const Icon = meta.Icon;
+  return (
+    <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
+      <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: `${meta.color}22`, color: meta.color }}>
+        <Icon size={16} />
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="block text-[15px] truncate">{tx.description || meta.label}</span>
+        <span className="block text-xs muted truncate">{sub}</span>
+      </span>
+      <span className={`num text-[15px] font-medium shrink-0 ${isT ? "c-blue" : tx.type === "income" ? "c-green" : ""}`}>
+        {isT ? "" : tx.type === "income" ? "+" : "−"}{fmtEUR(tx.amount)}
+      </span>
+    </button>
+  );
+}
+
+function ScheduledRow({ s, todayISO, onClick }) {
+  const { item, date } = s;
+  const isInc = item.kind === "income";
+  const days = daysUntil(isoToDate(date), todayISO);
+  return (
+    <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
+      <span className="w-10 text-center shrink-0">
+        <span className="block text-[11px] muted">{weekdayShort(date)}</span>
+        <span className="block text-lg font-semibold leading-none num">{isoToDate(date).getDate()}</span>
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="block text-[15px] truncate">{item.name}</span>
+        <span className={`block text-xs ${days < 0 ? "c-red" : "muted"}`}>{dueText(days)}{item.auto ? ", automatico" : ""}</span>
+      </span>
+      <span className={`num text-[15px] font-medium shrink-0 ${isInc ? "c-green" : ""}`}>{isInc ? "+" : "−"}{fmtEUR(item.amount)}</span>
+    </button>
+  );
+}
+
+function RecurringItem({ item, accounts, onEdit, onToggleActive, onToggleAuto, onMarkPaid }) {
+  const isInc = item.kind === "income";
+  const acc = accounts.find((a) => a.id === item.accountId)?.name;
+  const cat = (isInc ? INCOME_CATEGORIES : SUB_CATEGORIES).find((c) => c.id === item.category)?.label || "Altro";
+  const days = item.daysLeft;
+  let when = "In pausa";
+  if (item.active) when = days < 0 ? `Scaduto il ${fmtDateShort(item.nextISO)}` : days === 0 ? "Oggi" : days === 1 ? "Domani" : cap(fmtDayShortW(item.nextISO));
+  const whenCls = !item.active ? "muted" : days < 0 ? "c-red" : days <= 3 ? "c-ochre" : "muted";
+  return (
+    <div className="panel p-4" style={{ opacity: item.active ? 1 : 0.55 }}>
+      <button onClick={onEdit} className="w-full text-left">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-medium text-slate-200 truncate">{item.name}</div>
-            <div className="text-xs text-slate-500 truncate">{catLabel}{accountName ? ` · ${accountName}` : ""}</div>
+            <div className="text-[15px] font-semibold truncate">{item.name}</div>
+            <div className="text-xs muted mt-0.5 truncate">{FREQ_LABEL[item.frequency]}, {cat.toLowerCase()}{acc ? `, ${isInc ? "su" : "da"} ${acc}` : ""}</div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className={`num text-[15px] font-semibold ${isInc ? "c-green" : ""}`}>{isInc ? "+" : "−"}{fmtEUR(item.amount)}</div>
+            <div className={`text-xs mt-0.5 ${whenCls}`}>{when}</div>
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <button onClick={onEdit} className="p-1.5 rounded-lg text-slate-500" aria-label="Modifica">
-            <Pencil size={14} />
-          </button>
-          <button
-            onClick={() => (pending ? onConfirm() : onDelete())}
-            className={`p-1.5 rounded-lg ${pending ? "bg-rose-500 text-white" : "text-slate-600"}`}
-            aria-label="Elimina"
-          >
-            {pending ? <Check size={14} /> : <Trash2 size={14} />}
-          </button>
-        </div>
-      </div>
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-sm font-semibold ${isIncome ? "text-emerald-400" : "text-slate-100"}`}>
-            {isIncome ? "+" : ""}{fmtEUR(item.amount)}
-          </span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">{FREQ_LABEL[item.frequency]}</span>
-          {item.auto && <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">Auto</span>}
-        </div>
-        {item.active ? <RenewalBadge days={item.daysLeft} /> : <span className="text-xs text-slate-600">In pausa</span>}
-      </div>
-      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-slate-800 gap-2">
-        <span className="text-xs text-slate-500 truncate">
-          {item.active ? `Prossimo: ${fmtDateShort(item.nextISO)}` : "Non attivo"}
-        </span>
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-slate-500">Auto</span>
-            <Toggle checked={!!item.auto} onChange={onToggleAuto} />
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-slate-500">Attivo</span>
-            <Toggle checked={item.active} onChange={onToggleActive} />
-          </div>
-        </div>
+      </button>
+      <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--line)" }}>
+        <div className="flex items-center gap-2 text-sm muted"><Toggle checked={!!item.auto} onChange={onToggleAuto} label="Automatico" />Automatico</div>
+        <div className="flex items-center gap-2 text-sm muted">Attivo<Toggle checked={item.active} onChange={onToggleActive} label="Attivo" /></div>
       </div>
       {item.active && !item.auto && (
-        <button
-          onClick={onMarkPaid}
-          className="w-full mt-2.5 py-2 rounded-xl text-xs font-medium bg-emerald-500/10 border border-emerald-500/25 text-emerald-400"
-        >
-          Segna come {isIncome ? "ricevuta" : "pagato"}
+        <button onClick={onMarkPaid} className="btn btn-ghost mt-3" style={{ padding: "10px", fontSize: 14 }}>
+          {isInc ? "Segna come ricevuta" : "Segna come pagato"}
         </button>
       )}
     </div>
   );
 }
 
-function TxFormModal({ accounts, todayISO, onClose, onSave }) {
-  const [type, setType] = useState("expense");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState(EXPENSE_CATEGORIES[0].id);
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(todayISO);
-  const [accountId, setAccountId] = useState("");
+function BudgetRow({ r, onClick }) {
+  const has = r.limit > 0;
+  const ratio = has ? r.spent / r.limit : 0;
+  const color = ratio >= 1 ? "var(--red)" : ratio >= 0.8 ? "var(--ochre)" : "var(--green)";
+  return (
+    <button onClick={onClick} className="w-full text-left py-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-2 min-w-0">
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: r.color }} />
+          <span className="text-[15px] truncate">{r.label}</span>
+        </span>
+        <span className="num text-sm shrink-0">
+          {has ? <>{fmtEUR(r.spent)} <span className="muted">di {fmtEUR(r.limit)}</span></> : <span className="muted">{r.spent > 0 ? `${fmtEUR(r.spent)}, senza limite` : "Imposta un limite"}</span>}
+        </span>
+      </div>
+      {has && (
+        <>
+          <div className="mt-2 rounded-full overflow-hidden" style={{ height: 6, background: "var(--surface2)" }}>
+            <div style={{ width: `${Math.min(100, ratio * 100)}%`, height: "100%", background: color, borderRadius: 999 }} />
+          </div>
+          <div className="text-xs mt-1" style={{ color: ratio >= 1 ? "var(--red)" : "var(--muted)" }}>
+            {ratio >= 1 ? `Superato di ${fmtEUR(r.spent - r.limit)}` : `Restano ${fmtEUR(r.limit - r.spent)}`}
+          </div>
+        </>
+      )}
+    </button>
+  );
+}
 
-  const cats = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
-  useEffect(() => { setCategory(cats[0].id); }, [type]);
+/* ---------- Moduli ---------- */
+function TxFormModal({ tx, initialType, accounts, todayISO, onClose, onSave, onDelete }) {
+  const [type, setType] = useState(tx?.type || initialType || "expense");
+  const [amount, setAmount] = useState(tx ? String(tx.amount).replace(".", ",") : "");
+  const [category, setCategory] = useState(tx?.category || (type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)[0].id);
+  const [description, setDescription] = useState(tx?.description || "");
+  const [date, setDate] = useState(tx?.date || todayISO);
+  const [accountId, setAccountId] = useState(tx ? tx.accountId || "" : accounts.length === 1 ? accounts[0].id : "");
+  const skip = useRef(true);
+  const cats = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  useEffect(() => { if (skip.current) { skip.current = false; return; } setCategory(cats[0].id); }, [type]);
 
   const parsed = parseAmount(amount);
-  const valid = parsed > 0 && category && date;
-
+  const valid = parsed > 0 && date;
   const submit = () => {
     if (!valid) return;
-    onSave({ id: uid("t"), type, amount: parsed, category, description: description.trim(), date, accountId: accountId || null });
+    onSave({ ...(tx || {}), id: tx?.id || uid("t"), type, amount: round2(parsed), category, description: description.trim(), date, accountId: accountId || null }, tx);
   };
 
   return (
-    <Sheet title="Nuova transazione" onClose={onClose}>
-      <div className="flex gap-2 mb-4">
-        <button onClick={() => setType("expense")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${type === "expense" ? "bg-rose-500/15 border-rose-500/40 text-rose-400" : "border-slate-800 text-slate-500"}`}>Uscita</button>
-        <button onClick={() => setType("income")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${type === "income" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "border-slate-800 text-slate-500"}`}>Entrata</button>
+    <Sheet title={tx ? "Modifica movimento" : type === "income" ? "Nuova entrata" : "Nuova uscita"} onClose={onClose}>
+      <div className="seg mb-4">
+        <button className={type === "expense" ? "on" : ""} onClick={() => setType("expense")}>Uscita</button>
+        <button className={type === "income" ? "on" : ""} onClick={() => setType("income")}>Entrata</button>
       </div>
-
-      <label className="block text-xs text-slate-500 mb-1.5">Importo</label>
-      <input type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" className={`${inputCls} mb-3.5`} />
-
-      <label className="block text-xs text-slate-500 mb-1.5">Categoria</label>
-      <div className="grid grid-cols-2 gap-2 mb-3.5">
+      <label className="lbl">Importo in euro</label>
+      <input className="inp num mb-4" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
+      <label className="lbl">Categoria</label>
+      <div className="grid grid-cols-2 gap-2 mb-4">
         {cats.map((c) => (
-          <button key={c.id} onClick={() => setCategory(c.id)} className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm ${category === c.id ? "border-violet-500 bg-violet-500/10 text-slate-100" : "border-slate-800 text-slate-500"}`}>
-            <c.Icon size={14} />
+          <button key={c.id} onClick={() => setCategory(c.id)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left"
+            style={{ border: `1px solid ${category === c.id ? "var(--ink)" : "var(--line)"}`, background: category === c.id ? "var(--surface2)" : "transparent" }}>
+            <span style={{ color: c.color }}><c.Icon size={15} /></span>
             <span className="truncate">{c.label}</span>
           </button>
         ))}
       </div>
+      <label className="lbl">Descrizione</label>
+      <input className="inp mb-4" type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={type === "income" ? "Es. Ripetizioni" : "Es. Spesa settimanale"} />
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div>
+          <label className="lbl">Data</label>
+          <input className="inp" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
+        </div>
+        <div>
+          <label className="lbl">Conto</label>
+          <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+            <option value="">Nessuno</option>
+            {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </div>
+      </div>
+      <button onClick={submit} disabled={!valid} className="btn btn-ink">{tx ? "Salva modifiche" : "Registra"}</button>
+      {tx && <DeleteButton onConfirm={() => onDelete(tx)} />}
+    </Sheet>
+  );
+}
 
-      <label className="block text-xs text-slate-500 mb-1.5">Descrizione (opzionale)</label>
-      <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Es. Spesa settimanale" className={`${inputCls} mb-3.5`} />
+function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAddAccount }) {
+  const [from, setFrom] = useState(tx?.accountId || accounts[0]?.id || "");
+  const [to, setTo] = useState(tx?.toAccountId || accounts[1]?.id || "");
+  const [amount, setAmount] = useState(tx ? String(tx.amount).replace(".", ",") : "");
+  const [date, setDate] = useState(tx?.date || todayISO);
+  const [description, setDescription] = useState(tx?.description || "");
+  const parsed = parseAmount(amount);
+  const valid = from && to && from !== to && parsed > 0 && date;
 
-      <label className="block text-xs text-slate-500 mb-1.5">Data</label>
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} className={`${inputCls} mb-3.5`} />
+  if (accounts.length < 2 && !tx) {
+    return (
+      <Sheet title="Giroconto" onClose={onClose}>
+        <p className="text-[15px] muted mb-5">Per spostare denaro tra conti ne servono almeno due.</p>
+        <button onClick={onAddAccount} className="btn btn-ink">Aggiungi un conto</button>
+      </Sheet>
+    );
+  }
 
-      <label className="block text-xs text-slate-500 mb-1.5">Conto (opzionale)</label>
-      <select value={accountId} onChange={(e) => setAccountId(e.target.value)} className={`${inputCls} mb-5`}>
-        <option value="">Nessun conto</option>
+  return (
+    <Sheet title={tx ? "Modifica giroconto" : "Giroconto"} onClose={onClose}>
+      <label className="lbl">Importo in euro</label>
+      <input className="inp num mb-4" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
+      <label className="lbl">Da</label>
+      <select className="inp mb-4" value={from} onChange={(e) => setFrom(e.target.value)}>
         {accounts.map((a) => <option key={a.id} value={a.id}>{a.name} ({fmtEUR(a.balance)})</option>)}
       </select>
-
-      <button onClick={submit} disabled={!valid} className={`w-full py-3 rounded-xl font-medium ${valid ? "bg-violet-500 text-white" : "bg-slate-800 text-slate-600"}`}>Aggiungi</button>
+      <label className="lbl">A</label>
+      <select className="inp mb-1" value={to} onChange={(e) => setTo(e.target.value)}>
+        {accounts.map((a) => <option key={a.id} value={a.id}>{a.name} ({fmtEUR(a.balance)})</option>)}
+      </select>
+      {from && from === to && <p className="text-xs c-red mb-3">Scegli due conti diversi.</p>}
+      <div className="grid grid-cols-2 gap-3 mt-3 mb-5">
+        <div>
+          <label className="lbl">Data</label>
+          <input className="inp" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
+        </div>
+        <div>
+          <label className="lbl">Nota</label>
+          <input className="inp" type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Facoltativa" />
+        </div>
+      </div>
+      <button disabled={!valid} className="btn btn-ink"
+        onClick={() => valid && onSave({ id: tx?.id || uid("t"), type: "transfer", amount: round2(parsed), accountId: from, toAccountId: to, date, description: description.trim(), category: null }, tx)}>
+        {tx ? "Salva modifiche" : "Sposta denaro"}
+      </button>
+      {tx && <DeleteButton onConfirm={() => onDelete(tx)} />}
     </Sheet>
   );
 }
@@ -574,89 +754,62 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
   const [amount, setAmount] = useState(item ? String(item.amount).replace(".", ",") : "");
   const [frequency, setFrequency] = useState(item?.frequency || "mensile");
   const [refDate, setRefDate] = useState(item?.refDate || todayISO);
-  const [category, setCategory] = useState(item?.category || (initialKind === "expense" ? SUB_CATEGORIES[0].id : INCOME_CATEGORIES[0].id));
-  const [accountId, setAccountId] = useState(item?.accountId || "");
-  const [auto, setAuto] = useState(item?.auto || false);
-  const [confirmDel, setConfirmDel] = useState(false);
-  const skipReset = useRef(true);
-
-  const cats = kind === "expense" ? SUB_CATEGORIES : INCOME_CATEGORIES;
-  useEffect(() => {
-    if (skipReset.current) { skipReset.current = false; return; }
-    setCategory(cats[0].id);
-  }, [kind]);
+  const [category, setCategory] = useState(item?.category || (initialKind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES)[0].id);
+  const [accountId, setAccountId] = useState(item ? item.accountId || "" : accounts.length === 1 ? accounts[0].id : "");
+  const [auto, setAuto] = useState(item ? !!item.auto : true);
+  const skip = useRef(true);
+  const cats = kind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES;
+  useEffect(() => { if (skip.current) { skip.current = false; return; } setCategory(cats[0].id); }, [kind]);
 
   const parsed = parseAmount(amount);
   const valid = name.trim() && parsed > 0 && refDate;
 
-  const submit = () => {
-    if (!valid) return;
-    onSave({
-      id: item?.id || uid("r"),
-      kind, name: name.trim(), amount: parsed, frequency, refDate, category,
-      accountId: accountId || null,
-      active: item ? item.active : true,
-      auto,
-    });
-  };
-
   return (
-    <Sheet title={item ? "Modifica" : kind === "expense" ? "Nuovo abbonamento" : "Nuova entrata fissa"} onClose={onClose}>
-      <div className="flex gap-2 mb-4">
-        <button onClick={() => setKind("expense")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${kind === "expense" ? "bg-violet-500/15 border-violet-500/40 text-violet-400" : "border-slate-800 text-slate-500"}`}>Abbonamento</button>
-        <button onClick={() => setKind("income")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${kind === "income" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "border-slate-800 text-slate-500"}`}>Entrata fissa</button>
+    <Sheet title={item ? "Modifica" : kind === "income" ? "Nuova entrata fissa" : "Nuovo abbonamento"} onClose={onClose}>
+      <div className="seg mb-4">
+        <button className={kind === "expense" ? "on" : ""} onClick={() => setKind("expense")}>Spesa fissa</button>
+        <button className={kind === "income" ? "on" : ""} onClick={() => setKind("income")}>Entrata fissa</button>
       </div>
-
-      <label className="block text-xs text-slate-500 mb-1.5">Nome</label>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "expense" ? "Es. Netflix" : "Es. Stipendio"} className={`${inputCls} mb-3.5`} />
-
-      <label className="block text-xs text-slate-500 mb-1.5">Importo</label>
-      <input type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" className={`${inputCls} mb-3.5`} />
-
-      <label className="block text-xs text-slate-500 mb-1.5">Frequenza</label>
-      <div className="flex gap-2 mb-3.5">
+      <label className="lbl">Nome</label>
+      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "income" ? "Es. Borsa di studio" : "Es. Spotify"} />
+      <label className="lbl">Importo in euro</label>
+      <input className="inp num mb-4" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" />
+      <label className="lbl">Ogni quanto</label>
+      <div className="seg mb-4">
         {["settimanale", "mensile", "annuale"].map((f) => (
-          <button key={f} onClick={() => setFrequency(f)} className={`flex-1 py-2 rounded-xl text-xs font-medium border ${frequency === f ? "bg-violet-500/15 border-violet-500/40 text-violet-400" : "border-slate-800 text-slate-500"}`}>
-            {FREQ_LABEL[f]}
-          </button>
+          <button key={f} className={frequency === f ? "on" : ""} onClick={() => setFrequency(f)}>{FREQ_LABEL[f]}</button>
         ))}
       </div>
-
-      <label className="block text-xs text-slate-500 mb-1.5">Data di riferimento</label>
-      <input type="date" value={refDate} onChange={(e) => setRefDate(e.target.value)} className={`${inputCls} mb-1.5`} />
-      <p className="text-xs text-slate-600 mb-3.5">{freqHelpText(frequency, refDate)}</p>
-
-      <label className="block text-xs text-slate-500 mb-1.5">Categoria</label>
-      <select value={category} onChange={(e) => setCategory(e.target.value)} className={`${inputCls} mb-3.5`}>
-        {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-      </select>
-
-      <label className="block text-xs text-slate-500 mb-1.5">Conto (opzionale)</label>
-      <select value={accountId} onChange={(e) => setAccountId(e.target.value)} className={`${inputCls} mb-3.5`}>
-        <option value="">Nessun conto</option>
-        {accounts.map((a) => <option key={a.id} value={a.id}>{a.name} ({fmtEUR(a.balance)})</option>)}
-      </select>
-
-      <div className="flex items-center justify-between bg-slate-800/40 rounded-xl p-3 mb-5">
-        <div className="min-w-0 pr-3">
-          <div className="text-sm text-slate-200">Automatico</div>
-          <div className="text-xs text-slate-500">Registrato da solo a ogni scadenza, anche se l'app resta chiusa per giorni</div>
+      <label className="lbl">Data di addebito o accredito</label>
+      <input className="inp mb-1.5" type="date" value={refDate} onChange={(e) => setRefDate(e.target.value)} />
+      <p className="text-xs muted mb-4">{freqHelpText(frequency, refDate)}</p>
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className="lbl">Categoria</label>
+          <select className="inp" value={category} onChange={(e) => setCategory(e.target.value)}>
+            {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
         </div>
-        <Toggle checked={auto} onChange={setAuto} />
+        <div>
+          <label className="lbl">Conto</label>
+          <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+            <option value="">Nessuno</option>
+            {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </div>
       </div>
-
-      <button onClick={submit} disabled={!valid} className={`w-full py-3 rounded-xl font-medium ${valid ? "bg-violet-500 text-white" : "bg-slate-800 text-slate-600"}`}>
+      <div className="flex items-center justify-between rounded-xl p-3 mb-5" style={{ background: "var(--surface2)" }}>
+        <div className="pr-3">
+          <div className="text-[15px] font-medium">Registra in automatico</div>
+          <div className="text-xs muted">Ogni scadenza viene registrata da sola, anche se apri l'app giorni dopo.</div>
+        </div>
+        <Toggle checked={auto} onChange={setAuto} label="Registra in automatico" />
+      </div>
+      <button disabled={!valid} className="btn btn-ink"
+        onClick={() => valid && onSave({ id: item?.id || uid("r"), kind, name: name.trim(), amount: round2(parsed), frequency, refDate, category, accountId: accountId || null, active: item ? item.active : true, auto })}>
         {item ? "Salva modifiche" : "Aggiungi"}
       </button>
-
-      {item && (
-        <button
-          onClick={() => (confirmDel ? onDelete(item.id) : setConfirmDel(true))}
-          className={`w-full py-2.5 rounded-xl font-medium mt-2 text-sm ${confirmDel ? "bg-rose-500/15 border border-rose-500/40 text-rose-400" : "text-slate-500"}`}
-        >
-          {confirmDel ? "Tocca di nuovo per confermare" : "Elimina"}
-        </button>
-      )}
+      {item && <DeleteButton onConfirm={() => onDelete(item.id)} />}
     </Sheet>
   );
 }
@@ -664,53 +817,72 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
 function AccountFormModal({ account, onClose, onSave, onDelete }) {
   const [name, setName] = useState(account?.name || "");
   const [balance, setBalance] = useState(account ? String(account.balance).replace(".", ",") : "");
-  const [confirmDel, setConfirmDel] = useState(false);
-
   const parsed = parseAmount(balance);
   const valid = name.trim() && balance !== "" && !isNaN(parsed);
-
-  const submit = () => {
-    if (!valid) return;
-    onSave({ id: account?.id || uid("a"), name: name.trim(), balance: parsed });
-  };
-
   return (
     <Sheet title={account ? "Modifica conto" : "Nuovo conto"} onClose={onClose}>
-      <label className="block text-xs text-slate-500 mb-1.5">Nome conto</label>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Conto principale" className={`${inputCls} mb-3.5`} />
-
-      <label className="block text-xs text-slate-500 mb-1.5">Saldo attuale</label>
-      <input type="text" inputMode="decimal" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="0,00" className={`${inputCls} mb-1.5`} />
-      <p className="text-xs text-slate-600 mb-5">Si aggiorna da solo con i movimenti collegati; correggilo qui quando serve.</p>
-
-      <button onClick={submit} disabled={!valid} className={`w-full py-3 rounded-xl font-medium ${valid ? "bg-violet-500 text-white" : "bg-slate-800 text-slate-600"}`}>
+      <label className="lbl">Nome</label>
+      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Conto corrente, Revolut, Contanti" />
+      <label className="lbl">Saldo attuale in euro</label>
+      <input className="inp num mb-1.5" type="text" inputMode="decimal" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="0,00" />
+      <p className="text-xs muted mb-5">Si aggiorna da solo con i movimenti collegati. Correggilo qui se non coincide con l'estratto conto.</p>
+      <button disabled={!valid} className="btn btn-ink" onClick={() => valid && onSave({ id: account?.id || uid("a"), name: name.trim(), balance: round2(parsed) })}>
         {account ? "Salva modifiche" : "Aggiungi conto"}
       </button>
-
-      {account && (
-        <button
-          onClick={() => (confirmDel ? onDelete(account.id) : setConfirmDel(true))}
-          className={`w-full py-2.5 rounded-xl font-medium mt-2 text-sm ${confirmDel ? "bg-rose-500/15 border border-rose-500/40 text-rose-400" : "text-slate-500"}`}
-        >
-          {confirmDel ? "Tocca di nuovo per confermare" : "Elimina conto"}
-        </button>
-      )}
+      {account && <DeleteButton label="Elimina conto" onConfirm={() => onDelete(account.id)} />}
     </Sheet>
   );
 }
 
-function BackupCard({ data, onImport }) {
+function BudgetModal({ cat, limit, spent, onClose, onSave, onRemove }) {
+  const [amount, setAmount] = useState(limit ? String(limit).replace(".", ",") : "");
+  const parsed = parseAmount(amount);
+  const valid = parsed > 0;
+  return (
+    <Sheet title={`Budget: ${cat.label}`} onClose={onClose}>
+      <p className="text-sm muted mb-4">Speso questo mese: <span className="num" style={{ color: "var(--ink)" }}>{fmtEUR(spent)}</span></p>
+      <label className="lbl">Limite mensile in euro</label>
+      <input className="inp num mb-5" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" />
+      <button disabled={!valid} className="btn btn-ink" onClick={() => valid && onSave(round2(parsed))}>Salva limite</button>
+      {limit > 0 && <button onClick={onRemove} className="btn btn-danger mt-2">Rimuovi limite</button>}
+    </Sheet>
+  );
+}
+
+function AddSheet({ onClose, onPick }) {
+  const opts = [
+    { id: "expense", label: "Uscita", text: "Una spesa appena fatta", Icon: ShoppingCart, color: "var(--red)" },
+    { id: "income", label: "Entrata", text: "Denaro ricevuto", Icon: TrendingUp, color: "var(--green)" },
+    { id: "transfer", label: "Giroconto", text: "Sposta denaro tra due conti", Icon: ArrowLeftRight, color: "var(--blue)" },
+    { id: "rec-expense", label: "Spesa fissa", text: "Abbonamento, affitto, rata", Icon: RefreshCw, color: "var(--ochre)" },
+    { id: "rec-income", label: "Entrata fissa", text: "Stipendio, borsa di studio", Icon: CalendarIcon, color: "var(--ochre)" },
+    { id: "account", label: "Conto", text: "Banca, carta prepagata, contanti", Icon: Landmark, color: "var(--muted)" },
+  ];
+  return (
+    <Sheet title="Aggiungi" onClose={onClose}>
+      <Rows>
+        {opts.map((o) => (
+          <button key={o.id} onClick={() => onPick(o.id)} className="w-full flex items-center gap-3 py-3 text-left">
+            <span style={{ color: o.color }}><o.Icon size={20} /></span>
+            <span className="flex-1">
+              <span className="block text-[15px] font-medium">{o.label}</span>
+              <span className="block text-xs muted">{o.text}</span>
+            </span>
+            <ChevronRight size={18} className="muted" />
+          </button>
+        ))}
+      </Rows>
+    </Sheet>
+  );
+}
+
+function BackupSection({ data, onImport }) {
   const fileRef = useRef(null);
   const [last, setLast] = useState(() => { try { return localStorage.getItem(BACKUP_KEY); } catch (e) { return null; } });
-
-  const markDone = () => {
-    const now = new Date().toISOString();
-    try { localStorage.setItem(BACKUP_KEY, now); } catch (e) {}
-    setLast(now);
-  };
+  const markDone = () => { const now = new Date().toISOString(); try { localStorage.setItem(BACKUP_KEY, now); } catch (e) {} setLast(now); };
 
   const doExport = async () => {
-    const json = JSON.stringify({ app: "flussi-economici", version: 1, exportedAt: new Date().toISOString(), ...data }, null, 2);
+    const json = JSON.stringify({ app: "flussi-economici", version: 2, exportedAt: new Date().toISOString(), ...data }, null, 2);
     const name = `flussi-backup-${localISODate()}.json`;
     try {
       const file = new File([json], name, { type: "application/json" });
@@ -719,11 +891,8 @@ function BackupCard({ data, onImport }) {
         markDone();
         return;
       }
-    } catch (e) {
-      if (e && e.name === "AbortError") return;
-    }
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
@@ -738,577 +907,817 @@ function BackupCard({ data, onImport }) {
     try {
       const p = JSON.parse(await f.text());
       if (!Array.isArray(p.transactions) || !Array.isArray(p.recurring) || !Array.isArray(p.accounts)) throw new Error();
-      if (window.confirm("Sostituire tutti i dati attuali con quelli del backup?")) {
-        onImport({ transactions: p.transactions, recurring: p.recurring, accounts: p.accounts });
-      }
-    } catch (err) {
-      window.alert("File di backup non valido.");
-    }
+      if (window.confirm("Sostituire tutti i dati attuali con quelli del backup?")) onImport(normalize(p));
+    } catch (err) { window.alert("Il file scelto non è un backup di Flussi Economici."); }
   };
 
+  const stale = !last || (Date.now() - new Date(last).getTime()) / 86400000 > 30;
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-      <h3 className="text-sm font-medium text-slate-300 mb-1">Backup dati</h3>
-      <p className="text-xs text-slate-500 mb-3">
-        I dati esistono solo su questo telefono. Ultimo backup: {last ? new Date(last).toLocaleDateString("it-IT") : "mai"}
+    <div className="panel p-4">
+      <p className="text-sm muted mb-3">
+        I dati restano solo su questo telefono. Ultimo backup:{" "}
+        <span className={stale ? "c-ochre font-medium" : ""}>{last ? new Date(last).toLocaleDateString("it-IT") : "mai fatto"}</span>
       </p>
-      <div className="flex gap-2">
-        <button onClick={doExport} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-violet-500/15 border border-violet-500/30 text-violet-400">
-          <Download size={15} /> Esporta
-        </button>
-        <button onClick={() => fileRef.current && fileRef.current.click()} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border border-slate-700 text-slate-300">
-          <Upload size={15} /> Importa
-        </button>
-        <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={onFile} />
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={doExport} className="btn btn-ink flex items-center justify-center gap-2"><Download size={16} /> Esporta</button>
+        <button onClick={() => fileRef.current && fileRef.current.click()} className="btn btn-ghost flex items-center justify-center gap-2"><Upload size={16} /> Importa</button>
       </div>
+      <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" style={{ display: "none" }} onChange={onFile} />
     </div>
   );
 }
 
+/* ---------- App ---------- */
 function App() {
+  const theme = useTheme();
   const [data, setData] = useState(loadData);
   const [todayISO, setTodayISO] = useState(() => localISODate());
-  const [activeTab, setActiveTab] = useState("overview");
-  const [recurringView, setRecurringView] = useState("expense");
-  const [selectedMonth, setSelectedMonth] = useState(() => monthKeyOf(localISODate()));
-  const [showTxForm, setShowTxForm] = useState(false);
-  const [showRecForm, setShowRecForm] = useState(false);
-  const [recFormKind, setRecFormKind] = useState("expense");
-  const [editingRec, setEditingRec] = useState(null);
-  const [showAccountForm, setShowAccountForm] = useState(false);
-  const [editingAccount, setEditingAccount] = useState(null);
-  const [showFabMenu, setShowFabMenu] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState(null);
-  const [resetConfirm, setResetConfirm] = useState(false);
+  const [tab, setTab] = useState("overview");
+  const [movMonth, setMovMonth] = useState(() => monthKeyOf(localISODate()));
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [catFilter, setCatFilter] = useState(null);
+  const [calMonth, setCalMonth] = useState(() => monthKeyOf(localISODate()));
+  const [selDay, setSelDay] = useState(() => localISODate());
+  const [recView, setRecView] = useState("expense");
+  const [anPeriod, setAnPeriod] = useState(6);
+  const [anMonth, setAnMonth] = useState(() => monthKeyOf(localISODate()));
+  const [selCat, setSelCat] = useState(null);
+  const [txModal, setTxModal] = useState(null);
+  const [trModal, setTrModal] = useState(null);
+  const [recModal, setRecModal] = useState(null);
+  const [accModal, setAccModal] = useState(null);
+  const [budgetModal, setBudgetModal] = useState(null);
+  const [addSheet, setAddSheet] = useState(false);
   const [note, setNote] = useState(null);
 
-  const { transactions, recurring, accounts } = data;
-  const curMonthKey = monthKeyOf(todayISO);
+  const { transactions, recurring, accounts, budgets } = data;
+  const curKey = monthKeyOf(todayISO);
+  const prevKey = shiftMonth(curKey, -1);
+  const dayNum = isoToDate(todayISO).getDate();
   const yesterdayISO = addDaysISO(todayISO, -1);
 
-  const setRecurring = (f) => setData((d) => ({ ...d, recurring: typeof f === "function" ? f(d.recurring) : f }));
-  const setAccounts = (f) => setData((d) => ({ ...d, accounts: typeof f === "function" ? f(d.accounts) : f }));
-
+  /* persistenza, data corrente, automatismi */
+  useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }, [data]);
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-  }, [data]);
-
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState === "visible") setTodayISO(localISODate());
-    };
+    const onVisible = () => { if (document.visibilityState === "visible") setTodayISO(localISODate()); };
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", onVisible);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
-    };
+    return () => { document.removeEventListener("visibilitychange", onVisible); window.removeEventListener("focus", onVisible); };
   }, []);
-
   useEffect(() => {
     const { count } = applyCatchUp(data, todayISO);
     if (count > 0) {
       setData((d) => applyCatchUp(d, todayISO).data);
-      setNote(autoMsg(count));
+      setNote(count === 1 ? "Registrato 1 movimento ricorrente" : `Registrati ${count} movimenti ricorrenti`);
     }
   }, [data.recurring, todayISO]);
+  useEffect(() => { if (!note) return; const t = setTimeout(() => setNote(null), 5000); return () => clearTimeout(t); }, [note]);
+  useEffect(() => { window.scrollTo(0, 0); }, [tab]);
 
-  useEffect(() => {
-    if (!pendingDelete) return;
-    const t = setTimeout(() => setPendingDelete(null), 3000);
-    return () => clearTimeout(t);
-  }, [pendingDelete]);
+  /* aggregati */
+  const totalAccounts = useMemo(() => round2(accounts.reduce((s, a) => s + a.balance, 0)), [accounts]);
 
-  useEffect(() => {
-    if (!resetConfirm) return;
-    const t = setTimeout(() => setResetConfirm(false), 3000);
-    return () => clearTimeout(t);
-  }, [resetConfirm]);
-
-  useEffect(() => {
-    if (!note) return;
-    const t = setTimeout(() => setNote(null), 6000);
-    return () => clearTimeout(t);
-  }, [note]);
-
-  useEffect(() => { setShowFabMenu(false); }, [activeTab]);
-
-  const monthTx = useMemo(
-    () => transactions.filter((t) => monthKeyOf(t.date) === selectedMonth).sort((a, b) => b.date.localeCompare(a.date)),
-    [transactions, selectedMonth]
-  );
-
-  const entrateMese = useMemo(() => monthTx.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0), [monthTx]);
-  const usciteMese = useMemo(() => monthTx.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0), [monthTx]);
-  const totalAccounts = useMemo(() => accounts.reduce((s, a) => s + a.balance, 0), [accounts]);
-
-  const recurringSorted = useMemo(() => {
-    return recurring
-      .map((r) => {
-        if (!r.active) return { ...r, daysLeft: null, nextISO: null };
-        const due = nextDue(r, todayISO);
-        return { ...r, daysLeft: daysUntil(due, todayISO), nextISO: localISODate(due) };
-      })
-      .sort((a, b) => {
-        if (a.active !== b.active) return a.active ? -1 : 1;
-        if (a.daysLeft == null || b.daysLeft == null) return 0;
-        return a.daysLeft - b.daysLeft;
-      });
-  }, [recurring, todayISO]);
-
-  const activeRec = useMemo(() => recurringSorted.filter((r) => r.active), [recurringSorted]);
-  const abbonamentiMensili = useMemo(() => activeRec.filter((r) => r.kind === "expense").reduce((s, r) => s + monthlyEquivalent(r), 0), [activeRec]);
-  const entrateFisseMensili = useMemo(() => activeRec.filter((r) => r.kind === "income").reduce((s, r) => s + monthlyEquivalent(r), 0), [activeRec]);
-  const upcomingRecurring = useMemo(() => activeRec.slice(0, 4), [activeRec]);
-
-  const viewRecurring = useMemo(() => recurringSorted.filter((r) => r.kind === recurringView), [recurringSorted, recurringView]);
-  const viewActive = viewRecurring.filter((r) => r.active);
-  const viewMonthlyTotal = viewActive.reduce((s, r) => s + monthlyEquivalent(r), 0);
-
-  const last6 = useMemo(() => {
-    const arr = [];
-    const now = isoToDate(todayISO);
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      const label = new Intl.DateTimeFormat("it-IT", { month: "short" }).format(d);
-      const ent = transactions.filter((t) => t.type === "income" && monthKeyOf(t.date) === key).reduce((s, t) => s + t.amount, 0);
-      const usc = transactions.filter((t) => t.type === "expense" && monthKeyOf(t.date) === key).reduce((s, t) => s + t.amount, 0);
-      arr.push({ month: label, Entrate: ent, Uscite: usc });
+  const agg = useMemo(() => {
+    const m = {};
+    for (const t of transactions) {
+      if (t.type === "transfer") continue;
+      const k = monthKeyOf(t.date);
+      const e = m[k] || (m[k] = { inc: 0, exp: 0, cat: {} });
+      if (t.type === "income") e.inc += t.amount;
+      else { e.exp += t.amount; e.cat[t.category] = (e.cat[t.category] || 0) + t.amount; }
     }
-    return arr;
-  }, [transactions, todayISO]);
+    return m;
+  }, [transactions]);
+  const getAgg = (k) => agg[k] || { inc: 0, exp: 0, cat: {} };
 
-  const categoryData = useMemo(() => {
-    const totals = {};
-    monthTx.filter((t) => t.type === "expense").forEach((t) => { totals[t.category] = (totals[t.category] || 0) + t.amount; });
-    return Object.entries(totals)
-      .map(([id, value]) => {
-        const meta = EXPENSE_CATEGORIES.find((c) => c.id === id) || { label: id, color: "#64748b" };
-        return { name: meta.label, value, color: meta.color };
-      })
-      .sort((a, b) => b.value - a.value);
-  }, [monthTx]);
+  const mtd = (type, key, limitDay) =>
+    transactions.reduce((s, t) => (t.type === type && monthKeyOf(t.date) === key && isoToDate(t.date).getDate() <= limitDay ? s + t.amount : s), 0);
+  const prevLimit = Math.min(dayNum, daysInMonth(prevKey));
+  const expMTD = mtd("expense", curKey, dayNum);
+  const expPrevMTD = mtd("expense", prevKey, prevLimit);
+  const incMTD = mtd("income", curKey, dayNum);
+  const incPrevMTD = mtd("income", prevKey, prevLimit);
 
-  const addTransaction = (tx) => {
-    setData((d) => ({
-      ...d,
-      transactions: [...d.transactions, tx],
-      accounts: applyBalance(d.accounts, tx.accountId, tx.type === "income" ? tx.amount : -tx.amount),
-    }));
-    setShowTxForm(false);
-  };
+  const recurringSorted = useMemo(() => recurring
+    .map((r) => {
+      if (!r.active) return { ...r, daysLeft: null, nextISO: null };
+      const due = nextDue(r, todayISO);
+      return { ...r, daysLeft: daysUntil(due, todayISO), nextISO: localISODate(due) };
+    })
+    .sort((a, b) => {
+      if (a.active !== b.active) return a.active ? -1 : 1;
+      if (a.daysLeft == null || b.daysLeft == null) return 0;
+      return a.daysLeft - b.daysLeft;
+    }), [recurring, todayISO]);
 
-  const confirmDeleteTx = (id) => {
-    setData((d) => {
-      const tx = d.transactions.find((t) => t.id === id);
-      if (!tx) return d;
-      return {
-        ...d,
-        transactions: d.transactions.filter((t) => t.id !== id),
-        accounts: applyBalance(d.accounts, tx.accountId, tx.type === "income" ? -tx.amount : tx.amount),
-      };
+  const scheduledBetween = (fromISO, toISO) => {
+    const out = [];
+    recurring.forEach((item) => {
+      if (!item.active) return;
+      const due = localISODate(nextDue(item, todayISO));
+      occurrencesInRange(item, maxISO(due, fromISO), toISO).forEach((date) => out.push({ item, date }));
     });
-    setPendingDelete(null);
+    return out.sort((a, b) => a.date.localeCompare(b.date));
   };
 
+  const monthSched = useMemo(() => scheduledBetween(monthStartISO(curKey), monthEndISO(curKey)), [recurring, todayISO]);
+  const next7 = useMemo(() => scheduledBetween("1970-01-01", addDaysISO(todayISO, 7)), [recurring, todayISO]);
+  const projected = round2(totalAccounts + monthSched.reduce((s, x) => s + (x.item.kind === "income" ? x.item.amount : -x.item.amount), 0));
+  const curAgg = getAgg(curKey);
+  const savingsCur = curAgg.inc - curAgg.exp;
+
+  const budgetRows = EXPENSE_CATEGORIES.map((c) => ({ ...c, limit: budgets[c.id] || 0, spent: curAgg.cat[c.id] || 0 }));
+  const budgetAlerts = budgetRows.filter((r) => r.limit > 0 && r.spent >= r.limit * 0.8);
+
+  /* azioni sui dati */
+  const saveTx = (tx, old) => {
+    setData((d) => {
+      let acc = d.accounts;
+      if (old) acc = applyEffects(acc, txEffects(old), -1);
+      acc = applyEffects(acc, txEffects(tx), 1);
+      const txs = old ? d.transactions.map((t) => (t.id === tx.id ? tx : t)) : [...d.transactions, tx];
+      return { ...d, transactions: txs, accounts: acc };
+    });
+    setTxModal(null); setTrModal(null);
+    setNote(old ? "Movimento aggiornato" : tx.type === "transfer" ? "Giroconto registrato" : "Movimento registrato");
+  };
+  const deleteTx = (tx) => {
+    setData((d) => ({ ...d, transactions: d.transactions.filter((t) => t.id !== tx.id), accounts: applyEffects(d.accounts, txEffects(tx), -1) }));
+    setTxModal(null); setTrModal(null);
+    setNote("Movimento eliminato");
+  };
+  const openTx = (tx) => (tx.type === "transfer" ? setTrModal({ tx }) : setTxModal({ tx }));
+
+  const setRecurring = (f) => setData((d) => ({ ...d, recurring: f(d.recurring) }));
   const saveRecurring = (item) => {
     setRecurring((prev) => {
       const old = prev.find((r) => r.id === item.id);
       let processedThrough = yesterdayISO;
       if (old) {
-        const patternChanged = old.refDate !== item.refDate || old.frequency !== item.frequency;
         const base = old.processedThrough || yesterdayISO;
-        if (patternChanged) processedThrough = yesterdayISO;
+        if (old.refDate !== item.refDate || old.frequency !== item.frequency) processedThrough = yesterdayISO;
         else if (item.auto && !old.auto) processedThrough = maxISO(base, yesterdayISO);
         else processedThrough = base;
       }
       const next = { ...item, processedThrough };
       return old ? prev.map((r) => (r.id === item.id ? next : r)) : [...prev, next];
     });
-    setShowRecForm(false);
-    setEditingRec(null);
+    setRecModal(null);
   };
-
-  const deleteRecurring = (id) => {
-    setRecurring((prev) => prev.filter((r) => r.id !== id));
-    setPendingDelete(null);
-    setShowRecForm(false);
-    setEditingRec(null);
-  };
-
-  const toggleRecActive = (id) =>
-    setRecurring((prev) => prev.map((r) => {
-      if (r.id !== id) return r;
-      const active = !r.active;
-      return active ? { ...r, active, processedThrough: maxISO(r.processedThrough || yesterdayISO, yesterdayISO) } : { ...r, active };
-    }));
-
-  const toggleRecAuto = (id) =>
-    setRecurring((prev) => prev.map((r) => {
-      if (r.id !== id) return r;
-      const auto = !r.auto;
-      return auto ? { ...r, auto, processedThrough: maxISO(r.processedThrough || yesterdayISO, yesterdayISO) } : { ...r, auto };
-    }));
-
+  const deleteRecurring = (id) => { setRecurring((prev) => prev.filter((r) => r.id !== id)); setRecModal(null); };
+  const toggleRec = (id, field) => setRecurring((prev) => prev.map((r) => {
+    if (r.id !== id) return r;
+    const val = !r[field];
+    return val ? { ...r, [field]: val, processedThrough: maxISO(r.processedThrough || yesterdayISO, yesterdayISO) } : { ...r, [field]: val };
+  }));
   const markRecurringPaid = (item) => {
     const isIncome = item.kind === "income";
     const date = item.nextISO < todayISO ? item.nextISO : todayISO;
     setData((d) => ({
-      transactions: [...d.transactions, {
-        id: uid("t"), type: item.kind, amount: item.amount,
-        category: isIncome ? item.category : "abbonamenti",
-        description: item.name, date, accountId: item.accountId || null,
-      }],
+      ...d,
+      transactions: [...d.transactions, { id: uid("t"), type: item.kind, amount: item.amount, category: isIncome ? item.category : "abbonamenti", description: item.name, date, accountId: item.accountId || null }],
       accounts: applyBalance(d.accounts, item.accountId, isIncome ? item.amount : -item.amount),
       recurring: d.recurring.map((r) => (r.id === item.id ? { ...r, processedThrough: item.nextISO } : r)),
     }));
+    setNote(isIncome ? "Entrata registrata" : "Pagamento registrato");
   };
 
   const saveAccount = (acc) => {
-    setAccounts((prev) => (prev.some((a) => a.id === acc.id) ? prev.map((a) => (a.id === acc.id ? acc : a)) : [...prev, acc]));
-    setShowAccountForm(false);
-    setEditingAccount(null);
+    setData((d) => ({ ...d, accounts: d.accounts.some((a) => a.id === acc.id) ? d.accounts.map((a) => (a.id === acc.id ? acc : a)) : [...d.accounts, acc] }));
+    setAccModal(null);
+  };
+  const deleteAccount = (id) => { setData((d) => ({ ...d, accounts: d.accounts.filter((a) => a.id !== id) })); setAccModal(null); };
+
+  const setBudget = (catId, value) => {
+    setData((d) => {
+      const b = { ...d.budgets };
+      if (value > 0) b[catId] = value; else delete b[catId];
+      return { ...d, budgets: b };
+    });
+    setBudgetModal(null);
   };
 
-  const deleteAccount = (id) => {
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
-    setShowAccountForm(false);
-    setEditingAccount(null);
+  const pickAdd = (id) => {
+    setAddSheet(false);
+    if (id === "expense" || id === "income") setTxModal({ tx: null, type: id });
+    else if (id === "transfer") setTrModal({ tx: null });
+    else if (id === "rec-expense") setRecModal({ item: null, kind: "expense" });
+    else if (id === "rec-income") setRecModal({ item: null, kind: "income" });
+    else if (id === "account") setAccModal({ acc: null });
   };
 
-  const openNewRecurring = (kind) => { setEditingRec(null); setRecFormKind(kind); setShowRecForm(true); };
-  const openEditRecurring = (item) => { setEditingRec(item); setShowRecForm(true); };
-  const openNewAccount = () => { setEditingAccount(null); setShowAccountForm(true); };
+  /* ---------- Oggi ---------- */
+  const steps = [
+    { done: accounts.length > 0, title: "Aggiungi i tuoi conti", text: "Con il saldo di oggi: banca, carta, contanti.", go: () => setAccModal({ acc: null }) },
+    { done: recurring.length > 0, title: "Inserisci le spese e le entrate fisse", text: "Affitto, abbonamenti, borsa di studio. Si registrano da sole.", go: () => setRecModal({ item: null, kind: "expense" }) },
+    { done: transactions.length > 0, title: "Registra il primo movimento", text: "Ogni spesa collegata a un conto ne aggiorna il saldo.", go: () => setTxModal({ tx: null, type: "expense" }) },
+  ];
+  const showSteps = steps.some((s) => !s.done);
+  const recentTx = useMemo(() => [...transactions].sort((a, b) => b.date.localeCompare(a.date) || (b.id > a.id ? 1 : -1)).slice(0, 5), [transactions]);
 
-  const handleFabClick = () => {
-    if (activeTab === "transactions") setShowTxForm(true);
-    else if (activeTab === "recurring") openNewRecurring(recurringView);
-    else if (activeTab === "accounts") openNewAccount();
-    else setShowFabMenu((v) => !v);
-  };
+  const renderOverview = () => (
+    <div>
+      <header className="mb-4">
+        <div className="text-sm muted">{cap(fmtDayLong(todayISO))}</div>
+        <h1 className="serif text-[32px] leading-tight">{cap(monthLabel(curKey))}</h1>
+      </header>
 
-  const handleReset = () => {
-    if (!resetConfirm) { setResetConfirm(true); return; }
-    setData({ transactions: [], recurring: [], accounts: [] });
-    setResetConfirm(false);
-  };
+      <div className="relative overflow-hidden" style={{ background: "var(--note)", color: "var(--note-ink)", borderRadius: 22 }}>
+        <Guilloche />
+        <div className="relative p-5">
+          <div className="text-sm" style={{ color: "var(--note-soft)" }}>Disponibile sui conti</div>
+          {accounts.length ? (
+            <div className="serif num mt-1" style={{ fontSize: 42, lineHeight: 1.05 }}>{fmtEUR(totalAccounts)}</div>
+          ) : (
+            <button onClick={() => setAccModal({ acc: null })} className="serif text-[26px] mt-1 text-left underline underline-offset-4">Aggiungi un conto</button>
+          )}
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <div>
+              <div className="text-xs" style={{ color: "var(--note-soft)" }}>Previsto a fine {monthName(curKey)}</div>
+              <div className="num text-lg font-semibold mt-0.5">{fmtEUR(projected)}</div>
+            </div>
+            <div>
+              <div className="text-xs" style={{ color: "var(--note-soft)" }}>Risparmio di {monthName(curKey)}</div>
+              <div className="num text-lg font-semibold mt-0.5">{fmtSigned(savingsCur)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  const handleImport = (imported) => {
-    setData(imported);
-    setNote("Backup ripristinato");
-  };
+      {showSteps && (
+        <Section title="Per iniziare">
+          <Rows>
+            {steps.map((s, i) => (
+              <button key={i} onClick={s.go} className="w-full flex items-start gap-3 py-3 text-left" disabled={s.done}>
+                <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-semibold num"
+                  style={{ background: s.done ? "var(--green)" : "var(--surface2)", color: s.done ? "var(--surface)" : "var(--ink)" }}>
+                  {s.done ? <Check size={15} /> : i + 1}
+                </span>
+                <span>
+                  <span className="block text-[15px] font-medium" style={{ textDecoration: s.done ? "line-through" : "none", color: s.done ? "var(--muted)" : "var(--ink)" }}>{s.title}</span>
+                  {!s.done && <span className="block text-xs muted mt-0.5">{s.text}</span>}
+                </span>
+              </button>
+            ))}
+          </Rows>
+        </Section>
+      )}
 
-  const tooltipStyle = { background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8, fontSize: 12 };
+      <Section title="Questo mese, fino a oggi">
+        <div className="panel grid grid-cols-2">
+          <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
+            <div className="text-sm muted">Uscite</div>
+            <div className="num text-[22px] font-semibold mt-0.5">{fmtEUR(expMTD)}</div>
+            <div className="mt-1"><Delta cur={expMTD} prev={expPrevMTD} upIsGood={false} /></div>
+            <div className="text-xs muted mt-1 num">{fmtEUR(expPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
+          </div>
+          <div className="p-4">
+            <div className="text-sm muted">Entrate</div>
+            <div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(incMTD)}</div>
+            <div className="mt-1"><Delta cur={incMTD} prev={incPrevMTD} upIsGood={true} /></div>
+            <div className="text-xs muted mt-1 num">{fmtEUR(incPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
+          </div>
+        </div>
+      </Section>
+
+      {budgetAlerts.length > 0 && (
+        <Section title="Budget quasi esauriti" action={<button onClick={() => setTab("analysis")} className="text-sm c-blue">Tutti i budget</button>}>
+          <Rows>{budgetAlerts.map((r) => <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />)}</Rows>
+        </Section>
+      )}
+
+      <Section title="Prossimi 7 giorni" action={<button onClick={() => { setCalMonth(curKey); setSelDay(todayISO); setTab("schedule"); }} className="text-sm c-blue">Calendario</button>}>
+        {next7.length ? (
+          <Rows>{next7.map((s, i) => <ScheduledRow key={`${s.item.id}-${s.date}-${i}`} s={s} todayISO={todayISO} onClick={() => setRecModal({ item: recurring.find((r) => r.id === s.item.id) })} />)}</Rows>
+        ) : (
+          <p className="text-sm muted">Nessun pagamento o accredito in programma.</p>
+        )}
+      </Section>
+
+      <Section title="Ultimi movimenti" action={transactions.length > 0 && <button onClick={() => { setMovMonth(curKey); setTab("movements"); }} className="text-sm c-blue">Vedi tutti</button>}>
+        {recentTx.length ? (
+          <Rows>{recentTx.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}</Rows>
+        ) : (
+          <p className="text-sm muted">Ancora nessun movimento. Usa il pulsante + per registrare la prima spesa.</p>
+        )}
+      </Section>
+    </div>
+  );
+
+  /* ---------- Movimenti ---------- */
+  const q = search.trim().toLowerCase();
+  const movBase = useMemo(() => (q ? transactions : transactions.filter((t) => monthKeyOf(t.date) === movMonth)), [transactions, movMonth, q]);
+  const movFiltered = useMemo(() => movBase
+    .filter((t) => typeFilter === "all" || t.type === typeFilter)
+    .filter((t) => !catFilter || t.category === catFilter)
+    .filter((t) => {
+      if (!q) return true;
+      const label = t.type === "transfer" ? "giroconto" : catMeta(t.type, t.category).label.toLowerCase();
+      return (t.description || "").toLowerCase().includes(q) || label.includes(q);
+    })
+    .sort((a, b) => b.date.localeCompare(a.date)), [movBase, typeFilter, catFilter, q]);
+  const movGroups = useMemo(() => {
+    const g = [];
+    movFiltered.forEach((t) => {
+      const last = g[g.length - 1];
+      if (last && last.date === t.date) last.items.push(t); else g.push({ date: t.date, items: [t] });
+    });
+    return g;
+  }, [movFiltered]);
+  const movAgg = getAgg(movMonth);
+
+  const renderMovements = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight mb-2">Movimenti</h1>
+      {!q && <MonthNav monthKey={movMonth} onChange={setMovMonth} max={curKey} />}
+      {!q && (
+        <div className="panel grid grid-cols-3 mt-2">
+          {[["Entrate", fmtEUR(movAgg.inc), "c-green"], ["Uscite", fmtEUR(movAgg.exp), ""], ["Saldo", fmtSigned(movAgg.inc - movAgg.exp), movAgg.inc - movAgg.exp < 0 ? "c-red" : ""]].map(([l, v, c], i) => (
+            <div key={l} className="py-3 px-3" style={i ? { borderLeft: "1px solid var(--line)" } : null}>
+              <div className="text-xs muted">{l}</div>
+              <div className={`num text-[15px] font-semibold mt-0.5 ${c}`}>{v}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="relative mt-4">
+        <span className="absolute muted" style={{ left: 12, top: 13 }}><Search size={18} /></span>
+        <input className="inp" style={{ paddingLeft: 38 }} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca in tutti i mesi" />
+      </div>
+      <div className="flex gap-2 overflow-x-auto noscroll mt-3 -mx-4 px-4">
+        {[["all", "Tutti"], ["expense", "Uscite"], ["income", "Entrate"], ["transfer", "Giroconti"]].map(([id, l]) => (
+          <button key={id} onClick={() => { setTypeFilter(id); setCatFilter(null); }} className={`chip ${typeFilter === id ? "chip-on" : ""}`}>{l}</button>
+        ))}
+      </div>
+      {(typeFilter === "expense" || typeFilter === "income") && (
+        <div className="flex gap-2 overflow-x-auto noscroll mt-2 -mx-4 px-4">
+          {(typeFilter === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
+            <button key={c.id} onClick={() => setCatFilter(catFilter === c.id ? null : c.id)} className={`chip ${catFilter === c.id ? "chip-on" : ""}`}>{c.label}</button>
+          ))}
+        </div>
+      )}
+      {q && <p className="text-xs muted mt-3">{movFiltered.length} risultati in tutti i mesi</p>}
+      {movGroups.length ? movGroups.map((g) => {
+        const net = g.items.reduce((s, t) => s + (t.type === "income" ? t.amount : t.type === "expense" ? -t.amount : 0), 0);
+        return (
+          <div key={g.date} className="mt-5">
+            <div className="flex justify-between text-sm muted mb-1.5 px-1">
+              <span>{cap(fmtDayLong(g.date))}{q ? ` ${g.date.slice(0, 4)}` : ""}</span>
+              <span className="num">{Math.abs(net) > 0.004 ? fmtSigned(net) : ""}</span>
+            </div>
+            <Rows>{g.items.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}</Rows>
+          </div>
+        );
+      }) : (
+        <div className="mt-8 text-center">
+          <p className="text-[15px] muted">{movBase.length ? "Nessun movimento corrisponde ai filtri." : `Nessun movimento a ${monthName(movMonth)}.`}</p>
+          {!movBase.length && !q && <button onClick={() => setTxModal({ tx: null, type: "expense" })} className="btn btn-ghost mt-4 mx-auto" style={{ width: "auto", display: "inline-block" }}>Registra una spesa</button>}
+        </div>
+      )}
+    </div>
+  );
+
+  /* ---------- Scadenze ---------- */
+  const calCells = useMemo(() => {
+    const first = keyToDate(calMonth);
+    const lead = (first.getDay() + 6) % 7;
+    const cells = Array(lead).fill(null);
+    for (let d = 1; d <= daysInMonth(calMonth); d++) cells.push(`${calMonth}-${String(d).padStart(2, "0")}`);
+    return cells;
+  }, [calMonth]);
+  const actualsByDay = useMemo(() => {
+    const m = {};
+    transactions.forEach((t) => { if (monthKeyOf(t.date) === calMonth) (m[t.date] = m[t.date] || []).push(t); });
+    return m;
+  }, [transactions, calMonth]);
+  const calSched = useMemo(() => scheduledBetween(monthStartISO(calMonth), monthEndISO(calMonth)), [recurring, todayISO, calMonth]);
+  const calSchedByDay = useMemo(() => {
+    const m = {};
+    calSched.forEach((s) => { (m[s.date] = m[s.date] || []).push(s); });
+    return m;
+  }, [calSched]);
+  const calAgg = getAgg(calMonth);
+  const schedOut = calSched.filter((s) => s.item.kind === "expense").reduce((s, x) => s + x.item.amount, 0);
+  const schedIn = calSched.filter((s) => s.item.kind === "income").reduce((s, x) => s + x.item.amount, 0);
+  const selActs = selDay ? actualsByDay[selDay] || [] : [];
+  const selSched = selDay ? calSchedByDay[selDay] || [] : [];
+  const recList = recurringSorted.filter((r) => r.kind === recView);
+  const recMonthly = recList.filter((r) => r.active).reduce((s, r) => s + monthlyEquivalent(r), 0);
+
+  const renderSchedule = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight mb-2">Scadenze</h1>
+      <MonthNav monthKey={calMonth} onChange={(k) => { setCalMonth(k); setSelDay(k === curKey ? todayISO : null); }} />
+      <div className="panel p-2.5 mt-2">
+        <div className="grid grid-cols-7 text-center text-xs muted mb-1">
+          {["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}
+        </div>
+        <div className="grid grid-cols-7 gap-y-1">
+          {calCells.map((iso, i) => {
+            if (!iso) return <span key={`b${i}`} />;
+            const acts = actualsByDay[iso] || [];
+            const sch = calSchedByDay[iso] || [];
+            const hasExp = acts.some((t) => t.type === "expense");
+            const hasInc = acts.some((t) => t.type === "income");
+            const overdue = sch.some((s) => s.date < todayISO);
+            const sel = iso === selDay;
+            const isToday = iso === todayISO;
+            return (
+              <button key={iso} onClick={() => setSelDay(iso)} className="flex flex-col items-center justify-center rounded-xl" aria-label={fmtDayLong(iso)}
+                style={{ height: 46, background: sel ? "var(--ink)" : "transparent", color: sel ? "var(--paper)" : iso < todayISO ? "var(--muted)" : "var(--ink)", boxShadow: isToday && !sel ? "inset 0 0 0 1.5px var(--ink)" : "none" }}>
+                <span className="text-[15px] num leading-none">{Number(iso.slice(8))}</span>
+                <span className="flex gap-[3px] mt-1.5" style={{ height: 6 }}>
+                  {hasExp && <span style={{ width: 6, height: 6, borderRadius: 9, background: "var(--red)" }} />}
+                  {hasInc && <span style={{ width: 6, height: 6, borderRadius: 9, background: "var(--green)" }} />}
+                  {sch.length > 0 && <span style={{ width: 6, height: 6, borderRadius: 9, boxShadow: `inset 0 0 0 1.5px ${overdue ? "var(--red)" : "var(--ochre)"}` }} />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs muted mt-2 px-1">
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--red)" }} />uscita registrata</span>
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--green)" }} />entrata registrata</span>
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, boxShadow: "inset 0 0 0 1.5px var(--ochre)" }} />in programma</span>
+      </div>
+
+      <Section title={selDay && monthKeyOf(selDay) === calMonth ? cap(fmtDayLong(selDay)) : "Dettaglio del giorno"} className="mt-6">
+        {!selDay || monthKeyOf(selDay) !== calMonth ? (
+          <p className="text-sm muted">Tocca un giorno del calendario.</p>
+        ) : selSched.length || selActs.length ? (
+          <Rows>
+            {selSched.map((s, i) => <ScheduledRow key={`s${i}`} s={s} todayISO={todayISO} onClick={() => setRecModal({ item: recurring.find((r) => r.id === s.item.id) })} />)}
+            {selActs.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}
+          </Rows>
+        ) : (
+          <p className="text-sm muted">Nessun movimento né scadenza in questo giorno.</p>
+        )}
+      </Section>
+
+      <Section title={`Il mese di ${monthName(calMonth)}`}>
+        <div className="panel grid grid-cols-2">
+          <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
+            <div className="text-sm muted">Registrato</div>
+            <div className="num text-[15px] mt-1">−{fmtEUR(calAgg.exp)}</div>
+            <div className="num text-[15px] c-green">+{fmtEUR(calAgg.inc)}</div>
+          </div>
+          <div className="p-4">
+            <div className="text-sm muted">Ancora in programma</div>
+            <div className="num text-[15px] mt-1">−{fmtEUR(schedOut)}</div>
+            <div className="num text-[15px] c-green">+{fmtEUR(schedIn)}</div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Spese ed entrate fisse">
+        <div className="seg">
+          <button className={recView === "expense" ? "on" : ""} onClick={() => setRecView("expense")}>Spese fisse</button>
+          <button className={recView === "income" ? "on" : ""} onClick={() => setRecView("income")}>Entrate fisse</button>
+        </div>
+        {recList.length > 0 && (
+          <p className="text-sm muted mt-3 num">
+            {recList.filter((r) => r.active).length} attive: {fmtEUR(recMonthly)} al mese, {fmtEUR(recMonthly * 12)} all'anno
+          </p>
+        )}
+        <div className="space-y-2.5 mt-3">
+          {recList.map((r) => (
+            <RecurringItem key={r.id} item={r} accounts={accounts}
+              onEdit={() => setRecModal({ item: recurring.find((x) => x.id === r.id) })}
+              onToggleActive={() => toggleRec(r.id, "active")}
+              onToggleAuto={() => toggleRec(r.id, "auto")}
+              onMarkPaid={() => markRecurringPaid(r)} />
+          ))}
+        </div>
+        {!recList.length && <p className="text-sm muted mt-3">{recView === "expense" ? "Nessuna spesa fissa inserita." : "Nessuna entrata fissa inserita."}</p>}
+        <button onClick={() => setRecModal({ item: null, kind: recView })} className="btn btn-ghost mt-3">
+          {recView === "expense" ? "Aggiungi spesa fissa" : "Aggiungi entrata fissa"}
+        </button>
+      </Section>
+    </div>
+  );
+
+  /* ---------- Analisi ---------- */
+  const series = useMemo(() => {
+    const arr = [];
+    for (let i = anPeriod - 1; i >= 0; i--) {
+      const k = shiftMonth(curKey, -i);
+      const a = getAgg(k);
+      arr.push({ key: k, label: shortMonth(k), Entrate: round2(a.inc), Uscite: round2(a.exp), Saldo: round2(a.inc - a.exp) });
+    }
+    return arr;
+  }, [agg, anPeriod, curKey]);
+  const completeMonths = series.filter((s) => s.key < curKey);
+  const avgBase = completeMonths.length ? completeMonths : series;
+  const avg = (f) => avgBase.reduce((s, x) => s + x[f], 0) / avgBase.length;
+
+  const anAgg = getAgg(anMonth);
+  const anPrevKey = shiftMonth(anMonth, -1);
+  const anPrev = getAgg(anPrevKey);
+  const rate = (a) => (a.inc > 0 ? ((a.inc - a.exp) / a.inc) * 100 : null);
+  const rCur = rate(anAgg), rPrev = rate(anPrev);
+
+  const pace = useMemo(() => {
+    const daily = (key) => {
+      const arr = new Array(32).fill(0);
+      transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === key) arr[isoToDate(t.date).getDate()] += t.amount; });
+      return arr;
+    };
+    const dim = daysInMonth(anMonth), pdim = daysInMonth(anPrevKey);
+    const curLen = anMonth === curKey ? dayNum : dim;
+    const a = daily(anMonth), b = daily(anPrevKey);
+    const rows = [];
+    let ca = 0, cb = 0;
+    for (let d = 1; d <= Math.max(dim, pdim); d++) {
+      if (d <= dim) ca += a[d];
+      if (d <= pdim) cb += b[d];
+      rows.push({ day: d, cur: d <= curLen ? round2(ca) : null, prev: d <= pdim ? round2(cb) : null });
+    }
+    return { rows, curLen, curTot: round2(ca), atDayCur: rows[curLen - 1]?.cur ?? 0, atDayPrev: rows[Math.min(curLen, pdim) - 1]?.prev ?? 0 };
+  }, [transactions, anMonth, curKey, dayNum]);
+
+  const catRows = useMemo(() => {
+    const ids = new Set([...Object.keys(anAgg.cat), ...Object.keys(anPrev.cat)]);
+    return [...ids].map((id) => {
+      const m = catMeta("expense", id);
+      return { id, label: m.label, color: m.color, cur: anAgg.cat[id] || 0, prev: anPrev.cat[id] || 0 };
+    }).sort((a, b) => b.cur - a.cur || b.prev - a.prev);
+  }, [anAgg, anPrev]);
+  const donut = catRows.filter((r) => r.cur > 0);
+  const selRow = catRows.find((r) => r.id === selCat);
+  const catSeries = useMemo(() => (selCat ? series.map((s) => ({ label: s.label, key: s.key, value: round2(getAgg(s.key).cat[selCat] || 0) })) : []), [selCat, series]);
+  const catAvg = catSeries.length ? catSeries.reduce((s, x) => s + x.value, 0) / catSeries.length : 0;
+
+  const tickStyle = { fill: theme.muted, fontSize: 11 };
+  const noCharts = <p className="text-sm muted p-4">Grafici non disponibili: la libreria non si è caricata. Ricarica l'app con la connessione attiva.</p>;
+
+  const renderAnalysis = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight mb-3">Analisi</h1>
+      <div className="flex gap-2">
+        {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
+      </div>
+
+      <Section title="Entrate e uscite" className="mt-5">
+        <div className="panel pt-4 pr-2 pb-1">
+          {!RC ? noCharts : (
+            <RC.ResponsiveContainer width="100%" height={230}>
+              <RC.ComposedChart data={series} margin={{ top: 4, right: 6, left: 0, bottom: 0 }}>
+                <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} />
+                <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} tickFormatter={compactEUR} />
+                <RC.Tooltip content={<ChartTip />} cursor={{ fill: theme.line, opacity: 0.35 }} />
+                <RC.Bar dataKey="Entrate" fill={theme.green} radius={[4, 4, 0, 0]} onClick={(_, i) => setAnMonth(series[i].key)}>
+                  {series.map((s) => <RC.Cell key={s.key} fill={theme.green} fillOpacity={s.key === anMonth ? 1 : 0.4} />)}
+                </RC.Bar>
+                <RC.Bar dataKey="Uscite" fill={theme.red} radius={[4, 4, 0, 0]} onClick={(_, i) => setAnMonth(series[i].key)}>
+                  {series.map((s) => <RC.Cell key={s.key} fill={theme.red} fillOpacity={s.key === anMonth ? 1 : 0.4} />)}
+                </RC.Bar>
+                <RC.Line type="monotone" dataKey="Saldo" stroke={theme.ink} strokeWidth={2} dot={{ r: 2.5, fill: theme.ink, strokeWidth: 0 }} />
+              </RC.ComposedChart>
+            </RC.ResponsiveContainer>
+          )}
+        </div>
+        <p className="text-xs muted mt-2">Tocca le barre di un mese per esaminarlo qui sotto. La linea è il saldo tra entrate e uscite.</p>
+        <div className="panel grid grid-cols-3 mt-3">
+          {[["Uscite medie", fmtEUR(avg("Uscite")), ""], ["Entrate medie", fmtEUR(avg("Entrate")), "c-green"], ["Saldo medio", fmtSigned(avg("Saldo")), avg("Saldo") < 0 ? "c-red" : ""]].map(([l, v, c], i) => (
+            <div key={l} className="py-3 px-3" style={i ? { borderLeft: "1px solid var(--line)" } : null}>
+              <div className="text-xs muted">{l}</div>
+              <div className={`num text-[14px] font-semibold mt-0.5 ${c}`}>{v}</div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs muted mt-1.5">Medie calcolate sui mesi conclusi del periodo.</p>
+      </Section>
+
+      <div className="mt-9 pt-2" style={{ borderTop: "1px solid var(--line)" }}>
+        <MonthNav monthKey={anMonth} onChange={(k) => { setAnMonth(k); }} max={curKey} />
+      </div>
+
+      <Section title={`Rispetto a ${monthName(anPrevKey)}`} className="mt-3">
+        <Rows>
+          {[
+            ["Uscite", fmtEUR(anAgg.exp), `prima ${fmtEUR(anPrev.exp)}`, <Delta cur={anAgg.exp} prev={anPrev.exp} upIsGood={false} />],
+            ["Entrate", fmtEUR(anAgg.inc), `prima ${fmtEUR(anPrev.inc)}`, <Delta cur={anAgg.inc} prev={anPrev.inc} upIsGood={true} />],
+            ["Risparmio", fmtSigned(anAgg.inc - anAgg.exp), `prima ${fmtSigned(anPrev.inc - anPrev.exp)}`, <DiffAmount cur={anAgg.inc - anAgg.exp} prev={anPrev.inc - anPrev.exp} upIsGood={true} />],
+            ["Quota risparmiata", rCur == null ? "n.d." : `${rCur.toFixed(0)}%`, `prima ${rPrev == null ? "n.d." : `${rPrev.toFixed(0)}%`}`,
+              rCur != null && rPrev != null && Math.abs(rCur - rPrev) >= 1
+                ? <span className={`text-xs font-medium num ${rCur > rPrev ? "c-green" : "c-red"}`}>{rCur > rPrev ? "▲" : "▼"} {Math.abs(rCur - rPrev).toFixed(0)} punti</span>
+                : null],
+          ].map(([label, value, sub, delta]) => (
+            <div key={label} className="flex items-center justify-between py-3 gap-3">
+              <div className="min-w-0"><div className="text-[15px]">{label}</div><div className="text-xs muted num">{sub}</div></div>
+              <div className="text-right shrink-0"><div className="num text-[15px] font-semibold">{value}</div>{delta}</div>
+            </div>
+          ))}
+        </Rows>
+      </Section>
+
+      <Section title="Ritmo di spesa">
+        <div className="panel pt-4 pr-2 pb-1">
+          {!RC ? noCharts : (
+            <RC.ResponsiveContainer width="100%" height={190}>
+              <RC.LineChart data={pace.rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                <RC.XAxis dataKey="day" tick={tickStyle} axisLine={false} tickLine={false} interval={4} />
+                <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} tickFormatter={compactEUR} />
+                <RC.Tooltip content={<ChartTip labelPrefix="Giorno " />} />
+                <RC.Line type="monotone" dataKey="prev" name={cap(monthName(anPrevKey))} stroke={theme.muted} strokeDasharray="4 4" strokeWidth={1.5} dot={false} connectNulls={false} />
+                <RC.Line type="monotone" dataKey="cur" name={cap(monthName(anMonth))} stroke={theme.red} strokeWidth={2.2} dot={false} connectNulls={false} />
+              </RC.LineChart>
+            </RC.ResponsiveContainer>
+          )}
+        </div>
+        <p className="text-sm muted mt-2 num">
+          {anMonth === curKey
+            ? `Al giorno ${pace.curLen} hai speso ${fmtEUR(pace.atDayCur)}; a ${monthName(anPrevKey)}, nello stesso punto, ${fmtEUR(pace.atDayPrev)}.`
+            : `A ${monthName(anMonth)} hai speso ${fmtEUR(anAgg.exp)}, contro ${fmtEUR(anPrev.exp)} a ${monthName(anPrevKey)}.`}
+        </p>
+      </Section>
+
+      <Section title="Dove vanno i soldi">
+        {donut.length ? (
+          <>
+            {RC && (
+              <div className="relative" style={{ height: 190 }}>
+                <RC.ResponsiveContainer width="100%" height={190}>
+                  <RC.PieChart>
+                    <RC.Pie data={donut} dataKey="cur" nameKey="label" innerRadius={58} outerRadius={84} paddingAngle={1.5} stroke="none"
+                      onClick={(_, i) => setSelCat(selCat === donut[i].id ? null : donut[i].id)}>
+                      {donut.map((d) => <RC.Cell key={d.id} fill={d.color} fillOpacity={!selCat || selCat === d.id ? 1 : 0.28} />)}
+                    </RC.Pie>
+                  </RC.PieChart>
+                </RC.ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                  <span className="text-xs muted">{selRow ? selRow.label : "Totale uscite"}</span>
+                  <span className="num text-lg font-semibold">{fmtEUR(selRow ? selRow.cur : anAgg.exp)}</span>
+                </div>
+              </div>
+            )}
+            <Rows>
+              {catRows.map((r) => (
+                <button key={r.id} onClick={() => setSelCat(selCat === r.id ? null : r.id)} className="w-full flex items-center gap-3 py-3 text-left"
+                  style={{ background: selCat === r.id ? "var(--surface2)" : "transparent", margin: "0 -16px", padding: "12px 16px", width: "calc(100% + 32px)" }}>
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: r.color }} />
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] truncate">{r.label}</span>
+                    <span className="block text-xs muted num">{anAgg.exp > 0 ? `${((r.cur / anAgg.exp) * 100).toFixed(0)}% delle uscite` : ""}{r.prev > 0 ? `${anAgg.exp > 0 ? ", " : ""}prima ${fmtEUR(r.prev)}` : ""}</span>
+                  </span>
+                  <span className="text-right shrink-0">
+                    <span className="block num text-[15px] font-medium">{fmtEUR(r.cur)}</span>
+                    <Delta cur={r.cur} prev={r.prev} upIsGood={false} />
+                  </span>
+                </button>
+              ))}
+            </Rows>
+            {selRow && (
+              <div className="panel mt-3 pt-4 pr-2 pb-2">
+                <div className="px-4 mb-2">
+                  <div className="text-[15px] font-semibold">{selRow.label} negli ultimi {anPeriod} mesi</div>
+                  <div className="text-xs muted num">Media {fmtEUR(catAvg)} al mese</div>
+                </div>
+                {RC && (
+                  <RC.ResponsiveContainer width="100%" height={160}>
+                    <RC.BarChart data={catSeries} margin={{ top: 4, right: 6, left: 0, bottom: 0 }}>
+                      <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                      <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} />
+                      <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} tickFormatter={compactEUR} />
+                      <RC.Tooltip content={<ChartTip />} cursor={{ fill: theme.line, opacity: 0.35 }} />
+                      <RC.ReferenceLine y={catAvg} stroke={theme.muted} strokeDasharray="4 4" />
+                      <RC.Bar dataKey="value" name={selRow.label} fill={selRow.color} radius={[4, 4, 0, 0]}>
+                        {catSeries.map((s) => <RC.Cell key={s.key} fill={selRow.color} fillOpacity={s.key === anMonth ? 1 : 0.5} />)}
+                      </RC.Bar>
+                    </RC.BarChart>
+                  </RC.ResponsiveContainer>
+                )}
+              </div>
+            )}
+            {!selRow && <p className="text-xs muted mt-2">Tocca una categoria per vederne l'andamento nel tempo.</p>}
+          </>
+        ) : (
+          <p className="text-sm muted">Nessuna uscita registrata a {monthName(anMonth)}.</p>
+        )}
+      </Section>
+
+      <Section title="Budget mensili" action={<span className="text-xs muted">{cap(monthLabel(curKey))}</span>}>
+        <Rows>
+          {[...budgetRows].sort((a, b) => (b.limit > 0) - (a.limit > 0) || b.spent - a.spent).map((r) => (
+            <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />
+          ))}
+        </Rows>
+      </Section>
+    </div>
+  );
+
+  /* ---------- Conti ---------- */
+  const positiveTotal = accounts.reduce((s, a) => s + Math.max(0, a.balance), 0);
+  const renderAccounts = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight">Conti</h1>
+      <div className="mt-3">
+        <div className="text-sm muted">Totale</div>
+        <div className={`serif num text-[40px] leading-tight ${totalAccounts < 0 ? "c-red" : ""}`}>{fmtEUR(totalAccounts)}</div>
+      </div>
+      {positiveTotal > 0 && accounts.length > 1 && (
+        <div className="flex mt-3 rounded-full overflow-hidden" style={{ height: 8, background: "var(--surface2)" }}>
+          {accounts.map((a, i) => a.balance > 0 && (
+            <div key={a.id} style={{ width: `${(a.balance / positiveTotal) * 100}%`, background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
+          ))}
+        </div>
+      )}
+      <div className="mt-5">
+        {accounts.length ? (
+          <Rows>
+            {accounts.map((a, i) => (
+              <button key={a.id} onClick={() => setAccModal({ acc: a })} className="w-full flex items-center gap-3 py-3.5 text-left">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[15px] truncate">{a.name}</span>
+                  {positiveTotal > 0 && a.balance > 0 && <span className="block text-xs muted num">{((a.balance / positiveTotal) * 100).toFixed(0)}% del totale</span>}
+                </span>
+                <span className={`num text-[15px] font-semibold ${a.balance < 0 ? "c-red" : ""}`}>{fmtEUR(a.balance)}</span>
+              </button>
+            ))}
+          </Rows>
+        ) : (
+          <p className="text-[15px] muted">Nessun conto. Aggiungine uno con il saldo di oggi per far partire i calcoli.</p>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        <button onClick={() => setAccModal({ acc: null })} className="btn btn-ghost">Nuovo conto</button>
+        <button onClick={() => setTrModal({ tx: null })} className="btn btn-ghost">Giroconto</button>
+      </div>
+
+      <Section title="Backup">
+        <BackupSection data={data} onImport={(d) => { setData(d); setNote("Backup ripristinato"); }} />
+      </Section>
+
+      <Section title="Dati">
+        <div className="panel p-4">
+          <p className="text-sm muted">Cancella conti, movimenti, scadenze e budget da questo telefono. L'operazione non si può annullare.</p>
+          <DeleteButton label="Cancella tutti i dati" onConfirm={() => { setData({ ...EMPTY_DATA }); setNote("Dati cancellati"); }} />
+        </div>
+      </Section>
+    </div>
+  );
+
+  const views = { overview: renderOverview, movements: renderMovements, schedule: renderSchedule, analysis: renderAnalysis, accounts: renderAccounts };
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-slate-100 px-4 sm:px-6"
-      style={{ paddingTop: "calc(env(safe-area-inset-top) + 16px)", paddingBottom: "calc(env(safe-area-inset-bottom) + 100px)" }}
-    >
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2.5 bg-violet-500/15 border border-violet-500/30 rounded-xl">
-            <Wallet className="text-violet-400" size={22} />
+    <div style={{ minHeight: "100vh" }}>
+      <main className="max-w-xl mx-auto px-4" style={{ paddingTop: "calc(env(safe-area-inset-top) + 18px)", paddingBottom: "calc(env(safe-area-inset-bottom) + 150px)" }}>
+        {views[tab]()}
+      </main>
+
+      {note && (
+        <div className="fixed left-4 right-4 z-50 flex justify-center fade" style={{ top: "calc(env(safe-area-inset-top) + 10px)" }}>
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium" style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 6px 20px rgba(0,0,0,.18)" }}>
+            <Check size={16} /> {note}
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-semibold text-slate-50">Flussi Economici</h1>
-            <p className="text-xs text-slate-500 truncate">La tua situazione finanziaria, sempre sotto controllo</p>
-          </div>
-          <button
-            onClick={handleReset}
-            className={`text-xs px-2.5 py-1.5 rounded-lg border shrink-0 ${resetConfirm ? "bg-rose-500/15 border-rose-500/40 text-rose-400" : "border-slate-800 text-slate-600"}`}
-          >
-            {resetConfirm ? "Conferma" : "Reset"}
-          </button>
         </div>
+      )}
 
-        {note && (
-          <div className="flex items-center justify-between bg-cyan-500/10 border border-cyan-500/25 rounded-xl px-3 py-2 mb-4 text-xs text-cyan-300">
-            <span>✓ {note}</span>
-            <button onClick={() => setNote(null)} className="text-cyan-400 shrink-0 ml-2" aria-label="Chiudi avviso">
-              <X size={14} />
-            </button>
-          </div>
-        )}
+      <button onClick={() => setAddSheet(true)} aria-label="Aggiungi"
+        className="fixed z-30 flex items-center justify-center active:scale-95"
+        style={{ right: 18, bottom: "calc(env(safe-area-inset-bottom) + 76px)", width: 56, height: 56, borderRadius: 999, background: "var(--ink)", color: "var(--paper)", boxShadow: "0 8px 22px rgba(0,0,0,.22)" }}>
+        <Plus size={26} />
+      </button>
 
-        <div className="flex gap-1 bg-slate-900/60 border border-slate-800 rounded-full p-1 mb-5">
-          {[
-            { id: "overview", label: "Panoramica" },
-            { id: "transactions", label: "Transazioni" },
-            { id: "recurring", label: "Ricorrenti" },
-            { id: "accounts", label: "Conti" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2 text-xs sm:text-sm font-medium rounded-full ${activeTab === tab.id ? "bg-violet-500 text-white" : "text-slate-400"}`}
-            >
-              {tab.label}
+      <nav className="fixed bottom-0 left-0 right-0 z-30" style={{ background: "var(--surface)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="max-w-xl mx-auto flex">
+          {TABS.map((t) => (
+            <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex flex-col items-center gap-1 pt-2 pb-1.5"
+              style={{ color: tab === t.id ? "var(--ink)" : "var(--muted)" }} aria-current={tab === t.id ? "page" : undefined}>
+              <t.Icon size={21} />
+              <span className="text-[11px]" style={{ fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
             </button>
           ))}
         </div>
+      </nav>
 
-        {activeTab === "overview" && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              <SummaryCard label="Sui conti" value={fmtEUR(totalAccounts)} icon={Landmark} tone={totalAccounts >= 0 ? "cyan" : "rose"} />
-              <SummaryCard label="Entrate" sub={cap(monthLabel(selectedMonth))} value={fmtEUR(entrateMese)} icon={ArrowUpRight} tone="emerald" />
-              <SummaryCard label="Uscite" sub={cap(monthLabel(selectedMonth))} value={fmtEUR(usciteMese)} icon={ArrowDownRight} tone="rose" />
-              <SummaryCard label="Abbonamenti" sub="equivalente mensile" value={fmtEUR(abbonamentiMensili)} icon={RefreshCw} tone="violet" />
-              <SummaryCard label="Entrate fisse" sub="equivalente mensile" value={fmtEUR(entrateFisseMensili)} icon={TrendingUp} tone="amber" />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-                <h3 className="text-sm font-medium text-slate-300 mb-3">Andamento ultimi 6 mesi</h3>
-                {!RC ? (
-                  <EmptyChart text="Grafici non disponibili (libreria non caricata)" />
-                ) : transactions.length ? (
-                  <RC.ResponsiveContainer width="100%" height={220}>
-                    <RC.BarChart data={last6}>
-                      <RC.CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <RC.XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                      <RC.YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} width={40} />
-                      <RC.Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
-                      <RC.Legend wrapperStyle={{ fontSize: 12 }} />
-                      <RC.Bar dataKey="Entrate" fill="#10b981" radius={[4, 4, 0, 0]} />
-                      <RC.Bar dataKey="Uscite" fill="#f43f5e" radius={[4, 4, 0, 0]} />
-                    </RC.BarChart>
-                  </RC.ResponsiveContainer>
-                ) : (
-                  <EmptyChart text="Aggiungi una transazione per vedere l'andamento" />
-                )}
-              </div>
-
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-                <h3 className="text-sm font-medium text-slate-300 mb-3">Uscite per categoria — {cap(monthLabel(selectedMonth))}</h3>
-                {categoryData.length ? (
-                  <div className="flex flex-col sm:flex-row items-center gap-3">
-                    {RC && (
-                      <RC.ResponsiveContainer width="100%" height={180}>
-                        <RC.PieChart>
-                          <RC.Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
-                            {categoryData.map((c, i) => <RC.Cell key={i} fill={c.color} stroke="none" />)}
-                          </RC.Pie>
-                          <RC.Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
-                        </RC.PieChart>
-                      </RC.ResponsiveContainer>
-                    )}
-                    <div className="w-full sm:w-36 space-y-1.5 shrink-0">
-                      {categoryData.map((c, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs">
-                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} />
-                          <span className="text-slate-400 flex-1 truncate">{c.name}</span>
-                          <span className="text-slate-300 font-medium shrink-0">{fmtEUR(c.value)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <EmptyChart text="Nessuna uscita registrata questo mese" />
-                )}
-              </div>
-            </div>
-
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-              <h3 className="text-sm font-medium text-slate-300 mb-3">Prossimi movimenti ricorrenti</h3>
-              {upcomingRecurring.length ? (
-                <div className="space-y-1">
-                  {upcomingRecurring.map((r) => (
-                    <div key={r.id} className="flex items-center justify-between py-1.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`p-1.5 rounded-lg border shrink-0 ${r.kind === "income" ? "bg-emerald-500/10 border-emerald-500/20" : "bg-violet-500/10 border-violet-500/20"}`}>
-                          {r.kind === "income" ? <TrendingUp size={13} className="text-emerald-400" /> : <RefreshCw size={13} className="text-violet-400" />}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm text-slate-200 truncate">{r.name}</div>
-                          <div className="text-xs text-slate-500">
-                            {r.kind === "income" ? "+" : ""}{fmtEUR(r.amount)} · {FREQ_LABEL[r.frequency].toLowerCase()}{r.auto ? " · auto" : ""}
-                          </div>
-                        </div>
-                      </div>
-                      <RenewalBadge days={r.daysLeft} />
-                    </div>
-                  ))}
-                  {activeRec.length > upcomingRecurring.length && (
-                    <button onClick={() => setActiveTab("recurring")} className="text-xs text-violet-400 mt-1">Vedi tutti</button>
-                  )}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500">Nessun movimento ricorrente attivo</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "transactions" && (
-          <div className="space-y-4">
-            <MonthNav
-              label={cap(monthLabel(selectedMonth))}
-              onPrev={() => setSelectedMonth((m) => shiftMonth(m, -1))}
-              onNext={() => setSelectedMonth((m) => shiftMonth(m, 1))}
-              canNext={selectedMonth < curMonthKey}
-            />
-
-            <div className="grid grid-cols-3 gap-2.5">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
-                <div className="text-xs text-slate-500 mb-1">Entrate</div>
-                <div className="text-sm font-semibold text-emerald-400">{fmtEUR(entrateMese)}</div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
-                <div className="text-xs text-slate-500 mb-1">Uscite</div>
-                <div className="text-sm font-semibold text-rose-400">{fmtEUR(usciteMese)}</div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
-                <div className="text-xs text-slate-500 mb-1">Saldo mese</div>
-                <div className={`text-sm font-semibold ${entrateMese - usciteMese >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{fmtEUR(entrateMese - usciteMese)}</div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {monthTx.length ? (
-                monthTx.map((t) => (
-                  <TxRow
-                    key={t.id} tx={t} accounts={accounts}
-                    pending={pendingDelete === `tx-${t.id}`}
-                    onDelete={() => setPendingDelete(`tx-${t.id}`)}
-                    onConfirm={() => confirmDeleteTx(t.id)}
-                  />
-                ))
-              ) : (
-                <EmptyState text="Nessuna transazione in questo mese" cta="Aggiungi transazione" onClick={() => setShowTxForm(true)} />
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "recurring" && (
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <button onClick={() => setRecurringView("expense")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${recurringView === "expense" ? "bg-violet-500/15 border-violet-500/40 text-violet-400" : "border-slate-800 text-slate-500"}`}>Abbonamenti</button>
-              <button onClick={() => setRecurringView("income")} className={`flex-1 py-2 rounded-xl text-sm font-medium border ${recurringView === "income" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "border-slate-800 text-slate-500"}`}>Entrate fisse</button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
-                <div className="text-xs text-slate-500 mb-1">Attivi</div>
-                <div className="text-sm font-semibold text-slate-200">{viewActive.length}</div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
-                <div className="text-xs text-slate-500 mb-1">Equivalente mensile</div>
-                <div className={`text-sm font-semibold ${recurringView === "income" ? "text-emerald-400" : "text-violet-400"}`}>{fmtEUR(viewMonthlyTotal)}</div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {viewRecurring.length ? (
-                viewRecurring.map((r) => (
-                  <RecurringCard
-                    key={r.id} item={r} accounts={accounts}
-                    pending={pendingDelete === `rec-${r.id}`}
-                    onDelete={() => setPendingDelete(`rec-${r.id}`)}
-                    onConfirm={() => deleteRecurring(r.id)}
-                    onToggleActive={() => toggleRecActive(r.id)}
-                    onToggleAuto={() => toggleRecAuto(r.id)}
-                    onMarkPaid={() => markRecurringPaid(r)}
-                    onEdit={() => openEditRecurring(r)}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  text={recurringView === "expense" ? "Nessun abbonamento registrato" : "Nessuna entrata fissa registrata"}
-                  cta={recurringView === "expense" ? "Aggiungi abbonamento" : "Aggiungi entrata fissa"}
-                  onClick={() => openNewRecurring(recurringView)}
-                />
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "accounts" && (
-          <div className="space-y-4">
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center">
-              <div className="text-xs text-slate-500 mb-1">Totale sui conti</div>
-              <div className={`text-2xl font-semibold ${totalAccounts >= 0 ? "text-slate-50" : "text-rose-400"}`}>{fmtEUR(totalAccounts)}</div>
-            </div>
-
-            <div className="space-y-2">
-              {accounts.length ? (
-                accounts.map((a) => (
-                  <button
-                    key={a.id}
-                    onClick={() => { setEditingAccount(a); setShowAccountForm(true); }}
-                    className="w-full flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 text-left"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-lg shrink-0">
-                        <Landmark size={15} className="text-cyan-400" />
-                      </div>
-                      <span className="text-sm text-slate-200 truncate">{a.name}</span>
-                    </div>
-                    <span className={`text-sm font-semibold shrink-0 ${a.balance >= 0 ? "text-slate-100" : "text-rose-400"}`}>{fmtEUR(a.balance)}</span>
-                  </button>
-                ))
-              ) : (
-                <EmptyState text="Nessun conto aggiunto" cta="Aggiungi conto" onClick={openNewAccount} />
-              )}
-            </div>
-
-            <BackupCard data={data} onImport={handleImport} />
-          </div>
-        )}
-      </div>
-
-      {showFabMenu && <div className="fixed inset-0 z-20" onClick={() => setShowFabMenu(false)} />}
-
-      {showFabMenu && activeTab === "overview" && (
-        <div className="fixed right-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-2 z-30 space-y-1" style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}>
-          <button onClick={() => { setShowFabMenu(false); setShowTxForm(true); }} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-200 w-full text-left whitespace-nowrap">
-            <Wallet size={15} className="text-violet-400" /> Nuova transazione
-          </button>
-          <button onClick={() => { setShowFabMenu(false); openNewRecurring("expense"); }} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-200 w-full text-left whitespace-nowrap">
-            <RefreshCw size={15} className="text-violet-400" /> Nuovo abbonamento
-          </button>
-          <button onClick={() => { setShowFabMenu(false); openNewRecurring("income"); }} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-200 w-full text-left whitespace-nowrap">
-            <TrendingUp size={15} className="text-violet-400" /> Nuova entrata fissa
-          </button>
-          <button onClick={() => { setShowFabMenu(false); openNewAccount(); }} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-200 w-full text-left whitespace-nowrap">
-            <Landmark size={15} className="text-violet-400" /> Nuovo conto
-          </button>
-        </div>
+      {addSheet && <AddSheet onClose={() => setAddSheet(false)} onPick={pickAdd} />}
+      {txModal && (
+        <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} todayISO={todayISO}
+          onClose={() => setTxModal(null)} onSave={saveTx} onDelete={deleteTx} />
       )}
-
-      <button
-        onClick={handleFabClick}
-        className="fixed right-6 w-14 h-14 rounded-full bg-violet-500 shadow-lg shadow-violet-500/30 flex items-center justify-center text-white active:scale-95 z-30"
-        style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}
-        aria-label="Aggiungi"
-      >
-        <Plus size={24} className={`transition-transform ${showFabMenu ? "rotate-45" : ""}`} />
-      </button>
-
-      {showTxForm && (
-        <TxFormModal accounts={accounts} todayISO={todayISO} onClose={() => setShowTxForm(false)} onSave={addTransaction} />
+      {trModal && (
+        <TransferModal tx={trModal.tx} accounts={accounts} todayISO={todayISO}
+          onClose={() => setTrModal(null)} onSave={saveTx} onDelete={deleteTx}
+          onAddAccount={() => { setTrModal(null); setAccModal({ acc: null }); }} />
       )}
-      {showRecForm && (
-        <RecurringFormModal
-          item={editingRec}
-          accounts={accounts}
-          initialKind={recFormKind}
-          todayISO={todayISO}
-          onClose={() => { setShowRecForm(false); setEditingRec(null); }}
-          onSave={saveRecurring}
-          onDelete={deleteRecurring}
-        />
+      {recModal && (
+        <RecurringFormModal item={recModal.item} accounts={accounts} initialKind={recModal.kind || "expense"} todayISO={todayISO}
+          onClose={() => setRecModal(null)} onSave={saveRecurring} onDelete={deleteRecurring} />
       )}
-      {showAccountForm && (
-        <AccountFormModal
-          account={editingAccount}
-          onClose={() => { setShowAccountForm(false); setEditingAccount(null); }}
-          onSave={saveAccount}
-          onDelete={deleteAccount}
-        />
+      {accModal && (
+        <AccountFormModal account={accModal.acc} onClose={() => setAccModal(null)} onSave={saveAccount} onDelete={deleteAccount} />
+      )}
+      {budgetModal && (
+        <BudgetModal cat={budgetModal.cat} limit={budgets[budgetModal.cat.id] || 0} spent={curAgg.cat[budgetModal.cat.id] || 0}
+          onClose={() => setBudgetModal(null)}
+          onSave={(v) => setBudget(budgetModal.cat.id, v)}
+          onRemove={() => setBudget(budgetModal.cat.id, 0)} />
       )}
     </div>
   );
