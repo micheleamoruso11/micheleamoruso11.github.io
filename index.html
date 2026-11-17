@@ -10,7 +10,39 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Flussi" />
 <link rel="manifest" href='data:application/manifest+json,{"name":"Flussi Economici","short_name":"Flussi","display":"standalone","start_url":".","background_color":"%23020617","theme_color":"%23020617"}' />
+<style>
+  html, body { background: #020617; margin: 0; -webkit-tap-highlight-color: transparent; }
+  body { overscroll-behavior-y: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; }
+  select { -webkit-appearance: none; appearance: none; }
+  #boot { color: #94a3b8; font-size: 14px; text-align: center; padding: 40vh 24px 0; line-height: 1.5; }
+  #boot button { margin-top: 16px; background: #8b5cf6; color: #fff; border: 0; border-radius: 12px; padding: 10px 20px; font-size: 15px; }
+  #boot .err { color: #fb7185; font-size: 12px; margin-top: 10px; word-break: break-word; }
+</style>
 <script>
+  window.__appStarted = false;
+  window.__bootFail = function (msg) {
+    if (window.__appStarted) return;
+    var b = document.getElementById("boot");
+    if (!b) return;
+    b.innerHTML =
+      "Impossibile avviare l'app.<br>Controlla la connessione e riprova." +
+      '<div class="err">' + String(msg || "").replace(/</g, "&lt;") + "</div>" +
+      '<button onclick="location.reload()">Riprova</button>';
+  };
+  window.addEventListener("error", function (e) {
+    var t = e && e.target;
+    if (t && t.tagName === "SCRIPT" && t.src) {
+      var optional = t.getAttribute("data-optional") === "1";
+      if (!optional) window.__bootFail("Libreria non caricata: " + t.src);
+      return;
+    }
+    if (e && e.message) window.__bootFail(e.message);
+  }, true);
+  setTimeout(function () {
+    if (!window.__appStarted) window.__bootFail("Tempo di caricamento scaduto");
+  }, 25000);
+
   (function () {
     try {
       var c = document.createElement("canvas");
@@ -35,35 +67,51 @@
     } catch (e) {}
   })();
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
-<script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
-<style>
-  html, body { background: #020617; margin: 0; -webkit-tap-highlight-color: transparent; }
-  body { overscroll-behavior-y: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; }
-  select { -webkit-appearance: none; appearance: none; }
-</style>
+<script src="https://cdn.tailwindcss.com" data-optional="1"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js" data-optional="1"></script>
+<script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js" data-optional="1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
 </head>
 <body>
-<div id="root"><div style="color:#64748b;font-size:14px;text-align:center;padding-top:40vh">Caricamento…</div></div>
+<div id="root"><div id="boot">Caricamento…</div></div>
 
 <script type="text/babel">
 const { useState, useEffect, useMemo, useRef } = React;
-const {
-  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer,
-} = Recharts;
-const {
-  Plus, X, Trash2, Check, Wallet, TrendingUp, AlertCircle,
-  RefreshCw, ChevronLeft, ChevronRight, Home, Car, Heart, BookOpen,
-  ShoppingCart, Film, MoreHorizontal, ArrowUpRight, ArrowDownRight, Gift,
-  Landmark, Pencil, Download, Upload,
-} = LucideReact;
+const RC = window.Recharts || null;
+
+const mkIcon = (children) => ({ size = 24, className = "", style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+    strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+    {children}
+  </svg>
+);
+
+const Plus = mkIcon(<><path d="M5 12h14" /><path d="M12 5v14" /></>);
+const X = mkIcon(<><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>);
+const Trash2 = mkIcon(<><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><path d="M10 11v6" /><path d="M14 11v6" /></>);
+const Check = mkIcon(<path d="M20 6 9 17l-5-5" />);
+const Wallet = mkIcon(<><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></>);
+const TrendingUp = mkIcon(<><path d="M22 7 13.5 15.5 8.5 10.5 2 17" /><path d="M16 7h6v6" /></>);
+const AlertCircle = mkIcon(<><circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" /></>);
+const RefreshCw = mkIcon(<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></>);
+const ChevronLeft = mkIcon(<path d="m15 18-6-6 6-6" />);
+const ChevronRight = mkIcon(<path d="m9 18 6-6-6-6" />);
+const Home = mkIcon(<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></>);
+const Car = mkIcon(<><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" /></>);
+const Heart = mkIcon(<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />);
+const BookOpen = mkIcon(<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></>);
+const ShoppingCart = mkIcon(<><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></>);
+const Film = mkIcon(<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" /></>);
+const MoreHorizontal = mkIcon(<><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></>);
+const ArrowUpRight = mkIcon(<><path d="M7 7h10v10" /><path d="M7 17 17 7" /></>);
+const ArrowDownRight = mkIcon(<><path d="m7 7 10 10" /><path d="M17 7v10H7" /></>);
+const Gift = mkIcon(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13" /><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5" /></>);
+const Landmark = mkIcon(<><path d="M3 22h18" /><path d="M6 18v-7" /><path d="M10 18v-7" /><path d="M14 18v-7" /><path d="M18 18v-7" /><path d="M12 2l8 5H4z" /></>);
+const Pencil = mkIcon(<><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></>);
+const Download = mkIcon(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /><path d="M12 15V3" /></>);
+const Upload = mkIcon(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" /></>);
 
 const STORAGE_KEY = "flussi-economici-v1";
 const BACKUP_KEY = "flussi-economici-last-backup";
@@ -738,7 +786,6 @@ function App() {
   const curMonthKey = monthKeyOf(todayISO);
   const yesterdayISO = addDaysISO(todayISO, -1);
 
-  const setTransactions = (f) => setData((d) => ({ ...d, transactions: typeof f === "function" ? f(d.transactions) : f }));
   const setRecurring = (f) => setData((d) => ({ ...d, recurring: typeof f === "function" ? f(d.recurring) : f }));
   const setAccounts = (f) => setData((d) => ({ ...d, accounts: typeof f === "function" ? f(d.accounts) : f }));
 
@@ -1015,18 +1062,20 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
                 <h3 className="text-sm font-medium text-slate-300 mb-3">Andamento ultimi 6 mesi</h3>
-                {transactions.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={last6}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} width={40} />
-                      <Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
-                      <Legend wrapperStyle={{ fontSize: 12 }} />
-                      <Bar dataKey="Entrate" fill="#10b981" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Uscite" fill="#f43f5e" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                {!RC ? (
+                  <EmptyChart text="Grafici non disponibili (libreria non caricata)" />
+                ) : transactions.length ? (
+                  <RC.ResponsiveContainer width="100%" height={220}>
+                    <RC.BarChart data={last6}>
+                      <RC.CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                      <RC.XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                      <RC.YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} width={40} />
+                      <RC.Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
+                      <RC.Legend wrapperStyle={{ fontSize: 12 }} />
+                      <RC.Bar dataKey="Entrate" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <RC.Bar dataKey="Uscite" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+                    </RC.BarChart>
+                  </RC.ResponsiveContainer>
                 ) : (
                   <EmptyChart text="Aggiungi una transazione per vedere l'andamento" />
                 )}
@@ -1036,14 +1085,16 @@ function App() {
                 <h3 className="text-sm font-medium text-slate-300 mb-3">Uscite per categoria — {cap(monthLabel(selectedMonth))}</h3>
                 {categoryData.length ? (
                   <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <ResponsiveContainer width="100%" height={180}>
-                      <PieChart>
-                        <Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
-                          {categoryData.map((c, i) => <Cell key={i} fill={c.color} stroke="none" />)}
-                        </Pie>
-                        <Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {RC && (
+                      <RC.ResponsiveContainer width="100%" height={180}>
+                        <RC.PieChart>
+                          <RC.Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
+                            {categoryData.map((c, i) => <RC.Cell key={i} fill={c.color} stroke="none" />)}
+                          </RC.Pie>
+                          <RC.Tooltip formatter={(v) => fmtEUR(v)} contentStyle={tooltipStyle} />
+                        </RC.PieChart>
+                      </RC.ResponsiveContainer>
+                    )}
                     <div className="w-full sm:w-36 space-y-1.5 shrink-0">
                       {categoryData.map((c, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs">
@@ -1263,6 +1314,7 @@ function App() {
   );
 }
 
+window.__appStarted = true;
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
