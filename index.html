@@ -19,12 +19,14 @@
     --paper: #ECF0EA; --surface: #F7F9F5; --surface2: #E2E8DF; --ink: #16232B; --muted: #5A686A; --line: #D2DACF;
     --green: #2E6A4E; --red: #A63249; --ochre: #9E680C; --blue: #2C5C8A;
     --note: #1E4637; --note-ink: #EEF4EC; --note-soft: #A9CBB8; --note-line: #4F8A6E;
+    --inv: #1E3A5C; --inv-soft: #A9C2DD; --inv-line: #4C729C;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --paper: #111B1B; --surface: #192626; --surface2: #213030; --ink: #E3EAE4; --muted: #8FA09B; --line: #2A3A39;
       --green: #6DBE91; --red: #EC8096; --ochre: #E3AA4A; --blue: #8AB6E0;
       --note: #1D4434; --note-ink: #EEF4EC; --note-soft: #9DC4AE; --note-line: #4C8A6B;
+      --inv: #1D3756; --inv-soft: #A3BEDB; --inv-line: #4A70A0;
     }
   }
   html, body { background: var(--paper); color: var(--ink); margin: 0; -webkit-tap-highlight-color: transparent; }
@@ -51,12 +53,15 @@
   .btn-danger { color: var(--red); }
   .btn-danger-on { color: var(--red); background: color-mix(in srgb, var(--red) 14%, transparent); }
   .seg { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; gap: 3px; }
-  .seg button { flex: 1; padding: 9px 6px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  .seg button { flex: 1; padding: 9px 4px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  .seg.small button { font-size: 13px; padding: 9px 2px; }
   .seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .noscroll::-webkit-scrollbar { display: none; }
   .noscroll { scrollbar-width: none; }
   .bar { height: 6px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
   .bar > div { height: 100%; border-radius: 999px; }
+  .ring-anim { transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
+  input[type="range"] { width: 100%; accent-color: var(--ink); height: 28px; }
 
   .wallet-btn { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 16px 16px 12px; border-radius: 20px; background: var(--ink); color: var(--paper); overflow: hidden; text-align: left; transition: transform .12s ease; }
   .wallet-btn:active { transform: scale(.98); }
@@ -77,7 +82,7 @@
     @keyframes sheetUp { from { transform: translateY(28px); opacity: .6; } to { transform: none; opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   }
-  @media (prefers-reduced-motion: reduce) { .wallet-card, .wallet-btn { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .wallet-card, .wallet-btn, .ring-anim { transition: none; } }
   #boot { color: var(--muted); font-size: 14px; text-align: center; padding: 40vh 24px 0; line-height: 1.5; }
   #boot button { margin-top: 16px; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 10px 20px; font-size: 15px; }
   #boot .err { color: var(--red); font-size: 12px; margin-top: 10px; word-break: break-word; }
@@ -102,7 +107,6 @@
     if (e && e.message) window.__bootFail(e.message);
   }, true);
   setTimeout(function () { if (!window.__appStarted) window.__bootFail("Tempo di caricamento scaduto"); }, 25000);
-
   (function () {
     try {
       var c = document.createElement("canvas");
@@ -187,7 +191,7 @@ const Mic = mkIcon(<><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-
 const Target = mkIcon(<><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>);
 const Users = mkIcon(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>);
 const Tag = mkIcon(<><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /><circle cx="7.5" cy="7.5" r=".6" fill="currentColor" /></>);
-const Bulb = mkIcon(<><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></>);
+const InvestIcon = mkIcon(<><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></>);
 
 /* ================= Costanti ================= */
 const STORAGE_KEY = "flussi-economici-v1";
@@ -220,7 +224,7 @@ const SUB_CATEGORIES = [
   { id: "altro-s", label: "Altro" },
 ];
 const FREQ_LABEL = { settimanale: "Settimanale", mensile: "Mensile", annuale: "Annuale" };
-const ACCOUNT_COLORS = ["var(--green)", "var(--blue)", "var(--ochre)", "#8E4A84", "#3E8A99", "#B4495B"];
+const ACCOUNT_COLORS = ["#2E6A4E", "#2C5C8A", "#B07A1A", "#8E4A84", "#3E8A99", "#B4495B"];
 const GOAL_COLORS = ["#2E6A4E", "#2C5C8A", "#B07A1A", "#8E4A84", "#3E8A99", "#B4495B"];
 const WEEKDAYS = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"];
 
@@ -234,7 +238,9 @@ const TABS = [
 
 /* ================= Utilità ================= */
 const fmtEUR = (n) => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(n || 0);
+const fmtEUR0 = (n) => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n || 0);
 const fmtSigned = (n) => (n > 0.004 ? "+" : n < -0.004 ? "−" : "") + fmtEUR(Math.abs(n));
+const fmtPct = (n) => `${n > 0.05 ? "+" : n < -0.05 ? "−" : ""}${Math.abs(n).toFixed(1).replace(".", ",")}%`;
 const round2 = (n) => Math.round(n * 100) / 100;
 const compactEUR = (v) => (Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(1).replace(".", ",")}k` : `${Math.round(v)}`);
 const localISODate = (d = new Date()) =>
@@ -242,6 +248,7 @@ const localISODate = (d = new Date()) =>
 const isoToDate = (iso) => new Date(iso + "T00:00:00");
 const addDaysISO = (iso, n) => { const d = isoToDate(iso); d.setDate(d.getDate() + n); return localISODate(d); };
 const maxISO = (a, b) => (a > b ? a : b);
+const minISO = (a, b) => (a < b ? a : b);
 const monthKeyOf = (s) => s.slice(0, 7);
 const keyToDate = (key) => { const [y, m] = key.split("-").map(Number); return new Date(y, m - 1, 1); };
 const shiftMonth = (key, delta) => { const d = keyToDate(key); d.setMonth(d.getMonth() + delta); return localISODate(d).slice(0, 7); };
@@ -253,8 +260,8 @@ const intl = (opts) => new Intl.DateTimeFormat("it-IT", opts);
 const monthLabel = (key) => intl({ month: "long", year: "numeric" }).format(keyToDate(key));
 const monthName = (key) => intl({ month: "long" }).format(keyToDate(key));
 const shortMonth = (key) => intl({ month: "short" }).format(keyToDate(key)).replace(".", "");
+const shortMonthYear = (key) => `${shortMonth(key)} ${key.slice(2, 4)}`;
 const fmtDateShort = (iso) => intl({ day: "numeric", month: "short" }).format(isoToDate(iso));
-const fmtDateYear = (iso) => intl({ day: "numeric", month: "short", year: "numeric" }).format(isoToDate(iso));
 const fmtDayLong = (iso) => intl({ weekday: "long", day: "numeric", month: "long" }).format(isoToDate(iso));
 const fmtDayShortW = (iso) => intl({ weekday: "short", day: "numeric", month: "short" }).format(isoToDate(iso));
 const weekdayShort = (iso) => intl({ weekday: "short" }).format(isoToDate(iso)).replace(".", "");
@@ -262,6 +269,7 @@ const parseAmount = (s) => parseFloat(String(s).replace(/\s/g, "").replace(",", 
 const uid = (p) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 const daysUntil = (date, todayISO) => Math.round((date - isoToDate(todayISO)) / 86400000);
 const sameTag = (a, b) => a.toLowerCase() === b.toLowerCase();
+const isInvest = (a) => !!a && a.type === "invest";
 const catMeta = (type, id) => {
   const list = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   return list.find((c) => c.id === id) || list[list.length - 1];
@@ -296,6 +304,21 @@ const goalMonthly = (g, todayISO) => {
   const months = Math.max(1, Math.ceil(days / 30.44));
   return round2(Math.max(0, g.target - g.saved) / months);
 };
+const lastValuation = (a) => {
+  const v = (a.valuations || []).slice().sort((x, y) => x.date.localeCompare(y.date));
+  return v.length ? v[v.length - 1] : null;
+};
+const accountValue = (a) => {
+  if (!isInvest(a)) return a.balance;
+  const v = lastValuation(a);
+  return v ? round2(v.value + (a.balance - v.book)) : a.balance;
+};
+function futureValue(start, monthly, annualRatePct, months) {
+  const r = Math.pow(1 + annualRatePct / 100, 1 / 12) - 1;
+  if (Math.abs(r) < 1e-9) return start + monthly * months;
+  const g = Math.pow(1 + r, months);
+  return start * g + monthly * ((g - 1) / r);
+}
 
 /* ================= Importazione Wallet / Siri ================= */
 function hashStr(s) {
@@ -403,6 +426,13 @@ function nextDue(item, todayISO) {
   }
   return nextRenewal(item, isoToDate(startISO));
 }
+function recurringTx(item, date) {
+  if (item.kind === "transfer") {
+    return { id: uid("t"), type: "transfer", amount: item.amount, accountId: item.accountId, toAccountId: item.toAccountId, description: item.name, date, category: null, tags: [], recurringId: item.id };
+  }
+  const isIncome = item.kind === "income";
+  return { id: uid("t"), type: item.kind, amount: item.amount, category: isIncome ? item.category : "abbonamenti", description: item.name, date, accountId: item.accountId || null, tags: [], recurringId: item.id };
+}
 
 /* ================= Saldi ================= */
 function applyBalance(accounts, accountId, delta) {
@@ -446,13 +476,9 @@ function applyCatchUp(data, todayISO) {
     let processed = false;
     let guard = 0;
     while (occ <= end && guard < 520) {
-      const isIncome = item.kind === "income";
-      transactions = [...transactions, {
-        id: uid("t"), type: item.kind, amount: item.amount,
-        category: isIncome ? item.category : "abbonamenti",
-        description: item.name, date: localISODate(occ), accountId: item.accountId || null, tags: [],
-      }];
-      accounts = applyBalance(accounts, item.accountId, isIncome ? item.amount : -item.amount);
+      const tx = recurringTx(item, localISODate(occ));
+      transactions = [...transactions, tx];
+      accounts = applyEffects(accounts, txEffects(tx), 1);
       count++;
       processed = true;
       occ = occurrenceAfter(item, occ);
@@ -467,7 +493,7 @@ function applyCatchUp(data, todayISO) {
 const EMPTY_DATA = {
   transactions: [], recurring: [], accounts: [], budgets: {},
   walletSeen: [], merchantMap: {}, cardMap: {}, walletLastImport: null,
-  goals: [], people: [], shared: [],
+  goals: [], people: [], shared: [], investSettings: { rate: 5, years: 10 },
 };
 const isObj = (o) => o && typeof o === "object" && !Array.isArray(o);
 const arr = (v) => (Array.isArray(v) ? v : []);
@@ -484,6 +510,7 @@ function normalize(p) {
     goals: arr(p.goals),
     people: arr(p.people),
     shared: arr(p.shared),
+    investSettings: isObj(p.investSettings) ? { rate: 5, years: 10, ...p.investSettings } : { rate: 5, years: 10 },
   };
 }
 function loadData() {
@@ -498,7 +525,7 @@ function loadData() {
 function readTheme() {
   const s = getComputedStyle(document.documentElement);
   const g = (n) => s.getPropertyValue(n).trim();
-  return { ink: g("--ink"), muted: g("--muted"), line: g("--line"), green: g("--green"), red: g("--red"), ochre: g("--ochre"), blue: g("--blue"), surface: g("--surface") };
+  return { ink: g("--ink"), muted: g("--muted"), line: g("--line"), green: g("--green"), red: g("--red"), ochre: g("--ochre"), blue: g("--blue"), surface: g("--surface"), surface2: g("--surface2") };
 }
 function useTheme() {
   const [t, setT] = useState(readTheme);
@@ -630,6 +657,53 @@ function Insights({ items }) {
   );
 }
 
+function Ring({ value, size = 64, stroke = 7, color, track = "var(--surface2)", children }) {
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const [v, setV] = useState(0);
+  useEffect(() => { const id = requestAnimationFrame(() => setV(Math.max(0, Math.min(1, value)))); return () => cancelAnimationFrame(id); }, [value]);
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }} aria-hidden="true">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c * (1 - v)} className="ring-anim" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center text-center">{children}</div>
+    </div>
+  );
+}
+
+function Sparkline({ values, color, height = 44 }) {
+  if (!values || values.length < 2) return null;
+  const w = 300;
+  const min = Math.min(...values), max = Math.max(...values);
+  const span = max - min || 1;
+  const pts = values.map((v, i) => [(i / (values.length - 1)) * w, height - 4 - ((v - min) / span) * (height - 8)]);
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ");
+  const area = `${line} L${w} ${height} L0 ${height} Z`;
+  const last = pts[pts.length - 1];
+  return (
+    <svg viewBox={`0 0 ${w} ${height}`} preserveAspectRatio="none" className="w-full" style={{ height }} aria-hidden="true">
+      <path d={area} style={{ fill: color, opacity: 0.16 }} />
+      <path d={line} fill="none" strokeWidth="1.8" vectorEffect="non-scaling-stroke" style={{ stroke: color }} />
+      <circle cx={last[0]} cy={last[1]} r="3" style={{ fill: color }} />
+    </svg>
+  );
+}
+
+function Slider({ label, value, min, max, step, onChange, display }) {
+  return (
+    <div className="mb-4">
+      <div className="flex justify-between items-baseline text-sm mb-1">
+        <span className="muted">{label}</span>
+        <span className="num font-semibold text-[15px]">{display(value)}</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label={label} />
+    </div>
+  );
+}
+
 function TagInput({ tags, onChange, suggestions }) {
   const [v, setV] = useState("");
   const add = (t) => {
@@ -644,9 +718,7 @@ function TagInput({ tags, onChange, suggestions }) {
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map((t) => (
-            <button key={t} onClick={() => onChange(tags.filter((x) => x !== t))} className="chip chip-on flex items-center gap-1" aria-label={`Rimuovi ${t}`}>
-              {t} <X size={12} />
-            </button>
+            <button key={t} onClick={() => onChange(tags.filter((x) => x !== t))} className="chip chip-on flex items-center gap-1" aria-label={`Rimuovi ${t}`}>{t} <X size={12} /></button>
           ))}
         </div>
       )}
@@ -665,8 +737,8 @@ function TagInput({ tags, onChange, suggestions }) {
   );
 }
 
-/* ================= Biglietto e pulsante Wallet ================= */
-function Guilloche() {
+/* ================= Biglietti incisi e pulsante Wallet ================= */
+function Guilloche({ color = "var(--note-line)" }) {
   const paths = useMemo(() => {
     const out = [];
     for (let i = 0; i < 16; i++) {
@@ -690,7 +762,7 @@ function Guilloche() {
   }, []);
   return (
     <svg viewBox="0 0 400 210" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full" aria-hidden="true">
-      {paths.map((d, i) => <path key={i} d={d} fill="none" strokeWidth="0.7" style={{ stroke: "var(--note-line)", opacity: 0.55 }} />)}
+      {paths.map((d, i) => <path key={i} d={d} fill="none" strokeWidth="0.7" style={{ stroke: color, opacity: 0.55 }} />)}
     </svg>
   );
 }
@@ -713,8 +785,7 @@ function WalletButton({ lastLabel, onClick }) {
     <button className={`wallet-btn ${fan ? "fan" : ""}`}
       onClick={() => { setFan(true); setTimeout(() => setFan(false), 700); onClick(); }}
       aria-label="Importa i pagamenti da Wallet e Siri">
-      <svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"
-        style={{ position: "absolute", right: 0, top: 0, width: "62%", height: "100%", opacity: 0.1 }}>
+      <svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true" style={{ position: "absolute", right: 0, top: 0, width: "62%", height: "100%", opacity: 0.1 }}>
         {waves.map((d, i) => <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="0.8" />)}
       </svg>
       <span className="wallet-stack" aria-hidden="true">
@@ -766,8 +837,7 @@ function WalletReviewSheet({ items, accounts, onClose, onConfirm, onIgnore }) {
               </div>
               {r.include && (
                 <div className="grid gap-2 mt-3" style={{ gridTemplateColumns: "0.9fr 1.3fr" }}>
-                  <input className={`inp num ${bad ? "bad" : ""}`} type="text" inputMode="decimal" value={r.amountStr}
-                    onChange={(e) => upd(i, { amountStr: e.target.value })} placeholder="Importo" />
+                  <input className={`inp num ${bad ? "bad" : ""}`} type="text" inputMode="decimal" value={r.amountStr} onChange={(e) => upd(i, { amountStr: e.target.value })} placeholder="Importo" />
                   <select className="inp" value={r.category} onChange={(e) => upd(i, { category: e.target.value })}>
                     {EXPENSE_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
@@ -803,10 +873,10 @@ function GuideSheet({ onClose }) {
     ["Nuovo comando", "Comandi Rapidi, scheda Comandi, +. Chiamalo Spesa in contanti: è la frase che dirai a Siri."],
     ["Prima domanda", "Aggiungi l'azione Chiedi input, tipo Numero, testo della domanda: Quanto hai speso?"],
     ["Seconda domanda", "Aggiungi un'altra azione Chiedi input, tipo Testo, domanda: Dove?"],
-    ["Componi la riga", "Aggiungi l'azione Testo: Data attuale | risposta alla seconda domanda | risposta alla prima | Contanti. Le risposte si inseriscono con Seleziona variabile toccando il blocco Chiedi input corrispondente. La parola Contanti va scritta."],
+    ["Componi la riga", "Aggiungi l'azione Testo: Data attuale | risposta alla seconda domanda | risposta alla prima | Contanti. Le risposte si inseriscono con Seleziona variabile toccando il blocco corrispondente. La parola Contanti va scritta."],
     ["Formato della data", "Come per Wallet: Data attuale, Formato data, Personalizzato, yyyy-MM-dd HH:mm"],
     ["Stesso file", "Aggiungi l'azione Aggiungi al file di testo: Dropbox, /wallet.txt, Crea nuova riga attivo."],
-    ["Usalo", "Di' «Ehi Siri, spesa in contanti». La spesa arriva con la prossima importazione. La prima volta abbina Contanti al tuo conto dei contanti: poi lo farà da sola."],
+    ["Usalo", "Di' «Ehi Siri, spesa in contanti». La spesa arriva con la prossima importazione. La prima volta abbina Contanti al tuo conto dei contanti."],
   ];
   const steps = tab === "wallet" ? wallet : voice;
   return (
@@ -819,18 +889,13 @@ function GuideSheet({ onClose }) {
         {steps.map(([t, d], i) => (
           <li key={i} className="flex gap-3">
             <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-semibold num" style={{ background: "var(--surface2)" }}>{i + 1}</span>
-            <span>
-              <span className="block text-[15px] font-medium">{t}</span>
-              <span className="block text-sm muted mt-0.5">{d}</span>
-            </span>
+            <span><span className="block text-[15px] font-medium">{t}</span><span className="block text-sm muted mt-0.5">{d}</span></span>
           </li>
         ))}
       </ol>
       <div className="mt-5 p-3 rounded-xl text-sm" style={{ background: "var(--surface2)" }}>
         <div className="muted text-xs mb-1">Ogni spesa diventa una riga così:</div>
-        <div className="num font-medium" style={{ wordBreak: "break-all" }}>
-          {tab === "wallet" ? "2026-11-18 13:42|Conad City|12,40 €|Carta Visa" : "2026-11-18 19:05|Bar dell'università|1.5|Contanti"}
-        </div>
+        <div className="num font-medium" style={{ wordBreak: "break-all" }}>{tab === "wallet" ? "2026-11-18 13:42|Conad City|12,40 €|Carta Visa" : "2026-11-18 19:05|Bar dell'università|1.5|Contanti"}</div>
       </div>
       <button onClick={onClose} className="btn btn-ink mt-5">Ho capito</button>
     </Sheet>
@@ -840,8 +905,9 @@ function GuideSheet({ onClose }) {
 /* ================= Righe ================= */
 function TxRow({ tx, accounts, onClick }) {
   const isT = tx.type === "transfer";
-  const meta = isT ? { label: "Giroconto", color: "#2C5C8A", Icon: ArrowLeftRight } : catMeta(tx.type, tx.category);
   const accName = (id) => accounts.find((a) => a.id === id)?.name;
+  const toInvest = isT && isInvest(accounts.find((a) => a.id === tx.toAccountId));
+  const meta = isT ? (toInvest ? { label: "Versamento investimenti", color: "#2C5C8A", Icon: InvestIcon } : { label: "Giroconto", color: "#2C5C8A", Icon: ArrowLeftRight }) : catMeta(tx.type, tx.category);
   let sub;
   if (isT) sub = `Da ${accName(tx.accountId) || "conto eliminato"} a ${accName(tx.toAccountId) || "conto eliminato"}`;
   else {
@@ -850,7 +916,7 @@ function TxRow({ tx, accounts, onClick }) {
   }
   if (tx.sharedId) sub += ", quota condivisa";
   const Icon = meta.Icon;
-  const Badge = tx.source === "voice" ? Mic : tx.source === "wallet" ? Contactless : null;
+  const Badge = tx.source === "voice" ? Mic : tx.source === "wallet" ? Contactless : tx.recurringId ? RefreshCw : null;
   const tags = tx.tags || [];
   return (
     <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
@@ -880,8 +946,9 @@ function TxRow({ tx, accounts, onClick }) {
 
 function ScheduledRow({ s, todayISO, onClick }) {
   const { item, date } = s;
-  const isInc = item.kind === "income";
   const days = daysUntil(isoToDate(date), todayISO);
+  const cls = item.kind === "income" ? "c-green" : item.kind === "transfer" ? "c-blue" : "";
+  const sign = item.kind === "income" ? "+" : item.kind === "transfer" ? "" : "−";
   return (
     <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
       <span className="w-10 text-center shrink-0">
@@ -890,31 +957,34 @@ function ScheduledRow({ s, todayISO, onClick }) {
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] truncate">{item.name}</span>
-        <span className={`block text-xs ${days < 0 ? "c-red" : "muted"}`}>{dueText(days)}{item.auto ? ", automatico" : ""}</span>
+        <span className={`block text-xs ${days < 0 ? "c-red" : "muted"}`}>{dueText(days)}{item.kind === "transfer" ? ", trasferimento" : ""}{item.auto ? ", automatico" : ""}</span>
       </span>
-      <span className={`num text-[15px] font-medium shrink-0 ${isInc ? "c-green" : ""}`}>{isInc ? "+" : "−"}{fmtEUR(item.amount)}</span>
+      <span className={`num text-[15px] font-medium shrink-0 ${cls}`}>{sign}{fmtEUR(item.amount)}</span>
     </button>
   );
 }
 
 function RecurringItem({ item, accounts, onEdit, onToggleActive, onToggleAuto, onMarkPaid }) {
   const isInc = item.kind === "income";
-  const acc = accounts.find((a) => a.id === item.accountId)?.name;
-  const cat = (isInc ? INCOME_CATEGORIES : SUB_CATEGORIES).find((c) => c.id === item.category)?.label || "Altro";
+  const isTr = item.kind === "transfer";
+  const accName = (id) => accounts.find((a) => a.id === id)?.name;
+  const acc = accName(item.accountId);
+  const cat = isTr ? "" : (isInc ? INCOME_CATEGORIES : SUB_CATEGORIES).find((c) => c.id === item.category)?.label || "Altro";
   const days = item.daysLeft;
   let when = "In pausa";
   if (item.active) when = days < 0 ? `Scaduto il ${fmtDateShort(item.nextISO)}` : days === 0 ? "Oggi" : days === 1 ? "Domani" : cap(fmtDayShortW(item.nextISO));
   const whenCls = !item.active ? "muted" : days < 0 ? "c-red" : days <= 3 ? "c-ochre" : "muted";
+  const sub = isTr ? `${FREQ_LABEL[item.frequency]}, da ${acc || "?"} a ${accName(item.toAccountId) || "?"}` : `${FREQ_LABEL[item.frequency]}, ${cat.toLowerCase()}${acc ? `, ${isInc ? "su" : "da"} ${acc}` : ""}`;
   return (
     <div className="panel p-4" style={{ opacity: item.active ? 1 : 0.55 }}>
       <button onClick={onEdit} className="w-full text-left">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[15px] font-semibold truncate">{item.name}</div>
-            <div className="text-xs muted mt-0.5 truncate">{FREQ_LABEL[item.frequency]}, {cat.toLowerCase()}{acc ? `, ${isInc ? "su" : "da"} ${acc}` : ""}</div>
+            <div className="text-xs muted mt-0.5 truncate">{sub}</div>
           </div>
           <div className="text-right shrink-0">
-            <div className={`num text-[15px] font-semibold ${isInc ? "c-green" : ""}`}>{isInc ? "+" : "−"}{fmtEUR(item.amount)}</div>
+            <div className={`num text-[15px] font-semibold ${isInc ? "c-green" : isTr ? "c-blue" : ""}`}>{isInc ? "+" : isTr ? "" : "−"}{fmtEUR(item.amount)}</div>
             <div className={`text-xs mt-0.5 ${whenCls}`}>{when}</div>
           </div>
         </div>
@@ -925,7 +995,7 @@ function RecurringItem({ item, accounts, onEdit, onToggleActive, onToggleAuto, o
       </div>
       {item.active && !item.auto && (
         <button onClick={onMarkPaid} className="btn btn-ghost mt-3" style={{ padding: "10px", fontSize: 14 }}>
-          {isInc ? "Segna come ricevuta" : "Segna come pagato"}
+          {isInc ? "Segna come ricevuta" : isTr ? "Segna come eseguito" : "Segna come pagato"}
         </button>
       )}
     </div>
@@ -959,30 +1029,30 @@ function BudgetRow({ r, onClick }) {
   );
 }
 
-function GoalRow({ g, todayISO, onOpen, onMove }) {
-  const ratio = g.target > 0 ? Math.min(1, g.saved / g.target) : 0;
+function goalMeta(g, todayISO) {
   const done = g.saved >= g.target;
   const need = goalMonthly(g, todayISO);
   const late = g.deadline && daysUntil(isoToDate(g.deadline), todayISO) < 0 && !done;
-  let meta;
-  if (done) meta = "Obiettivo raggiunto";
-  else if (late) meta = `Scadenza superata, mancano ${fmtEUR(g.target - g.saved)}`;
-  else if (need != null) meta = `${fmtEUR(need)} al mese fino al ${fmtDateShort(g.deadline)}`;
-  else meta = `Mancano ${fmtEUR(g.target - g.saved)}`;
+  if (done) return { text: "Obiettivo raggiunto", cls: "c-green" };
+  if (late) return { text: `Scadenza superata, mancano ${fmtEUR(g.target - g.saved)}`, cls: "c-red" };
+  if (need != null) return { text: `${fmtEUR(need)} al mese fino al ${fmtDateShort(g.deadline)}`, cls: "muted" };
+  return { text: `Mancano ${fmtEUR(g.target - g.saved)}`, cls: "muted" };
+}
+
+function GoalCard({ g, todayISO, onOpen }) {
+  const ratio = g.target > 0 ? g.saved / g.target : 0;
+  const m = goalMeta(g, todayISO);
   return (
-    <div className="py-3">
-      <button onClick={onOpen} className="w-full text-left">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[15px] font-medium truncate">{g.name}</span>
-          <span className="num text-sm shrink-0">{fmtEUR(g.saved)} <span className="muted">di {fmtEUR(g.target)}</span></span>
-        </div>
-        <div className="bar mt-2" style={{ height: 8 }}><div style={{ width: `${ratio * 100}%`, background: g.color }} /></div>
-      </button>
-      <div className="flex items-center justify-between mt-1.5 gap-3">
-        <span className={`text-xs ${done ? "c-green" : late ? "c-red" : "muted"}`}>{meta}</span>
-        {onMove && <button onClick={onMove} className="text-xs c-blue font-medium shrink-0">Aggiungi o togli</button>}
-      </div>
-    </div>
+    <button onClick={onOpen} className="panel p-4 text-left flex flex-col items-start gap-3 w-full">
+      <Ring value={ratio} size={76} stroke={8} color={g.color}>
+        <span className="num text-[15px] font-semibold">{Math.round(Math.min(1, ratio) * 100)}%</span>
+      </Ring>
+      <span className="w-full min-w-0">
+        <span className="block text-[15px] font-semibold truncate">{g.name}</span>
+        <span className="block num text-sm mt-0.5">{fmtEUR0(g.saved)} <span className="muted">di {fmtEUR0(g.target)}</span></span>
+        <span className={`block text-xs mt-1 ${m.cls}`}>{m.text}</span>
+      </span>
+    </button>
   );
 }
 
@@ -993,7 +1063,8 @@ function TxFormModal({ tx, initialType, accounts, allTags, todayISO, onClose, on
   const [category, setCategory] = useState(tx?.category || (type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)[0].id);
   const [description, setDescription] = useState(tx?.description || "");
   const [date, setDate] = useState(tx?.date || todayISO);
-  const [accountId, setAccountId] = useState(tx ? tx.accountId || "" : accounts.length === 1 ? accounts[0].id : "");
+  const liquid = accounts.filter((a) => !isInvest(a));
+  const [accountId, setAccountId] = useState(tx ? tx.accountId || "" : liquid.length === 1 ? liquid[0].id : "");
   const [tags, setTags] = useState(tx?.tags || []);
   const skip = useRef(true);
   const cats = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
@@ -1071,7 +1142,7 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
       </select>
       <label className="lbl">A</label>
       <select className="inp mb-1" value={to} onChange={(e) => setTo(e.target.value)}>
-        {accounts.map((a) => <option key={a.id} value={a.id}>{a.name} ({fmtEUR(a.balance)})</option>)}
+        {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}{isInvest(a) ? " (investimenti)" : ""}</option>)}
       </select>
       {from && from === to && <p className="text-xs c-red mb-3">Scegli due conti diversi.</p>}
       <div className="grid grid-cols-2 gap-3 mt-3 mb-5">
@@ -1085,7 +1156,7 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
         </div>
       </div>
       <button disabled={!valid} className="btn btn-ink"
-        onClick={() => valid && onSave({ id: tx?.id || uid("t"), type: "transfer", amount: round2(parsed), accountId: from, toAccountId: to, date, description: description.trim(), category: null, tags: [] }, tx)}>
+        onClick={() => valid && onSave({ id: tx?.id || uid("t"), type: "transfer", amount: round2(parsed), accountId: from, toAccountId: to, date, description: description.trim(), category: null, tags: tx?.tags || [] }, tx)}>
         {tx ? "Salva modifiche" : "Sposta denaro"}
       </button>
       {tx && <DeleteButton onConfirm={() => onDelete(tx)} />}
@@ -1093,28 +1164,33 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
   );
 }
 
-function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, onSave, onDelete }) {
-  const [kind, setKind] = useState(item?.kind || initialKind);
-  const [name, setName] = useState(item?.name || "");
+function RecurringFormModal({ item, preset, accounts, todayISO, onClose, onSave, onDelete }) {
+  const initKind = item?.kind || preset?.kind || "expense";
+  const liquid = accounts.filter((a) => !isInvest(a));
+  const [kind, setKind] = useState(initKind);
+  const [name, setName] = useState(item?.name || preset?.name || "");
   const [amount, setAmount] = useState(item ? String(item.amount).replace(".", ",") : "");
   const [frequency, setFrequency] = useState(item?.frequency || "mensile");
   const [refDate, setRefDate] = useState(item?.refDate || todayISO);
-  const [category, setCategory] = useState(item?.category || (initialKind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES)[0].id);
-  const [accountId, setAccountId] = useState(item ? item.accountId || "" : accounts.length === 1 ? accounts[0].id : "");
+  const [category, setCategory] = useState(item?.category || (initKind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES)[0].id);
+  const [accountId, setAccountId] = useState(item ? item.accountId || "" : preset?.accountId || (liquid.length === 1 ? liquid[0].id : ""));
+  const [toAccountId, setToAccountId] = useState(item?.toAccountId || preset?.toAccountId || "");
   const [auto, setAuto] = useState(item ? !!item.auto : true);
   const skip = useRef(true);
   const cats = kind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES;
-  useEffect(() => { if (skip.current) { skip.current = false; return; } setCategory(cats[0].id); }, [kind]);
+  useEffect(() => { if (skip.current) { skip.current = false; return; } if (kind !== "transfer") setCategory(cats[0].id); }, [kind]);
   const parsed = parseAmount(amount);
-  const valid = name.trim() && parsed > 0 && refDate;
+  const valid = name.trim() && parsed > 0 && refDate && (kind !== "transfer" || (accountId && toAccountId && accountId !== toAccountId));
+  const title = item ? "Modifica" : kind === "income" ? "Nuova entrata fissa" : kind === "transfer" ? "Nuovo trasferimento fisso" : "Nuova spesa fissa";
   return (
-    <Sheet title={item ? "Modifica" : kind === "income" ? "Nuova entrata fissa" : "Nuova spesa fissa"} onClose={onClose}>
-      <div className="seg mb-4">
+    <Sheet title={title} onClose={onClose}>
+      <div className="seg small mb-4">
         <button className={kind === "expense" ? "on" : ""} onClick={() => setKind("expense")}>Spesa fissa</button>
         <button className={kind === "income" ? "on" : ""} onClick={() => setKind("income")}>Entrata fissa</button>
+        <button className={kind === "transfer" ? "on" : ""} onClick={() => setKind("transfer")}>Trasferimento</button>
       </div>
       <label className="lbl">Nome</label>
-      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "income" ? "Es. Borsa di studio" : "Es. Spotify"} />
+      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "income" ? "Es. Borsa di studio" : kind === "transfer" ? "Es. Versamento investimenti" : "Es. Spotify"} />
       <label className="lbl">Importo in euro</label>
       <input className="inp num mb-4" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" />
       <label className="lbl">Ogni quanto</label>
@@ -1123,24 +1199,45 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
           <button key={f} className={frequency === f ? "on" : ""} onClick={() => setFrequency(f)}>{FREQ_LABEL[f]}</button>
         ))}
       </div>
-      <label className="lbl">Data di addebito o accredito</label>
+      <label className="lbl">Data del movimento</label>
       <input className="inp mb-1.5" type="date" value={refDate} onChange={(e) => setRefDate(e.target.value)} />
       <p className="text-xs muted mb-4">{freqHelpText(frequency, refDate)}</p>
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div>
-          <label className="lbl">Categoria</label>
-          <select className="inp" value={category} onChange={(e) => setCategory(e.target.value)}>
-            {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-          </select>
+      {kind === "transfer" ? (
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="lbl">Da</label>
+            <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+              <option value="">Scegli</option>
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="lbl">A</label>
+            <select className="inp" value={toAccountId} onChange={(e) => setToAccountId(e.target.value)}>
+              <option value="">Scegli</option>
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+          {accountId && accountId === toAccountId && <p className="text-xs c-red" style={{ gridColumn: "1 / -1" }}>Scegli due conti diversi.</p>}
+          <p className="text-xs muted" style={{ gridColumn: "1 / -1" }}>Un trasferimento non conta come spesa: sposta denaro tra i tuoi conti, per esempio verso quello degli investimenti.</p>
         </div>
-        <div>
-          <label className="lbl">Conto</label>
-          <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
-            <option value="">Nessuno</option>
-            {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="lbl">Categoria</label>
+            <select className="inp" value={category} onChange={(e) => setCategory(e.target.value)}>
+              {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="lbl">Conto</label>
+            <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+              <option value="">Nessuno</option>
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex items-center justify-between rounded-xl p-3 mb-5" style={{ background: "var(--surface2)" }}>
         <div className="pr-3">
           <div className="text-[15px] font-medium">Registra in automatico</div>
@@ -1149,7 +1246,7 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
         <Toggle checked={auto} onChange={setAuto} label="Registra in automatico" />
       </div>
       <button disabled={!valid} className="btn btn-ink"
-        onClick={() => valid && onSave({ id: item?.id || uid("r"), kind, name: name.trim(), amount: round2(parsed), frequency, refDate, category, accountId: accountId || null, active: item ? item.active : true, auto })}>
+        onClick={() => valid && onSave({ id: item?.id || uid("r"), kind, name: name.trim(), amount: round2(parsed), frequency, refDate, category: kind === "transfer" ? null : category, accountId: accountId || null, toAccountId: kind === "transfer" ? toAccountId : null, active: item ? item.active : true, auto })}>
         {item ? "Salva modifiche" : "Aggiungi"}
       </button>
       {item && <DeleteButton onConfirm={() => onDelete(item.id)} />}
@@ -1157,22 +1254,68 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
   );
 }
 
-function AccountFormModal({ account, onClose, onSave, onDelete }) {
+function AccountFormModal({ account, presetType, onClose, onSave, onDelete }) {
+  const [type, setType] = useState(account?.type || presetType || "cash");
   const [name, setName] = useState(account?.name || "");
   const [balance, setBalance] = useState(account ? String(account.balance).replace(".", ",") : "");
+  const [value, setValue] = useState("");
   const parsed = parseAmount(balance);
-  const valid = name.trim() && balance !== "" && !isNaN(parsed);
+  const v = value === "" ? null : parseAmount(value);
+  const valid = name.trim() && balance !== "" && !isNaN(parsed) && (v === null || !isNaN(v));
+  const inv = type === "invest";
   return (
-    <Sheet title={account ? "Modifica conto" : "Nuovo conto"} onClose={onClose}>
+    <Sheet title={account ? "Modifica conto" : inv ? "Nuovo conto investimenti" : "Nuovo conto"} onClose={onClose}>
+      <div className="seg mb-4">
+        <button className={!inv ? "on" : ""} onClick={() => setType("cash")}>Conto o carta</button>
+        <button className={inv ? "on" : ""} onClick={() => setType("invest")}>Investimenti</button>
+      </div>
       <label className="lbl">Nome</label>
-      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Conto corrente, Revolut, Contanti" />
-      <label className="lbl">Saldo attuale in euro</label>
+      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={inv ? "Es. Carta investimenti, PAC ETF" : "Es. Conto corrente, Revolut, Contanti"} />
+      <label className="lbl">{inv ? "Quanto hai versato finora" : "Saldo attuale in euro"}</label>
       <input className="inp num mb-1.5" type="text" inputMode="decimal" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="0,00" />
-      <p className="text-xs muted mb-5">Si aggiorna da solo con i movimenti collegati. Correggilo qui se non coincide con l'estratto conto.</p>
-      <button disabled={!valid} className="btn btn-ink" onClick={() => valid && onSave({ id: account?.id || uid("a"), name: name.trim(), balance: round2(parsed) })}>
+      <p className="text-xs muted mb-4">
+        {inv ? "Aumenta da solo con ogni versamento che fai verso questo conto." : "Si aggiorna da solo con i movimenti collegati. Correggilo qui se non coincide con l'estratto conto."}
+      </p>
+      {inv && !account && (
+        <>
+          <label className="lbl">Valore attuale dell'investimento (facoltativo)</label>
+          <input className="inp num mb-1.5" type="text" inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder="Quanto vale oggi" />
+          <p className="text-xs muted mb-4">Serve a calcolare il rendimento. Potrai aggiornarlo quando vuoi.</p>
+        </>
+      )}
+      <button disabled={!valid} className="btn btn-ink mt-1"
+        onClick={() => valid && onSave({ ...(account || {}), id: account?.id || uid("a"), name: name.trim(), balance: round2(parsed), type, valuations: account?.valuations || [] }, v)}>
         {account ? "Salva modifiche" : "Aggiungi conto"}
       </button>
       {account && <DeleteButton label="Elimina conto" onConfirm={() => onDelete(account.id)} />}
+    </Sheet>
+  );
+}
+
+function ValuationModal({ accounts, initialId, todayISO, onClose, onSave }) {
+  const [id, setId] = useState(initialId || accounts[0]?.id || "");
+  const acc = accounts.find((a) => a.id === id);
+  const [value, setValue] = useState("");
+  const [date, setDate] = useState(todayISO);
+  const v = parseAmount(value);
+  const gain = acc && v > 0 ? v - acc.balance : null;
+  return (
+    <Sheet title="Aggiorna il valore" onClose={onClose}>
+      {accounts.length > 1 && (
+        <>
+          <label className="lbl">Conto</label>
+          <select className="inp mb-4" value={id} onChange={(e) => setId(e.target.value)}>
+            {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </>
+      )}
+      {acc && <p className="text-sm muted mb-4 num">Versato su {acc.name}: {fmtEUR(acc.balance)}. Valore attuale registrato: {fmtEUR(accountValue(acc))}.</p>}
+      <label className="lbl">Quanto vale oggi, secondo la tua app di investimento</label>
+      <input className="inp num mb-2" type="text" inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
+      {gain != null && <p className={`text-sm num mb-3 ${gain >= 0 ? "c-green" : "c-red"}`}>Rendimento: {fmtSigned(gain)} ({fmtPct(acc.balance > 0 ? (gain / acc.balance) * 100 : 0)})</p>}
+      <label className="lbl">Data</label>
+      <input className="inp mb-5" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
+      <button disabled={!(v > 0) || !acc} className="btn btn-ink" onClick={() => v > 0 && acc && onSave(acc.id, round2(v), date)}>Salva valore</button>
     </Sheet>
   );
 }
@@ -1196,6 +1339,7 @@ function GoalModal({ goal, colorIndex, onClose, onSave, onDelete }) {
   const [target, setTarget] = useState(goal ? String(goal.target).replace(".", ",") : "");
   const [deadline, setDeadline] = useState(goal?.deadline || "");
   const [saved, setSaved] = useState(goal ? String(goal.saved).replace(".", ",") : "");
+  const [color, setColor] = useState(goal?.color || GOAL_COLORS[colorIndex % GOAL_COLORS.length]);
   const t = parseAmount(target);
   const s = saved === "" ? 0 : parseAmount(saved);
   const valid = name.trim() && t > 0 && !isNaN(s) && s >= 0;
@@ -1214,13 +1358,18 @@ function GoalModal({ goal, colorIndex, onClose, onSave, onDelete }) {
         </div>
       </div>
       <label className="lbl">Entro il (facoltativo)</label>
-      <div className="flex gap-2 mb-1.5">
+      <div className="flex gap-2 mb-4">
         <input className="inp" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
         {deadline && <button onClick={() => setDeadline("")} className="btn btn-ghost" style={{ width: "auto", padding: "0 14px" }}>Togli</button>}
       </div>
-      <p className="text-xs muted mb-5">Con una scadenza l'app calcola quanto mettere da parte ogni mese. Gli obiettivi non spostano soldi tra i conti: indicano quanta parte del saldo è già impegnata.</p>
+      <label className="lbl">Colore</label>
+      <div className="flex gap-2.5 mb-5">
+        {GOAL_COLORS.map((c) => (
+          <button key={c} onClick={() => setColor(c)} aria-label="Scegli colore" style={{ width: 34, height: 34, borderRadius: 999, background: c, boxShadow: color === c ? "0 0 0 3px var(--surface), 0 0 0 5px var(--ink)" : "none" }} />
+        ))}
+      </div>
       <button disabled={!valid} className="btn btn-ink"
-        onClick={() => valid && onSave({ id: goal?.id || uid("g"), name: name.trim(), target: round2(t), saved: round2(s), deadline: deadline || null, color: goal?.color || GOAL_COLORS[colorIndex % GOAL_COLORS.length] })}>
+        onClick={() => valid && onSave({ ...(goal || {}), id: goal?.id || uid("g"), name: name.trim(), target: round2(t), saved: round2(s), deadline: deadline || null, color }, goal)}>
         {goal ? "Salva modifiche" : "Crea obiettivo"}
       </button>
       {goal && <DeleteButton label="Elimina obiettivo" onConfirm={() => onDelete(goal.id)} />}
@@ -1228,24 +1377,73 @@ function GoalModal({ goal, colorIndex, onClose, onSave, onDelete }) {
   );
 }
 
-function GoalMoveModal({ goal, onClose, onSave }) {
+function GoalDetailSheet({ goal, todayISO, theme, onClose, onMove, onEdit }) {
   const [dir, setDir] = useState("add");
   const [amount, setAmount] = useState("");
   const a = parseAmount(amount);
-  const valid = a > 0 && (dir === "add" || a <= goal.saved + 0.004);
+  const validMove = a > 0 && (dir === "add" || a <= goal.saved + 0.004);
+  const ratio = goal.target > 0 ? goal.saved / goal.target : 0;
+  const m = goalMeta(goal, todayISO);
+  const chart = useMemo(() => {
+    const hist = (goal.history || []).slice().sort((x, y) => x.date.localeCompare(y.date));
+    const created = goal.createdAt || (hist[0] ? hist[0].date : todayISO);
+    const startSaved = hist.filter((h) => h.date <= created).reduce((s, h) => s + h.delta, 0);
+    const dates = new Set([created, todayISO, ...hist.map((h) => h.date)]);
+    if (goal.deadline && goal.deadline > created) dates.add(goal.deadline);
+    const list = [...dates].sort();
+    const totalDays = goal.deadline ? Math.max(1, -daysUntil(isoToDate(created), goal.deadline)) : null;
+    return list.map((d) => {
+      const cum = d <= todayISO ? round2(hist.filter((h) => h.date <= d).reduce((s, h) => s + h.delta, 0)) : null;
+      let ideal = null;
+      if (goal.deadline && totalDays) {
+        const p = Math.min(1, Math.max(0, -daysUntil(isoToDate(created), d) / totalDays));
+        ideal = round2(startSaved + (goal.target - startSaved) * p);
+      }
+      return { label: fmtDateShort(d), saved: cum, ideal };
+    });
+  }, [goal, todayISO]);
   return (
     <Sheet title={goal.name} onClose={onClose}>
-      <p className="text-sm muted mb-4 num">Messi da parte {fmtEUR(goal.saved)} di {fmtEUR(goal.target)}.</p>
-      <div className="seg mb-4">
-        <button className={dir === "add" ? "on" : ""} onClick={() => setDir("add")}>Aggiungi</button>
+      <div className="flex items-center gap-5">
+        <Ring value={ratio} size={124} stroke={12} color={goal.color}>
+          <span>
+            <span className="block serif num text-[26px] leading-none">{Math.round(Math.min(1, ratio) * 100)}%</span>
+            <span className="block text-[11px] muted mt-1">completato</span>
+          </span>
+        </Ring>
+        <div className="min-w-0">
+          <div className="text-sm muted">Messi da parte</div>
+          <div className="num text-[22px] font-semibold">{fmtEUR(goal.saved)}</div>
+          <div className="text-sm muted num">di {fmtEUR(goal.target)}</div>
+          <div className={`text-xs mt-2 ${m.cls}`}>{m.text}</div>
+        </div>
+      </div>
+      {RC && chart.length > 1 && (
+        <div className="panel pt-4 pr-2 pb-1 mt-5">
+          <RC.ResponsiveContainer width="100%" height={170}>
+            <RC.ComposedChart data={chart} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+              <RC.CartesianGrid stroke={theme.line} vertical={false} />
+              <RC.XAxis dataKey="label" tick={{ fill: theme.muted, fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={24} />
+              <RC.YAxis tick={{ fill: theme.muted, fontSize: 11 }} axisLine={false} tickLine={false} width={42} tickFormatter={compactEUR} />
+              <RC.Tooltip content={<ChartTip />} />
+              <RC.ReferenceLine y={goal.target} stroke={goal.color} strokeDasharray="4 4" />
+              {goal.deadline && <RC.Line type="linear" dataKey="ideal" name="Percorso ideale" stroke={theme.muted} strokeDasharray="5 4" strokeWidth={1.5} dot={false} connectNulls />}
+              <RC.Area type="stepAfter" dataKey="saved" name="Messi da parte" stroke={goal.color} fill={goal.color} fillOpacity={0.18} strokeWidth={2.2} dot={false} connectNulls />
+            </RC.ComposedChart>
+          </RC.ResponsiveContainer>
+        </div>
+      )}
+      {goal.deadline && <p className="text-xs muted mt-2">La linea tratteggiata mostra dove dovresti essere oggi per arrivare in tempo.</p>}
+      <div className="seg mt-5 mb-3">
+        <button className={dir === "add" ? "on" : ""} onClick={() => setDir("add")}>Metti da parte</button>
         <button className={dir === "remove" ? "on" : ""} onClick={() => setDir("remove")}>Togli</button>
       </div>
-      <label className="lbl">Importo in euro</label>
-      <input className="inp num mb-1.5" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
-      {dir === "remove" && a > goal.saved + 0.004 && <p className="text-xs c-red">Non puoi togliere più di quanto hai messo da parte.</p>}
-      <button disabled={!valid} className="btn btn-ink mt-4" onClick={() => valid && onSave(round2(dir === "add" ? a : -a))}>
-        {dir === "add" ? "Metti da parte" : "Togli dall'obiettivo"}
-      </button>
+      <div className="flex gap-2">
+        <input className="inp num" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Importo" />
+        <button disabled={!validMove} onClick={() => { if (validMove) { onMove(round2(dir === "add" ? a : -a)); setAmount(""); } }} className="btn btn-ink" style={{ width: "auto", padding: "0 18px" }}>Conferma</button>
+      </div>
+      {dir === "remove" && a > goal.saved + 0.004 && <p className="text-xs c-red mt-1">Non puoi togliere più di quanto hai messo da parte.</p>}
+      <button onClick={onEdit} className="btn btn-ghost mt-4">Modifica obiettivo</button>
     </Sheet>
   );
 }
@@ -1258,7 +1456,8 @@ function SharedExpenseModal({ people, accounts, todayISO, onClose, onSave, onAdd
   const [parts, setParts] = useState(() => people.map((p) => p.id));
   const [includeMe, setIncludeMe] = useState(true);
   const [category, setCategory] = useState("casa");
-  const [accountId, setAccountId] = useState(accounts.length === 1 ? accounts[0].id : "");
+  const liquid = accounts.filter((a) => !isInvest(a));
+  const [accountId, setAccountId] = useState(liquid.length === 1 ? liquid[0].id : "");
   const [newName, setNewName] = useState("");
   const prevCount = useRef(people.length);
   useEffect(() => {
@@ -1276,7 +1475,7 @@ function SharedExpenseModal({ people, accounts, todayISO, onClose, onSave, onAdd
   const valid = description.trim() && amt > 0 && effParts.length > 0 && (payer === "me" || includeMe);
   let preview = "";
   if (amt > 0 && effParts.length) {
-    if (payer === "me") preview = includeMe ? `${fmtEUR(share)} a testa. La tua quota va tra le uscite, il resto ({x}) ti verrà restituito.`.replace("{x}", fmtEUR(share * effParts.length)) : `Prestito: ti devono ${fmtEUR(share * effParts.length)} in tutto.`;
+    if (payer === "me") preview = includeMe ? `${fmtEUR(share)} a testa. La tua quota va tra le uscite, il resto (${fmtEUR(share * effParts.length)}) ti verrà restituito.` : `Prestito: ti devono ${fmtEUR(share * effParts.length)} in tutto.`;
     else preview = includeMe ? `Devi ${fmtEUR(share)} a ${payerName}. La tua quota va tra le uscite; il conto si aggiorna quando salderai.` : "Se non hai pagato e non partecipi, la spesa non ti riguarda.";
   }
   const toggle = (id) => setParts((ps) => (ps.includes(id) ? ps.filter((x) => x !== id) : [...ps, id]));
@@ -1284,9 +1483,7 @@ function SharedExpenseModal({ people, accounts, todayISO, onClose, onSave, onAdd
     <Sheet title="Spesa condivisa" onClose={onClose}>
       <label className="lbl">Persone con cui dividi</label>
       <div className="flex flex-wrap gap-1.5 mb-2">
-        {people.map((p) => (
-          <button key={p.id} onClick={() => toggle(p.id)} className={`chip ${effParts.includes(p.id) ? "chip-on" : ""}`}>{p.name}</button>
-        ))}
+        {people.map((p) => <button key={p.id} onClick={() => toggle(p.id)} className={`chip ${effParts.includes(p.id) ? "chip-on" : ""}`}>{p.name}</button>)}
       </div>
       <div className="flex gap-2 mb-4">
         <input className="inp" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={people.length ? "Aggiungi un'altra persona" : "Nome del coinquilino o amico"} />
@@ -1350,7 +1547,8 @@ function SettleModal({ person, balance, accounts, todayISO, onClose, onSave }) {
   const [direction, setDirection] = useState(balance >= 0 ? "in" : "out");
   const [amount, setAmount] = useState(Math.abs(balance) > 0 ? String(Math.abs(balance)).replace(".", ",") : "");
   const [date, setDate] = useState(todayISO);
-  const [accountId, setAccountId] = useState(accounts.length === 1 ? accounts[0].id : "");
+  const liquid = accounts.filter((a) => !isInvest(a));
+  const [accountId, setAccountId] = useState(liquid.length === 1 ? liquid[0].id : "");
   const a = parseAmount(amount);
   return (
     <Sheet title={`Saldo con ${person.name}`} onClose={onClose}>
@@ -1383,6 +1581,24 @@ function SettleModal({ person, balance, accounts, todayISO, onClose, onSave }) {
   );
 }
 
+function EntryRow({ e, eff, person, onDelete }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
+  const title = e.kind === "settle" ? (e.direction === "in" ? `${person.name} ti ha restituito` : `Hai restituito a ${person.name}`) : e.description;
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <div className="flex-1 min-w-0">
+        <div className="text-[15px] truncate">{title}</div>
+        <div className="text-xs muted num">{fmtDateShort(e.date)}{e.kind === "expense" ? `, totale ${fmtEUR(e.total)}` : ""}</div>
+      </div>
+      <span className={`num text-sm font-medium ${eff > 0 ? "c-green" : eff < 0 ? "c-red" : "muted"}`}>{fmtSigned(eff)}</span>
+      <button onClick={() => (armed ? onDelete() : setArmed(true))} className="text-xs px-2 py-1 rounded-lg" style={{ color: "var(--red)", background: armed ? "color-mix(in srgb, var(--red) 14%, transparent)" : "transparent" }} aria-label="Elimina voce">
+        {armed ? "Conferma" : <X size={14} />}
+      </button>
+    </div>
+  );
+}
+
 function PersonSheet({ person, balance, entries, onClose, onSettle, onRename, onDelete, onDeleteEntry }) {
   const [name, setName] = useState(person.name);
   return (
@@ -1395,11 +1611,7 @@ function PersonSheet({ person, balance, entries, onClose, onSettle, onRename, on
       {entries.length > 0 && (
         <>
           <div className="text-[15px] font-semibold mb-2">Storico</div>
-          <Rows>
-            {entries.map(({ e, eff }) => (
-              <EntryRow key={e.id} e={e} eff={eff} person={person} onDelete={() => onDeleteEntry(e)} />
-            ))}
-          </Rows>
+          <Rows>{entries.map(({ e, eff }) => <EntryRow key={e.id} e={e} eff={eff} person={person} onDelete={() => onDeleteEntry(e)} />)}</Rows>
         </>
       )}
       <label className="lbl mt-6">Nome</label>
@@ -1407,30 +1619,8 @@ function PersonSheet({ person, balance, entries, onClose, onSettle, onRename, on
         <input className="inp" value={name} onChange={(e) => setName(e.target.value)} />
         <button disabled={!name.trim() || name.trim() === person.name} onClick={() => onRename(name.trim())} className="btn btn-ghost" style={{ width: "auto", padding: "0 16px" }}>Salva</button>
       </div>
-      {entries.length === 0 ? (
-        <DeleteButton label="Elimina persona" onConfirm={onDelete} />
-      ) : (
-        <p className="text-xs muted mt-3">Per eliminare la persona elimina prima le voci dello storico.</p>
-      )}
+      {entries.length === 0 ? <DeleteButton label="Elimina persona" onConfirm={onDelete} /> : <p className="text-xs muted mt-3">Per eliminare la persona elimina prima le voci dello storico.</p>}
     </Sheet>
-  );
-}
-
-function EntryRow({ e, eff, person, onDelete }) {
-  const [armed, setArmed] = useState(false);
-  useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
-  const title = e.kind === "settle" ? (e.direction === "in" ? `${person.name} ti ha restituito` : `Hai restituito a ${person.name}`) : e.description;
-  return (
-    <div className="flex items-center gap-3 py-3">
-      <div className="flex-1 min-w-0">
-        <div className="text-[15px] truncate">{title}</div>
-        <div className="text-xs muted num">{fmtDateShort(e.date)}{e.kind === "expense" ? `, totale ${fmtEUR(e.total)}` : ""}</div>
-      </div>
-      <span className={`num text-sm font-medium ${eff > 0 ? "c-green" : eff < 0 ? "c-red" : "muted"}`}>{fmtSigned(eff)}</span>
-      <button onClick={() => (armed ? onDelete() : setArmed(true))} className="text-xs px-2 py-1 rounded-lg" style={{ color: "var(--red)", background: armed ? "color-mix(in srgb, var(--red) 14%, transparent)" : "transparent" }}>
-        {armed ? "Conferma" : <X size={14} />}
-      </button>
-    </div>
   );
 }
 
@@ -1443,8 +1633,9 @@ function AddSheet({ onClose, onPick }) {
     { id: "transfer", label: "Giroconto", text: "Sposta denaro tra due conti", Icon: ArrowLeftRight, color: "var(--blue)" },
     { id: "rec-expense", label: "Spesa fissa", text: "Abbonamento, affitto, rata", Icon: RefreshCw, color: "var(--ochre)" },
     { id: "rec-income", label: "Entrata fissa", text: "Stipendio, borsa di studio", Icon: CalendarIcon, color: "var(--ochre)" },
+    { id: "rec-transfer", label: "Versamento ricorrente", text: "Per esempio verso gli investimenti", Icon: InvestIcon, color: "var(--blue)" },
     { id: "goal", label: "Obiettivo di risparmio", text: "Una cifra da raggiungere entro una data", Icon: Target, color: "var(--green)" },
-    { id: "account", label: "Conto", text: "Banca, carta prepagata, contanti", Icon: Landmark, color: "var(--muted)" },
+    { id: "account", label: "Conto", text: "Banca, carta, contanti o investimenti", Icon: Landmark, color: "var(--muted)" },
   ];
   return (
     <Sheet title="Aggiungi" onClose={onClose}>
@@ -1452,10 +1643,7 @@ function AddSheet({ onClose, onPick }) {
         {opts.map((o) => (
           <button key={o.id} onClick={() => onPick(o.id)} className="w-full flex items-center gap-3 py-3 text-left">
             <span style={{ color: o.color }}><o.Icon size={20} /></span>
-            <span className="flex-1">
-              <span className="block text-[15px] font-medium">{o.label}</span>
-              <span className="block text-xs muted">{o.text}</span>
-            </span>
+            <span className="flex-1"><span className="block text-[15px] font-medium">{o.label}</span><span className="block text-xs muted">{o.text}</span></span>
             <ChevronRight size={18} className="muted" />
           </button>
         ))}
@@ -1469,7 +1657,7 @@ function BackupSection({ data, onImport }) {
   const [last, setLast] = useState(() => { try { return localStorage.getItem(BACKUP_KEY); } catch (e) { return null; } });
   const markDone = () => { const now = new Date().toISOString(); try { localStorage.setItem(BACKUP_KEY, now); } catch (e) {} setLast(now); };
   const doExport = async () => {
-    const json = JSON.stringify({ app: "flussi-economici", version: 4, exportedAt: new Date().toISOString(), ...data }, null, 2);
+    const json = JSON.stringify({ app: "flussi-economici", version: 5, exportedAt: new Date().toISOString(), ...data }, null, 2);
     const name = `flussi-backup-${localISODate()}.json`;
     try {
       const file = new File([json], name, { type: "application/json" });
@@ -1499,10 +1687,7 @@ function BackupSection({ data, onImport }) {
   const stale = !last || (Date.now() - new Date(last).getTime()) / 86400000 > 30;
   return (
     <div className="panel p-4">
-      <p className="text-sm muted mb-3">
-        I dati restano solo su questo telefono. Ultimo backup:{" "}
-        <span className={stale ? "c-ochre font-medium" : ""}>{last ? new Date(last).toLocaleDateString("it-IT") : "mai fatto"}</span>
-      </p>
+      <p className="text-sm muted mb-3">I dati restano solo su questo telefono. Ultimo backup: <span className={stale ? "c-ochre font-medium" : ""}>{last ? new Date(last).toLocaleDateString("it-IT") : "mai fatto"}</span></p>
       <div className="grid grid-cols-2 gap-2">
         <button onClick={doExport} className="btn btn-ink flex items-center justify-center gap-2"><Download size={16} /> Esporta</button>
         <button onClick={() => fileRef.current && fileRef.current.click()} className="btn btn-ghost flex items-center justify-center gap-2"><Upload size={16} /> Importa</button>
@@ -1538,9 +1723,10 @@ function App() {
   const [trModal, setTrModal] = useState(null);
   const [recModal, setRecModal] = useState(null);
   const [accModal, setAccModal] = useState(null);
+  const [valModal, setValModal] = useState(null);
   const [budgetModal, setBudgetModal] = useState(null);
   const [goalModal, setGoalModal] = useState(null);
-  const [goalMove, setGoalMove] = useState(null);
+  const [goalOpen, setGoalOpen] = useState(null);
   const [sharedModal, setSharedModal] = useState(false);
   const [settleFor, setSettleFor] = useState(null);
   const [personOpen, setPersonOpen] = useState(null);
@@ -1548,15 +1734,15 @@ function App() {
   const [walletReview, setWalletReview] = useState(null);
   const [guide, setGuide] = useState(false);
   const [note, setNote] = useState(null);
+  const [simMonthly, setSimMonthly] = useState(null);
   const walletRef = useRef(null);
 
-  const { transactions, recurring, accounts, budgets, goals, people, shared } = data;
+  const { transactions, recurring, accounts, budgets, goals, people, shared, investSettings } = data;
   const curKey = monthKeyOf(todayISO);
   const prevKey = shiftMonth(curKey, -1);
   const dayNum = isoToDate(todayISO).getDate();
   const yesterdayISO = addDaysISO(todayISO, -1);
 
-  /* persistenza, data, automatismi */
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }, [data]);
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === "visible") setTodayISO(localISODate()); };
@@ -1574,10 +1760,50 @@ function App() {
   useEffect(() => { if (!note) return; const t = setTimeout(() => setNote(null), 5000); return () => clearTimeout(t); }, [note]);
   useEffect(() => { window.scrollTo(0, 0); }, [tab, anTab, accTab]);
 
-  /* aggregati */
-  const totalAccounts = useMemo(() => round2(accounts.reduce((s, a) => s + a.balance, 0)), [accounts]);
+  /* ---------- conti, liquidità, investimenti ---------- */
+  const accById = useMemo(() => Object.fromEntries(accounts.map((a) => [a.id, a])), [accounts]);
+  const cashAccs = accounts.filter((a) => !isInvest(a));
+  const investAccs = accounts.filter(isInvest);
+  const liquidIds = useMemo(() => new Set(accounts.filter((a) => !isInvest(a)).map((a) => a.id)), [accounts]);
+  const investIds = useMemo(() => new Set(accounts.filter(isInvest).map((a) => a.id)), [accounts]);
+  const liquidity = round2(cashAccs.reduce((s, a) => s + a.balance, 0));
+  const investBook = round2(investAccs.reduce((s, a) => s + a.balance, 0));
+  const investValue = round2(investAccs.reduce((s, a) => s + accountValue(a), 0));
+  const investGain = round2(investValue - investBook);
+  const netWorth = round2(liquidity + investValue);
   const goalsSaved = useMemo(() => round2(goals.reduce((s, g) => s + g.saved, 0)), [goals]);
 
+  const flows = useMemo(() => [
+    ...transactions.map((t) => ({ date: t.date, eff: txEffects(t) })),
+    ...shared.map((e) => ({ date: e.date, eff: sharedExtraEffects(e) })),
+  ], [transactions, shared]);
+  const bookAt = (iso, ids) => {
+    let cur = 0;
+    accounts.forEach((a) => { if (ids.has(a.id)) cur += a.balance; });
+    flows.forEach((f) => { if (f.date > iso) f.eff.forEach(([id, d]) => { if (id && ids.has(id)) cur -= d; }); });
+    return round2(cur);
+  };
+  const valueAt = (a, iso) => {
+    const vals = (a.valuations || []).filter((v) => v.date <= iso).sort((x, y) => x.date.localeCompare(y.date));
+    const book = bookAt(iso, new Set([a.id]));
+    const v = vals[vals.length - 1];
+    return v ? round2(v.value + (book - v.book)) : book;
+  };
+  const liqEffect = (item) => {
+    const liquidAcc = (id) => !id || !isInvest(accById[id]);
+    if (item.kind === "income") return liquidAcc(item.accountId) ? item.amount : 0;
+    if (item.kind === "expense") return liquidAcc(item.accountId) ? -item.amount : 0;
+    return (item.accountId && liquidAcc(item.accountId) ? -item.amount : 0) + (item.toAccountId && liquidAcc(item.toAccountId) ? item.amount : 0);
+  };
+
+  const liqHistory = useMemo(() => {
+    const out = [];
+    for (let d = 30; d >= 0; d--) out.push(bookAt(addDaysISO(todayISO, -d), liquidIds));
+    return out;
+  }, [flows, accounts, todayISO, liquidIds]);
+  const liq30 = liqHistory.length ? round2(liqHistory[liqHistory.length - 1] - liqHistory[0]) : 0;
+
+  /* ---------- aggregati ---------- */
   const agg = useMemo(() => {
     const m = {};
     for (const t of transactions) {
@@ -1623,9 +1849,10 @@ function App() {
 
   const monthSched = useMemo(() => scheduledBetween(monthStartISO(curKey), monthEndISO(curKey)), [recurring, todayISO]);
   const next7 = useMemo(() => scheduledBetween("1970-01-01", addDaysISO(todayISO, 7)), [recurring, todayISO]);
-  const projected = round2(totalAccounts + monthSched.reduce((s, x) => s + (x.item.kind === "income" ? x.item.amount : -x.item.amount), 0));
+  const projected = round2(liquidity + monthSched.reduce((s, x) => s + liqEffect(x.item), 0));
   const curAgg = getAgg(curKey);
   const savingsCur = curAgg.inc - curAgg.exp;
+  const monthCats = EXPENSE_CATEGORIES.map((c) => ({ ...c, v: curAgg.cat[c.id] || 0 })).filter((c) => c.v > 0).sort((a, b) => b.v - a.v);
 
   const budgetRows = EXPENSE_CATEGORIES.map((c) => ({ ...c, limit: budgets[c.id] || 0, spent: curAgg.cat[c.id] || 0 }));
   const budgetAlerts = budgetRows.filter((r) => r.limit > 0 && r.spent >= r.limit * 0.8);
@@ -1646,7 +1873,10 @@ function App() {
   const owedToMe = round2(Object.values(peopleBal).filter((v) => v > 0).reduce((s, v) => s + v, 0));
   const iOwe = round2(-Object.values(peopleBal).filter((v) => v < 0).reduce((s, v) => s + v, 0));
 
-  /* osservazioni automatiche */
+  const pacItems = recurring.filter((r) => r.kind === "transfer" && r.active && isInvest(accById[r.toAccountId]));
+  const pacMonthly = round2(pacItems.reduce((s, r) => s + monthlyEquivalent(r), 0));
+
+  /* ---------- osservazioni ---------- */
   const insights = useMemo(() => {
     const out = [];
     const exps = transactions.filter((t) => t.type === "expense");
@@ -1696,9 +1926,9 @@ function App() {
         const avgM = lastMonths.reduce((s, k) => s + agg[k].exp, 0) / lastMonths.length;
         const proj = (expMTD / dayNum) * daysInMonth(curKey);
         const p = ((proj - avgM) / avgM) * 100;
-        const per = lastMonths.length === 1 ? "del mese scorso" : `media degli ultimi ${lastMonths.length} mesi`;
-        if (p >= 15) out.push({ tone: "bad", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(p)}% in più ${lastMonths.length === 1 ? per : `della ${per}`} (${fmtEUR(avgM)}).` });
-        else if (p <= -15) out.push({ tone: "good", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(-p)}% in meno ${lastMonths.length === 1 ? per : `della ${per}`} (${fmtEUR(avgM)}).` });
+        const ref = lastMonths.length === 1 ? "del mese scorso" : `della media degli ultimi ${lastMonths.length} mesi`;
+        if (p >= 15) out.push({ tone: "bad", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(p)}% in più ${ref} (${fmtEUR(avgM)}).` });
+        else if (p <= -15) out.push({ tone: "good", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(-p)}% in meno ${ref} (${fmtEUR(avgM)}).` });
       }
       const over = EXPENSE_CATEGORIES.filter((c) => budgets[c.id] > 0 && (curAgg.cat[c.id] || 0) > budgets[c.id]);
       if (over.length === 1) out.push({ tone: "bad", text: `Hai superato il budget di ${over[0].label.toLowerCase()} di ${fmtEUR(curAgg.cat[over[0].id] - budgets[over[0].id])}.` });
@@ -1712,13 +1942,17 @@ function App() {
       const topM = Object.values(mm).sort((a, b) => b.tot - a.tot)[0];
       if (topM && topM.n >= 3) out.push({ tone: "info", text: `Il posto dove hai speso di più a ${monthName(curKey)} è ${topM.name}: ${fmtEUR(topM.tot)} in ${topM.n} volte.` });
     }
+    if (investAccs.length && investBook > 0 && investAccs.some((a) => lastValuation(a))) {
+      const pct = (investGain / investBook) * 100;
+      out.push({ tone: investGain >= 0 ? "good" : "bad", text: `I tuoi investimenti valgono ${fmtEUR(investValue)} su ${fmtEUR(investBook)} versati: ${fmtSigned(investGain)} (${fmtPct(pct)}).` });
+    }
     const g = goals.find((x) => x.deadline && x.saved < x.target && goalMonthly(x, todayISO) != null);
     if (g) out.push({ tone: "info", text: `Per ${g.name} servono ${fmtEUR(goalMonthly(g, todayISO))} al mese fino al ${fmtDateShort(g.deadline)}.` });
     if (owedToMe > 0) out.push({ tone: "info", text: `Dalle spese condivise devi ricevere in tutto ${fmtEUR(owedToMe)}.` });
     return out;
-  }, [transactions, todayISO, agg, budgets, goals, owedToMe]);
+  }, [transactions, todayISO, agg, budgets, goals, owedToMe, accounts]);
 
-  /* azioni sui dati */
+  /* ---------- azioni ---------- */
   const saveTx = (tx, old) => {
     setData((d) => {
       let acc = d.accounts;
@@ -1752,6 +1986,7 @@ function App() {
       return old ? prev.map((r) => (r.id === item.id ? next : r)) : [...prev, next];
     });
     setRecModal(null);
+    setNote("Movimento ricorrente salvato");
   };
   const deleteRecurring = (id) => { setRecurring((prev) => prev.filter((r) => r.id !== id)); setRecModal(null); };
   const toggleRec = (id, field) => setRecurring((prev) => prev.map((r) => {
@@ -1760,44 +1995,65 @@ function App() {
     return val ? { ...r, [field]: val, processedThrough: maxISO(r.processedThrough || yesterdayISO, yesterdayISO) } : { ...r, [field]: val };
   }));
   const markRecurringPaid = (item) => {
-    const isIncome = item.kind === "income";
     const date = item.nextISO < todayISO ? item.nextISO : todayISO;
+    const tx = recurringTx(item, date);
     setData((d) => ({
       ...d,
-      transactions: [...d.transactions, { id: uid("t"), type: item.kind, amount: item.amount, category: isIncome ? item.category : "abbonamenti", description: item.name, date, accountId: item.accountId || null, tags: [] }],
-      accounts: applyBalance(d.accounts, item.accountId, isIncome ? item.amount : -item.amount),
+      transactions: [...d.transactions, tx],
+      accounts: applyEffects(d.accounts, txEffects(tx), 1),
       recurring: d.recurring.map((r) => (r.id === item.id ? { ...r, processedThrough: item.nextISO } : r)),
     }));
-    setNote(isIncome ? "Entrata registrata" : "Pagamento registrato");
+    setNote(item.kind === "income" ? "Entrata registrata" : item.kind === "transfer" ? "Trasferimento registrato" : "Pagamento registrato");
   };
 
-  const saveAccount = (acc) => {
-    setData((d) => ({ ...d, accounts: d.accounts.some((a) => a.id === acc.id) ? d.accounts.map((a) => (a.id === acc.id ? acc : a)) : [...d.accounts, acc] }));
+  const saveAccount = (acc, initialValue) => {
+    setData((d) => {
+      let a = { ...acc };
+      if (!d.accounts.some((x) => x.id === a.id) && isInvest(a) && initialValue != null && initialValue > 0) {
+        a.valuations = [{ date: todayISO, value: round2(initialValue), book: a.balance }];
+      }
+      return { ...d, accounts: d.accounts.some((x) => x.id === a.id) ? d.accounts.map((x) => (x.id === a.id ? a : x)) : [...d.accounts, a] };
+    });
     setAccModal(null);
+    setNote("Conto salvato");
   };
   const deleteAccount = (id) => { setData((d) => ({ ...d, accounts: d.accounts.filter((a) => a.id !== id) })); setAccModal(null); };
+  const saveValuation = (id, value, date) => {
+    const book = bookAt(date, new Set([id]));
+    setData((d) => ({ ...d, accounts: d.accounts.map((a) => (a.id === id ? { ...a, valuations: [...(a.valuations || []).filter((v) => v.date !== date), { date, value, book }].sort((x, y) => x.date.localeCompare(y.date)) } : a)) }));
+    setValModal(null);
+    setNote("Valore aggiornato");
+  };
 
   const setBudget = (catId, value) => {
     setData((d) => { const b = { ...d.budgets }; if (value > 0) b[catId] = value; else delete b[catId]; return { ...d, budgets: b }; });
     setBudgetModal(null);
   };
 
-  const saveGoal = (g) => {
-    setData((d) => ({ ...d, goals: d.goals.some((x) => x.id === g.id) ? d.goals.map((x) => (x.id === g.id ? g : x)) : [...d.goals, g] }));
+  const saveGoal = (g, old) => {
+    setData((d) => {
+      let goal = { ...g };
+      if (!old) {
+        goal.createdAt = todayISO;
+        goal.history = g.saved > 0 ? [{ date: todayISO, delta: g.saved }] : [];
+      } else {
+        const delta = round2(g.saved - old.saved);
+        goal.history = [...(old.history || []), ...(Math.abs(delta) > 0.004 ? [{ date: todayISO, delta }] : [])];
+      }
+      return { ...d, goals: old ? d.goals.map((x) => (x.id === goal.id ? goal : x)) : [...d.goals, goal] };
+    });
     setGoalModal(null);
     setNote("Obiettivo salvato");
   };
-  const deleteGoal = (id) => { setData((d) => ({ ...d, goals: d.goals.filter((x) => x.id !== id) })); setGoalModal(null); };
+  const deleteGoal = (id) => { setData((d) => ({ ...d, goals: d.goals.filter((x) => x.id !== id) })); setGoalModal(null); setGoalOpen(null); };
   const moveGoal = (id, delta) => {
-    setData((d) => ({ ...d, goals: d.goals.map((x) => (x.id === id ? { ...x, saved: round2(Math.max(0, x.saved + delta)) } : x)) }));
-    setGoalMove(null);
+    setData((d) => ({ ...d, goals: d.goals.map((x) => (x.id === id ? { ...x, saved: round2(Math.max(0, x.saved + delta)), history: [...(x.history || []), { date: todayISO, delta }] } : x)) }));
     setNote(delta > 0 ? "Messo da parte" : "Tolto dall'obiettivo");
   };
 
   const addPerson = (name) => setData((d) => ({ ...d, people: [...d.people, { id: uid("p"), name }] }));
   const renamePerson = (id, name) => setData((d) => ({ ...d, people: d.people.map((p) => (p.id === id ? { ...p, name } : p)) }));
   const deletePerson = (id) => { setData((d) => ({ ...d, people: d.people.filter((p) => p.id !== id) })); setPersonOpen(null); };
-
   const saveShared = (entry) => {
     setData((d) => {
       let txs = d.transactions;
@@ -1828,8 +2084,9 @@ function App() {
     });
     setNote("Voce eliminata");
   };
+  const setInvestSetting = (k, v) => setData((d) => ({ ...d, investSettings: { ...d.investSettings, [k]: v } }));
 
-  /* Wallet e Siri */
+  /* ---------- Wallet e Siri ---------- */
   const openWalletPicker = () => { if (walletRef.current) walletRef.current.click(); };
   const onWalletFile = async (e) => {
     const f = e.target.files && e.target.files[0];
@@ -1838,21 +2095,14 @@ function App() {
     let text = "";
     try { text = await f.text(); } catch (err) { window.alert("Impossibile leggere il file scelto."); return; }
     const { items, valid } = parseWalletFile(text, new Set(data.walletSeen), todayISO);
-    if (!valid) {
-      window.alert("Il file non contiene spese nel formato previsto. Ogni riga deve essere data|esercente|importo|carta: controlla il comando rapido.");
-      return;
-    }
-    if (!items.length) {
-      setData((d) => ({ ...d, walletLastImport: new Date().toISOString() }));
-      setNote("Nessuna nuova spesa da importare");
-      return;
-    }
-    const enriched = items.map((it) => ({
+    if (!valid) { window.alert("Il file non contiene spese nel formato previsto. Ogni riga deve essere data|esercente|importo|carta: controlla il comando rapido."); return; }
+    if (!items.length) { setData((d) => ({ ...d, walletLastImport: new Date().toISOString() })); setNote("Nessuna nuova spesa da importare"); return; }
+    const liquid = accounts.filter((a) => !isInvest(a));
+    setWalletReview(items.map((it) => ({
       ...it,
       category: data.merchantMap[it.merchant.toLowerCase()] || "altro-u",
-      accountId: it.card && data.cardMap[it.card] && accounts.some((a) => a.id === data.cardMap[it.card]) ? data.cardMap[it.card] : accounts.length === 1 ? accounts[0].id : "",
-    }));
-    setWalletReview(enriched);
+      accountId: it.card && data.cardMap[it.card] && accById[data.cardMap[it.card]] ? data.cardMap[it.card] : liquid.length === 1 ? liquid[0].id : "",
+    })));
   };
   const confirmWallet = (rows) => {
     const inc = rows.filter((r) => r.include && r.amount > 0);
@@ -1881,14 +2131,16 @@ function App() {
   };
   const walletLastLabel = data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}` : "Da Wallet e dai contanti dettati a Siri";
 
+  const newPacPreset = () => ({ kind: "transfer", name: "Versamento investimenti", toAccountId: investAccs[0]?.id || "", accountId: cashAccs[0]?.id || "" });
   const pickAdd = (id) => {
     setAddSheet(false);
     if (id === "expense" || id === "income") setTxModal({ tx: null, type: id });
     else if (id === "wallet") openWalletPicker();
     else if (id === "shared") setSharedModal(true);
     else if (id === "transfer") setTrModal({ tx: null });
-    else if (id === "rec-expense") setRecModal({ item: null, kind: "expense" });
-    else if (id === "rec-income") setRecModal({ item: null, kind: "income" });
+    else if (id === "rec-expense") setRecModal({ item: null, preset: { kind: "expense" } });
+    else if (id === "rec-income") setRecModal({ item: null, preset: { kind: "income" } });
+    else if (id === "rec-transfer") setRecModal({ item: null, preset: newPacPreset() });
     else if (id === "goal") setGoalModal({ goal: null });
     else if (id === "account") setAccModal({ acc: null });
   };
@@ -1896,8 +2148,8 @@ function App() {
 
   /* ================= Oggi ================= */
   const steps = [
-    { done: accounts.length > 0, title: "Aggiungi i tuoi conti", text: "Con il saldo di oggi: banca, carta, contanti.", go: () => setAccModal({ acc: null }) },
-    { done: recurring.length > 0, title: "Inserisci le spese e le entrate fisse", text: "Affitto, abbonamenti, borsa di studio. Si registrano da sole.", go: () => setRecModal({ item: null, kind: "expense" }) },
+    { done: accounts.length > 0, title: "Aggiungi i tuoi conti", text: "Con il saldo di oggi: banca, carta, contanti, investimenti.", go: () => setAccModal({ acc: null }) },
+    { done: recurring.length > 0, title: "Inserisci i movimenti fissi", text: "Affitto, abbonamenti, borsa di studio, versamenti mensili.", go: () => setRecModal({ item: null, preset: { kind: "expense" } }) },
     { done: transactions.length > 0, title: "Registra il primo movimento", text: "Ogni spesa collegata a un conto ne aggiorna il saldo.", go: () => setTxModal({ tx: null, type: "expense" }) },
   ];
   const showSteps = steps.some((s) => !s.done);
@@ -1912,17 +2164,21 @@ function App() {
 
       <div className="relative overflow-hidden" style={{ background: "var(--note)", color: "var(--note-ink)", borderRadius: 22 }}>
         <Guilloche />
-        <div className="relative p-5">
-          <div className="text-sm" style={{ color: "var(--note-soft)" }}>Disponibile sui conti</div>
+        <div className="relative p-5 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="text-sm" style={{ color: "var(--note-soft)" }}>{investAccs.length ? "Liquidità disponibile" : "Disponibile sui conti"}</div>
+            {accounts.length > 0 && Math.abs(liq30) > 0.5 && (
+              <div className="text-xs num px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,.12)" }}>{liq30 > 0 ? "▲" : "▼"} {fmtEUR0(Math.abs(liq30))} in 30 giorni</div>
+            )}
+          </div>
           {accounts.length ? (
-            <div className="serif num mt-1" style={{ fontSize: 42, lineHeight: 1.05 }}>{fmtEUR(totalAccounts)}</div>
+            <div className="serif num mt-1" style={{ fontSize: 42, lineHeight: 1.05 }}>{fmtEUR(liquidity)}</div>
           ) : (
             <button onClick={() => setAccModal({ acc: null })} className="serif text-[26px] mt-1 text-left underline underline-offset-4">Aggiungi un conto</button>
           )}
-          {goalsSaved > 0 && (
-            <div className="text-xs mt-1 num" style={{ color: "var(--note-soft)" }}>di cui {fmtEUR(goalsSaved)} accantonati negli obiettivi, liberi {fmtEUR(totalAccounts - goalsSaved)}</div>
-          )}
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          {goalsSaved > 0 && <div className="text-xs mt-1 num" style={{ color: "var(--note-soft)" }}>di cui {fmtEUR(goalsSaved)} accantonati negli obiettivi, liberi {fmtEUR(liquidity - goalsSaved)}</div>}
+          {accounts.length > 0 && <div className="mt-3 -mx-1"><Sparkline values={liqHistory} color="var(--note-ink)" height={42} /></div>}
+          <div className="grid grid-cols-2 gap-4 mt-3">
             <div>
               <div className="text-xs" style={{ color: "var(--note-soft)" }}>Previsto a fine {monthName(curKey)}</div>
               <div className="num text-lg font-semibold mt-0.5">{fmtEUR(projected)}</div>
@@ -1932,6 +2188,12 @@ function App() {
               <div className="num text-lg font-semibold mt-0.5">{fmtSigned(savingsCur)}</div>
             </div>
           </div>
+          {investAccs.length > 0 && (
+            <button onClick={() => goTo("accounts", "invest")} className="w-full flex items-center justify-between mt-4 pt-3 text-left" style={{ borderTop: "1px solid rgba(255,255,255,.16)" }}>
+              <span className="text-xs" style={{ color: "var(--note-soft)" }}>Patrimonio con investimenti</span>
+              <span className="num text-[15px] font-semibold">{fmtEUR(netWorth)} {investGain !== 0 && <span className="text-xs" style={{ color: "var(--note-soft)" }}>({fmtPct(investBook > 0 ? (investGain / investBook) * 100 : 0)})</span>}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1945,10 +2207,7 @@ function App() {
           <Rows>
             {steps.map((s, i) => (
               <button key={i} onClick={s.go} className="w-full flex items-start gap-3 py-3 text-left" disabled={s.done}>
-                <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-semibold num"
-                  style={{ background: s.done ? "var(--green)" : "var(--surface2)", color: s.done ? "var(--surface)" : "var(--ink)" }}>
-                  {s.done ? <Check size={15} /> : i + 1}
-                </span>
+                <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-semibold num" style={{ background: s.done ? "var(--green)" : "var(--surface2)", color: s.done ? "var(--surface)" : "var(--ink)" }}>{s.done ? <Check size={15} /> : i + 1}</span>
                 <span>
                   <span className="block text-[15px] font-medium" style={{ textDecoration: s.done ? "line-through" : "none", color: s.done ? "var(--muted)" : "var(--ink)" }}>{s.title}</span>
                   {!s.done && <span className="block text-xs muted mt-0.5">{s.text}</span>}
@@ -1966,19 +2225,37 @@ function App() {
       )}
 
       <Section title="Questo mese, fino a oggi">
-        <div className="panel grid grid-cols-2">
-          <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
-            <div className="text-sm muted">Uscite</div>
-            <div className="num text-[22px] font-semibold mt-0.5">{fmtEUR(expMTD)}</div>
-            <div className="mt-1"><Delta cur={expMTD} prev={expPrevMTD} upIsGood={false} /></div>
-            <div className="text-xs muted mt-1 num">{fmtEUR(expPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
+        <div className="panel">
+          <div className="grid grid-cols-2">
+            <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
+              <div className="text-sm muted">Uscite</div>
+              <div className="num text-[22px] font-semibold mt-0.5">{fmtEUR(expMTD)}</div>
+              <div className="mt-1"><Delta cur={expMTD} prev={expPrevMTD} upIsGood={false} /></div>
+              <div className="text-xs muted mt-1 num">{fmtEUR(expPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
+            </div>
+            <div className="p-4">
+              <div className="text-sm muted">Entrate</div>
+              <div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(incMTD)}</div>
+              <div className="mt-1"><Delta cur={incMTD} prev={incPrevMTD} upIsGood={true} /></div>
+              <div className="text-xs muted mt-1 num">{fmtEUR(incPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
+            </div>
           </div>
-          <div className="p-4">
-            <div className="text-sm muted">Entrate</div>
-            <div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(incMTD)}</div>
-            <div className="mt-1"><Delta cur={incMTD} prev={incPrevMTD} upIsGood={true} /></div>
-            <div className="text-xs muted mt-1 num">{fmtEUR(incPrevMTD)} a {monthName(prevKey)} alla stessa data</div>
-          </div>
+          {monthCats.length > 0 && (
+            <button onClick={() => { setAnMonth(curKey); goTo("analysis", "month"); }} className="w-full text-left px-4 pb-4 pt-3" style={{ borderTop: "1px solid var(--line)" }}>
+              <div className="flex h-2.5 rounded-full overflow-hidden" style={{ gap: 2 }}>
+                {monthCats.map((c) => <div key={c.id} style={{ width: `${(c.v / curAgg.exp) * 100}%`, background: c.color }} />)}
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2.5">
+                {monthCats.slice(0, 4).map((c) => (
+                  <span key={c.id} className="flex items-center gap-1.5 text-xs">
+                    <span style={{ width: 7, height: 7, borderRadius: 9, background: c.color }} />
+                    <span className="muted">{c.label}</span>
+                    <span className="num font-medium">{fmtEUR0(c.v)}</span>
+                  </span>
+                ))}
+              </div>
+            </button>
+          )}
         </div>
       </Section>
 
@@ -1989,8 +2266,19 @@ function App() {
       )}
 
       {goals.length > 0 && (
-        <Section title="Obiettivi" action={<button onClick={() => goTo("accounts", "goals")} className="text-sm c-blue">Gestisci</button>}>
-          <Rows>{goals.slice(0, 3).map((g) => <GoalRow key={g.id} g={g} todayISO={todayISO} onOpen={() => setGoalModal({ goal: g })} onMove={() => setGoalMove({ goal: g })} />)}</Rows>
+        <Section title="Obiettivi" action={<button onClick={() => goTo("accounts", "goals")} className="text-sm c-blue">Tutti</button>}>
+          <div className="flex gap-3 overflow-x-auto noscroll -mx-4 px-4 pb-1">
+            {goals.map((g) => {
+              const r = g.target > 0 ? g.saved / g.target : 0;
+              return (
+                <button key={g.id} onClick={() => setGoalOpen(g.id)} className="panel p-3 flex flex-col items-center text-center shrink-0" style={{ width: 128 }}>
+                  <Ring value={r} size={68} stroke={7} color={g.color}><span className="num text-sm font-semibold">{Math.round(Math.min(1, r) * 100)}%</span></Ring>
+                  <span className="text-[13px] font-medium mt-2 w-full truncate">{g.name}</span>
+                  <span className="text-xs muted num">{fmtEUR0(g.saved)} di {fmtEUR0(g.target)}</span>
+                </button>
+              );
+            })}
+          </div>
         </Section>
       )}
 
@@ -2012,17 +2300,11 @@ function App() {
       <Section title="Prossimi 7 giorni" action={<button onClick={() => { setCalMonth(curKey); setSelDay(todayISO); setTab("schedule"); }} className="text-sm c-blue">Calendario</button>}>
         {next7.length ? (
           <Rows>{next7.map((s, i) => <ScheduledRow key={`${s.item.id}-${s.date}-${i}`} s={s} todayISO={todayISO} onClick={() => setRecModal({ item: recurring.find((r) => r.id === s.item.id) })} />)}</Rows>
-        ) : (
-          <p className="text-sm muted">Nessun pagamento o accredito in programma.</p>
-        )}
+        ) : <p className="text-sm muted">Nessun movimento in programma.</p>}
       </Section>
 
       <Section title="Ultimi movimenti" action={transactions.length > 0 && <button onClick={() => { setMovMonth(curKey); setTab("movements"); }} className="text-sm c-blue">Vedi tutti</button>}>
-        {recentTx.length ? (
-          <Rows>{recentTx.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}</Rows>
-        ) : (
-          <p className="text-sm muted">Ancora nessun movimento. Usa il pulsante + per registrare la prima spesa.</p>
-        )}
+        {recentTx.length ? <Rows>{recentTx.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}</Rows> : <p className="text-sm muted">Ancora nessun movimento. Usa il pulsante + per registrare la prima spesa.</p>}
       </Section>
     </div>
   );
@@ -2085,16 +2367,10 @@ function App() {
       {allTags.length > 0 && (
         <div className="flex gap-2 overflow-x-auto noscroll mt-2 -mx-4 px-4 items-center">
           <span className="muted shrink-0"><Tag size={15} /></span>
-          {allTags.map((t) => (
-            <button key={t} onClick={() => setTagFilter(tagFilter && sameTag(tagFilter, t) ? null : t)} className={`chip ${tagFilter && sameTag(tagFilter, t) ? "chip-on" : ""}`}>#{t}</button>
-          ))}
+          {allTags.map((t) => <button key={t} onClick={() => setTagFilter(tagFilter && sameTag(tagFilter, t) ? null : t)} className={`chip ${tagFilter && sameTag(tagFilter, t) ? "chip-on" : ""}`}>#{t}</button>)}
         </div>
       )}
-      {globalMode && (
-        <p className="text-xs muted mt-3 num">
-          {movFiltered.length} risultati in tutti i mesi{filteredTotals.exp > 0 ? `, uscite ${fmtEUR(filteredTotals.exp)}` : ""}{filteredTotals.inc > 0 ? `, entrate ${fmtEUR(filteredTotals.inc)}` : ""}
-        </p>
-      )}
+      {globalMode && <p className="text-xs muted mt-3 num">{movFiltered.length} risultati in tutti i mesi{filteredTotals.exp > 0 ? `, uscite ${fmtEUR(filteredTotals.exp)}` : ""}{filteredTotals.inc > 0 ? `, entrate ${fmtEUR(filteredTotals.inc)}` : ""}</p>}
       {movGroups.length ? movGroups.map((g) => {
         const net = g.items.reduce((s, t) => s + (t.type === "income" ? t.amount : t.type === "expense" ? -t.amount : 0), 0);
         return (
@@ -2128,14 +2404,11 @@ function App() {
     return m;
   }, [transactions, calMonth]);
   const calSched = useMemo(() => scheduledBetween(monthStartISO(calMonth), monthEndISO(calMonth)), [recurring, todayISO, calMonth]);
-  const calSchedByDay = useMemo(() => {
-    const m = {};
-    calSched.forEach((s) => { (m[s.date] = m[s.date] || []).push(s); });
-    return m;
-  }, [calSched]);
+  const calSchedByDay = useMemo(() => { const m = {}; calSched.forEach((s) => { (m[s.date] = m[s.date] || []).push(s); }); return m; }, [calSched]);
   const calAgg = getAgg(calMonth);
   const schedOut = calSched.filter((s) => s.item.kind === "expense").reduce((s, x) => s + x.item.amount, 0);
   const schedIn = calSched.filter((s) => s.item.kind === "income").reduce((s, x) => s + x.item.amount, 0);
+  const schedTr = calSched.filter((s) => s.item.kind === "transfer").reduce((s, x) => s + x.item.amount, 0);
   const selActs = selDay ? actualsByDay[selDay] || [] : [];
   const selSched = selDay ? calSchedByDay[selDay] || [] : [];
   const recList = recurringSorted.filter((r) => r.kind === recView);
@@ -2146,9 +2419,7 @@ function App() {
       <h1 className="serif text-[32px] leading-tight mb-2">Scadenze</h1>
       <MonthNav monthKey={calMonth} onChange={(k) => { setCalMonth(k); setSelDay(k === curKey ? todayISO : null); }} />
       <div className="panel p-2.5 mt-2">
-        <div className="grid grid-cols-7 text-center text-xs muted mb-1">
-          {["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}
-        </div>
+        <div className="grid grid-cols-7 text-center text-xs muted mb-1">{["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}</div>
         <div className="grid grid-cols-7 gap-y-1">
           {calCells.map((iso, i) => {
             if (!iso) return <span key={`b${i}`} />;
@@ -2156,6 +2427,7 @@ function App() {
             const sch = calSchedByDay[iso] || [];
             const hasExp = acts.some((t) => t.type === "expense");
             const hasInc = acts.some((t) => t.type === "income");
+            const hasTr = acts.some((t) => t.type === "transfer");
             const overdue = sch.some((s) => s.date < todayISO);
             const sel = iso === selDay;
             const isToday = iso === todayISO;
@@ -2166,6 +2438,7 @@ function App() {
                 <span className="flex gap-[3px] mt-1.5" style={{ height: 6 }}>
                   {hasExp && <span style={{ width: 6, height: 6, borderRadius: 9, background: "var(--red)" }} />}
                   {hasInc && <span style={{ width: 6, height: 6, borderRadius: 9, background: "var(--green)" }} />}
+                  {hasTr && <span style={{ width: 6, height: 6, borderRadius: 9, background: "var(--blue)" }} />}
                   {sch.length > 0 && <span style={{ width: 6, height: 6, borderRadius: 9, boxShadow: `inset 0 0 0 1.5px ${overdue ? "var(--red)" : "var(--ochre)"}` }} />}
                 </span>
               </button>
@@ -2174,22 +2447,20 @@ function App() {
         </div>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs muted mt-2 px-1">
-        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--red)" }} />uscita registrata</span>
-        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--green)" }} />entrata registrata</span>
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--red)" }} />uscita</span>
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--green)" }} />entrata</span>
+        <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, background: "var(--blue)" }} />trasferimento</span>
         <span className="flex items-center gap-1.5"><span style={{ width: 7, height: 7, borderRadius: 9, boxShadow: "inset 0 0 0 1.5px var(--ochre)" }} />in programma</span>
       </div>
 
       <Section title={selDay && monthKeyOf(selDay) === calMonth ? cap(fmtDayLong(selDay)) : "Dettaglio del giorno"} className="mt-6">
-        {!selDay || monthKeyOf(selDay) !== calMonth ? (
-          <p className="text-sm muted">Tocca un giorno del calendario.</p>
-        ) : selSched.length || selActs.length ? (
-          <Rows>
-            {selSched.map((s, i) => <ScheduledRow key={`s${i}`} s={s} todayISO={todayISO} onClick={() => setRecModal({ item: recurring.find((r) => r.id === s.item.id) })} />)}
-            {selActs.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}
-          </Rows>
-        ) : (
-          <p className="text-sm muted">Nessun movimento né scadenza in questo giorno.</p>
-        )}
+        {!selDay || monthKeyOf(selDay) !== calMonth ? <p className="text-sm muted">Tocca un giorno del calendario.</p>
+          : selSched.length || selActs.length ? (
+            <Rows>
+              {selSched.map((s, i) => <ScheduledRow key={`s${i}`} s={s} todayISO={todayISO} onClick={() => setRecModal({ item: recurring.find((r) => r.id === s.item.id) })} />)}
+              {selActs.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}
+            </Rows>
+          ) : <p className="text-sm muted">Nessun movimento né scadenza in questo giorno.</p>}
       </Section>
 
       <Section title={`Il mese di ${monthName(calMonth)}`}>
@@ -2203,18 +2474,18 @@ function App() {
             <div className="text-sm muted">Ancora in programma</div>
             <div className="num text-[15px] mt-1">−{fmtEUR(schedOut)}</div>
             <div className="num text-[15px] c-green">+{fmtEUR(schedIn)}</div>
+            {schedTr > 0 && <div className="num text-[13px] c-blue">{fmtEUR(schedTr)} in trasferimenti</div>}
           </div>
         </div>
       </Section>
 
-      <Section title="Spese ed entrate fisse">
-        <div className="seg">
+      <Section title="Movimenti ricorrenti">
+        <div className="seg small">
           <button className={recView === "expense" ? "on" : ""} onClick={() => setRecView("expense")}>Spese fisse</button>
           <button className={recView === "income" ? "on" : ""} onClick={() => setRecView("income")}>Entrate fisse</button>
+          <button className={recView === "transfer" ? "on" : ""} onClick={() => setRecView("transfer")}>Trasferimenti</button>
         </div>
-        {recList.length > 0 && (
-          <p className="text-sm muted mt-3 num">{recList.filter((r) => r.active).length} attive: {fmtEUR(recMonthly)} al mese, {fmtEUR(recMonthly * 12)} all'anno</p>
-        )}
+        {recList.length > 0 && <p className="text-sm muted mt-3 num">{recList.filter((r) => r.active).length} attivi: {fmtEUR(recMonthly)} al mese, {fmtEUR(recMonthly * 12)} all'anno</p>}
         <div className="space-y-2.5 mt-3">
           {recList.map((r) => (
             <RecurringItem key={r.id} item={r} accounts={accounts}
@@ -2224,9 +2495,9 @@ function App() {
               onMarkPaid={() => markRecurringPaid(r)} />
           ))}
         </div>
-        {!recList.length && <p className="text-sm muted mt-3">{recView === "expense" ? "Nessuna spesa fissa inserita." : "Nessuna entrata fissa inserita."}</p>}
-        <button onClick={() => setRecModal({ item: null, kind: recView })} className="btn btn-ghost mt-3">
-          {recView === "expense" ? "Aggiungi spesa fissa" : "Aggiungi entrata fissa"}
+        {!recList.length && <p className="text-sm muted mt-3">{recView === "expense" ? "Nessuna spesa fissa inserita." : recView === "income" ? "Nessuna entrata fissa inserita." : "Nessun trasferimento ricorrente. Usalo per i versamenti periodici verso gli investimenti."}</p>}
+        <button onClick={() => setRecModal({ item: null, preset: recView === "transfer" ? newPacPreset() : { kind: recView } })} className="btn btn-ghost mt-3">
+          {recView === "expense" ? "Aggiungi spesa fissa" : recView === "income" ? "Aggiungi entrata fissa" : "Aggiungi trasferimento ricorrente"}
         </button>
       </Section>
     </div>
@@ -2247,6 +2518,18 @@ function App() {
   const avg = (f) => avgBase.reduce((s, x) => s + x[f], 0) / avgBase.length;
   const periodStart = monthStartISO(shiftMonth(curKey, -(anPeriod - 1)));
 
+  const wealthSeries = useMemo(() => {
+    const out = [];
+    for (let i = anPeriod - 1; i >= 0; i--) {
+      const k = shiftMonth(curKey, -i);
+      const d = minISO(monthEndISO(k), todayISO);
+      const liq = bookAt(d, liquidIds);
+      const inv = round2(investAccs.reduce((s, a) => s + valueAt(a, d), 0));
+      out.push({ key: k, label: shortMonth(k), Liquidità: liq, Investimenti: inv, Totale: round2(liq + inv) });
+    }
+    return out;
+  }, [flows, accounts, anPeriod, curKey, todayISO]);
+
   const forecast = useMemo(() => {
     const end = addDaysISO(todayISO, forecastDays);
     const sched = scheduledBetween("1970-01-01", end);
@@ -2254,24 +2537,21 @@ function App() {
     const exps = transactions.filter((t) => t.type === "expense");
     const firstDate = exps.length ? exps.reduce((m, t) => (t.date < m ? t.date : m), exps[0].date) : todayISO;
     const span = Math.max(1, Math.min(90, -daysUntil(isoToDate(firstDate), todayISO) + 1));
-    const varSum = exps.filter((t) => t.category !== "abbonamenti" && !t.sharedId && t.date >= from90 && t.date <= todayISO).reduce((s, t) => s + t.amount, 0);
+    const varSum = exps.filter((t) => t.category !== "abbonamenti" && !t.recurringId && !t.sharedId && t.date >= from90 && t.date <= todayISO).reduce((s, t) => s + t.amount, 0);
     const daily = exps.length ? varSum / span : 0;
     const rows = [];
-    let bal = totalAccounts;
+    let bal = liquidity;
     let idx = 0;
     let minRow = null;
     for (let d = 0; d <= forecastDays; d++) {
       const iso = addDaysISO(todayISO, d);
-      while (idx < sched.length && sched[idx].date <= iso) {
-        bal += sched[idx].item.kind === "income" ? sched[idx].item.amount : -sched[idx].item.amount;
-        idx++;
-      }
+      while (idx < sched.length && sched[idx].date <= iso) { bal += liqEffect(sched[idx].item); idx++; }
       const row = { iso, label: fmtDateShort(iso), scad: round2(bal), stima: round2(bal - daily * d) };
       rows.push(row);
       if (!minRow || row.stima < minRow.stima) minRow = row;
     }
     return { rows, daily, minRow, last: rows[rows.length - 1] };
-  }, [transactions, recurring, todayISO, forecastDays, totalAccounts]);
+  }, [transactions, recurring, todayISO, forecastDays, liquidity, accounts]);
 
   const anAgg = getAgg(anMonth);
   const anPrevKey = shiftMonth(anMonth, -1);
@@ -2280,11 +2560,7 @@ function App() {
   const rCur = rate(anAgg), rPrev = rate(anPrev);
 
   const pace = useMemo(() => {
-    const daily = (key) => {
-      const a = new Array(32).fill(0);
-      transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === key) a[isoToDate(t.date).getDate()] += t.amount; });
-      return a;
-    };
+    const daily = (key) => { const a = new Array(32).fill(0); transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === key) a[isoToDate(t.date).getDate()] += t.amount; }); return a; };
     const dim = daysInMonth(anMonth), pdim = daysInMonth(anPrevKey);
     const curLen = anMonth === curKey ? dayNum : dim;
     const a = daily(anMonth), b = daily(anPrevKey);
@@ -2300,12 +2576,7 @@ function App() {
 
   const heat = useMemo(() => {
     const days = {};
-    transactions.forEach((t) => {
-      if (t.type === "expense" && monthKeyOf(t.date) === anMonth) {
-        days[t.date] = days[t.date] || { tot: 0, n: 0 };
-        days[t.date].tot += t.amount; days[t.date].n++;
-      }
-    });
+    transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === anMonth) { days[t.date] = days[t.date] || { tot: 0, n: 0 }; days[t.date].tot += t.amount; days[t.date].n++; } });
     const max = Object.values(days).reduce((m, x) => Math.max(m, x.tot), 0);
     const lead = (keyToDate(anMonth).getDay() + 6) % 7;
     const cells = Array(lead).fill(null);
@@ -2315,22 +2586,17 @@ function App() {
 
   const weekdayAvg = useMemo(() => {
     const sums = Array(7).fill(0), counts = Array(7).fill(0);
-    let iso = periodStart;
-    let guard = 0;
+    let iso = periodStart, guard = 0;
     while (iso <= todayISO && guard < 400) { counts[(isoToDate(iso).getDay() + 6) % 7]++; iso = addDaysISO(iso, 1); guard++; }
     transactions.forEach((t) => { if (t.type === "expense" && t.date >= periodStart && t.date <= todayISO) sums[(isoToDate(t.date).getDay() + 6) % 7] += t.amount; });
     const avgs = sums.map((s, i) => (counts[i] ? s / counts[i] : 0));
     const max = Math.max(...avgs);
-    const top = avgs.indexOf(max);
-    return { avgs, max, top };
+    return { avgs, max, top: avgs.indexOf(max) };
   }, [transactions, periodStart, todayISO]);
 
   const catRows = useMemo(() => {
     const ids = new Set([...Object.keys(anAgg.cat), ...Object.keys(anPrev.cat)]);
-    return [...ids].map((id) => {
-      const m = catMeta("expense", id);
-      return { id, label: m.label, color: m.color, cur: anAgg.cat[id] || 0, prev: anPrev.cat[id] || 0 };
-    }).sort((a, b) => b.cur - a.cur || b.prev - a.prev);
+    return [...ids].map((id) => { const m = catMeta("expense", id); return { id, label: m.label, color: m.color, cur: anAgg.cat[id] || 0, prev: anPrev.cat[id] || 0 }; }).sort((a, b) => b.cur - a.cur || b.prev - a.prev);
   }, [anAgg, anPrev]);
   const donut = catRows.filter((r) => r.cur > 0);
   const selRow = catRows.find((r) => r.id === selCat);
@@ -2367,12 +2633,44 @@ function App() {
   const tickStyle = { fill: theme.muted, fontSize: 11 };
   const noCharts = <p className="text-sm muted p-4">Grafici non disponibili: la libreria non si è caricata. Ricarica l'app con la connessione attiva.</p>;
   const heatColor = (v) => (v > 0 && heat.max > 0 ? `color-mix(in srgb, var(--red) ${Math.round(18 + 70 * Math.sqrt(v / heat.max))}%, var(--surface2))` : "var(--surface2)");
+  const PeriodChips = () => (
+    <div className="flex gap-2">
+      {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
+    </div>
+  );
 
   const renderAnalysisTrend = () => (
     <>
       {insights.length > 0 && <Section title="Da notare" className="mt-5"><Insights items={insights} /></Section>}
 
-      <Section title="Previsione del saldo" className={insights.length ? "" : "mt-5"}>
+      <Section title="Il tuo patrimonio" className={insights.length ? "" : "mt-5"} action={<span className="num text-[15px] font-semibold">{fmtEUR(netWorth)}</span>}>
+        <div className="mb-3"><PeriodChips /></div>
+        <div className="panel pt-4 pr-2 pb-1">
+          {!RC ? noCharts : (
+            <RC.ResponsiveContainer width="100%" height={200}>
+              <RC.AreaChart data={wealthSeries} margin={{ top: 4, right: 6, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gLiq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.green} stopOpacity={0.45} /><stop offset="100%" stopColor={theme.green} stopOpacity={0.05} /></linearGradient>
+                  <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.blue} stopOpacity={0.55} /><stop offset="100%" stopColor={theme.blue} stopOpacity={0.08} /></linearGradient>
+                </defs>
+                <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} />
+                <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} tickFormatter={compactEUR} />
+                <RC.Tooltip content={<ChartTip />} />
+                <RC.Area type="monotone" dataKey="Liquidità" stackId="w" stroke={theme.green} strokeWidth={2} fill="url(#gLiq)" />
+                {investAccs.length > 0 && <RC.Area type="monotone" dataKey="Investimenti" stackId="w" stroke={theme.blue} strokeWidth={2} fill="url(#gInv)" />}
+              </RC.AreaChart>
+            </RC.ResponsiveContainer>
+          )}
+        </div>
+        {wealthSeries.length > 1 && (
+          <p className="text-sm muted mt-2 num">
+            {(() => { const d = wealthSeries[wealthSeries.length - 1].Totale - wealthSeries[0].Totale; return `Da ${shortMonth(wealthSeries[0].key)} a oggi il patrimonio è ${d >= 0 ? "cresciuto" : "sceso"} di ${fmtEUR(Math.abs(d))}.`; })()}
+          </p>
+        )}
+      </Section>
+
+      <Section title="Previsione della liquidità">
         <div className="flex gap-2 mb-3">
           {[30, 60, 90].map((n) => <button key={n} onClick={() => setForecastDays(n)} className={`chip ${forecastDays === n ? "chip-on" : ""}`}>{n} giorni</button>)}
         </div>
@@ -2380,31 +2678,26 @@ function App() {
           {!RC ? noCharts : (
             <RC.ResponsiveContainer width="100%" height={200}>
               <RC.ComposedChart data={forecast.rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <defs><linearGradient id="gFc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.green} stopOpacity={0.35} /><stop offset="100%" stopColor={theme.green} stopOpacity={0.03} /></linearGradient></defs>
                 <RC.CartesianGrid stroke={theme.line} vertical={false} />
                 <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} interval={Math.floor(forecastDays / 5)} />
                 <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} tickFormatter={compactEUR} domain={["auto", "auto"]} />
                 <RC.Tooltip content={<ChartTip />} />
                 <RC.ReferenceLine y={0} stroke={theme.red} strokeDasharray="3 3" />
-                <RC.Area type="stepAfter" dataKey="scad" name="Solo scadenze fisse" stroke={theme.green} fill={theme.green} fillOpacity={0.12} strokeWidth={1.8} dot={false} />
+                <RC.Area type="stepAfter" dataKey="scad" name="Solo movimenti fissi" stroke={theme.green} fill="url(#gFc)" strokeWidth={1.8} dot={false} />
                 <RC.Line type="monotone" dataKey="stima" name="Con le spese abituali" stroke={theme.ink} strokeWidth={2} strokeDasharray="5 4" dot={false} />
               </RC.ComposedChart>
             </RC.ResponsiveContainer>
           )}
         </div>
         <p className="text-sm muted mt-2 num">
-          {accounts.length
-            ? `Con le spese abituali (circa ${fmtEUR(forecast.daily)} al giorno oltre alle scadenze) tra ${forecastDays} giorni avresti circa ${fmtEUR(forecast.last.stima)}. Punto più basso: ${fmtEUR(forecast.minRow.stima)} il ${fmtDateShort(forecast.minRow.iso)}.`
-            : "Aggiungi i conti per vedere la previsione."}
+          {accounts.length ? `Con le spese abituali (circa ${fmtEUR(forecast.daily)} al giorno oltre ai movimenti fissi) tra ${forecastDays} giorni avresti circa ${fmtEUR(forecast.last.stima)} di liquidità. Punto più basso: ${fmtEUR(forecast.minRow.stima)} il ${fmtDateShort(forecast.minRow.iso)}.` : "Aggiungi i conti per vedere la previsione."}
         </p>
-        {forecast.minRow && forecast.minRow.stima < 0 && accounts.length > 0 && (
-          <p className="text-sm c-red mt-1">Al ritmo attuale il saldo andrebbe sotto zero entro il {fmtDateShort(forecast.rows.find((r) => r.stima < 0).iso)}.</p>
-        )}
+        {accounts.length > 0 && forecast.minRow && forecast.minRow.stima < 0 && <p className="text-sm c-red mt-1">Al ritmo attuale la liquidità andrebbe sotto zero entro il {fmtDateShort(forecast.rows.find((r) => r.stima < 0).iso)}.</p>}
       </Section>
 
-      <div className="flex gap-2 mt-8">
-        {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
-      </div>
-      <Section title="Entrate e uscite" className="mt-4">
+      <Section title="Entrate e uscite">
+        <div className="mb-3"><PeriodChips /></div>
         <div className="panel pt-4 pr-2 pb-1">
           {!RC ? noCharts : (
             <RC.ResponsiveContainer width="100%" height={230}>
@@ -2420,7 +2713,7 @@ function App() {
             </RC.ResponsiveContainer>
           )}
         </div>
-        <p className="text-xs muted mt-2">Tocca le barre di un mese per aprirne il dettaglio. La linea è il saldo tra entrate e uscite.</p>
+        <p className="text-xs muted mt-2">Tocca le barre di un mese per aprirne il dettaglio. I trasferimenti, compresi i versamenti negli investimenti, non contano come uscite.</p>
         <div className="panel grid grid-cols-3 mt-3">
           {[["Uscite medie", fmtEUR(avg("Uscite")), ""], ["Entrate medie", fmtEUR(avg("Entrate")), "c-green"], ["Saldo medio", fmtSigned(avg("Saldo")), avg("Saldo") < 0 ? "c-red" : ""]].map(([l, v, c], i) => (
             <div key={l} className="py-3 px-3" style={i ? { borderLeft: "1px solid var(--line)" } : null}>
@@ -2429,15 +2722,10 @@ function App() {
             </div>
           ))}
         </div>
-        <p className="text-xs muted mt-1.5">Medie calcolate sui mesi conclusi del periodo.</p>
       </Section>
 
       <Section title="Budget mensili" action={<span className="text-xs muted">{cap(monthLabel(curKey))}</span>}>
-        <Rows>
-          {[...budgetRows].sort((a, b) => (b.limit > 0) - (a.limit > 0) || b.spent - a.spent).map((r) => (
-            <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />
-          ))}
-        </Rows>
+        <Rows>{[...budgetRows].sort((a, b) => (b.limit > 0) - (a.limit > 0) || b.spent - a.spent).map((r) => <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />)}</Rows>
       </Section>
     </>
   );
@@ -2445,7 +2733,6 @@ function App() {
   const renderAnalysisMonth = () => (
     <>
       <div className="mt-4"><MonthNav monthKey={anMonth} onChange={(k) => { setAnMonth(k); setHeatDay(null); }} max={curKey} /></div>
-
       <Section title={`Rispetto a ${monthName(anPrevKey)}`} className="mt-3">
         <Rows>
           {[
@@ -2453,9 +2740,7 @@ function App() {
             ["Entrate", fmtEUR(anAgg.inc), `prima ${fmtEUR(anPrev.inc)}`, <Delta cur={anAgg.inc} prev={anPrev.inc} upIsGood={true} />],
             ["Risparmio", fmtSigned(anAgg.inc - anAgg.exp), `prima ${fmtSigned(anPrev.inc - anPrev.exp)}`, <DiffAmount cur={anAgg.inc - anAgg.exp} prev={anPrev.inc - anPrev.exp} upIsGood={true} />],
             ["Quota risparmiata", rCur == null ? "n.d." : `${rCur.toFixed(0)}%`, `prima ${rPrev == null ? "n.d." : `${rPrev.toFixed(0)}%`}`,
-              rCur != null && rPrev != null && Math.abs(rCur - rPrev) >= 1
-                ? <span className={`text-xs font-medium num ${rCur > rPrev ? "c-green" : "c-red"}`}>{rCur > rPrev ? "▲" : "▼"} {Math.abs(rCur - rPrev).toFixed(0)} punti</span>
-                : null],
+              rCur != null && rPrev != null && Math.abs(rCur - rPrev) >= 1 ? <span className={`text-xs font-medium num ${rCur > rPrev ? "c-green" : "c-red"}`}>{rCur > rPrev ? "▲" : "▼"} {Math.abs(rCur - rPrev).toFixed(0)} punti</span> : null],
           ].map(([label, value, sub, delta]) => (
             <div key={label} className="flex items-center justify-between py-3 gap-3">
               <div className="min-w-0"><div className="text-[15px]">{label}</div><div className="text-xs muted num">{sub}</div></div>
@@ -2469,29 +2754,26 @@ function App() {
         <div className="panel pt-4 pr-2 pb-1">
           {!RC ? noCharts : (
             <RC.ResponsiveContainer width="100%" height={190}>
-              <RC.LineChart data={pace.rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+              <RC.AreaChart data={pace.rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <defs><linearGradient id="gPace" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.red} stopOpacity={0.35} /><stop offset="100%" stopColor={theme.red} stopOpacity={0.02} /></linearGradient></defs>
                 <RC.CartesianGrid stroke={theme.line} vertical={false} />
                 <RC.XAxis dataKey="day" tick={tickStyle} axisLine={false} tickLine={false} interval={4} />
                 <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} tickFormatter={compactEUR} />
                 <RC.Tooltip content={<ChartTip labelPrefix="Giorno " />} />
-                <RC.Line type="monotone" dataKey="prev" name={cap(monthName(anPrevKey))} stroke={theme.muted} strokeDasharray="4 4" strokeWidth={1.5} dot={false} connectNulls={false} />
-                <RC.Line type="monotone" dataKey="cur" name={cap(monthName(anMonth))} stroke={theme.red} strokeWidth={2.2} dot={false} connectNulls={false} />
-              </RC.LineChart>
+                <RC.Area type="monotone" dataKey="prev" name={cap(monthName(anPrevKey))} stroke={theme.muted} strokeDasharray="4 4" strokeWidth={1.5} fill="none" dot={false} connectNulls={false} />
+                <RC.Area type="monotone" dataKey="cur" name={cap(monthName(anMonth))} stroke={theme.red} strokeWidth={2.2} fill="url(#gPace)" dot={false} connectNulls={false} />
+              </RC.AreaChart>
             </RC.ResponsiveContainer>
           )}
         </div>
         <p className="text-sm muted mt-2 num">
-          {anMonth === curKey
-            ? `Al giorno ${pace.curLen} hai speso ${fmtEUR(pace.atDayCur)}; a ${monthName(anPrevKey)}, nello stesso punto, ${fmtEUR(pace.atDayPrev)}.`
-            : `A ${monthName(anMonth)} hai speso ${fmtEUR(anAgg.exp)}, contro ${fmtEUR(anPrev.exp)} a ${monthName(anPrevKey)}.`}
+          {anMonth === curKey ? `Al giorno ${pace.curLen} hai speso ${fmtEUR(pace.atDayCur)}; a ${monthName(anPrevKey)}, nello stesso punto, ${fmtEUR(pace.atDayPrev)}.` : `A ${monthName(anMonth)} hai speso ${fmtEUR(anAgg.exp)}, contro ${fmtEUR(anPrev.exp)} a ${monthName(anPrevKey)}.`}
         </p>
       </Section>
 
       <Section title="Mappa delle spese">
         <div className="panel p-2.5">
-          <div className="grid grid-cols-7 text-center text-xs muted mb-1">
-            {["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}
-          </div>
+          <div className="grid grid-cols-7 text-center text-xs muted mb-1">{["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}</div>
           <div className="grid grid-cols-7 gap-1">
             {heat.cells.map((iso, i) => {
               if (!iso) return <span key={`h${i}`} />;
@@ -2501,16 +2783,13 @@ function App() {
               return (
                 <button key={iso} onClick={() => setHeatDay(sel ? null : iso)} className="rounded-lg flex items-center justify-center num text-[13px]"
                   style={{ height: 40, background: heatColor(v), color: strong ? "#fff" : iso > todayISO ? "var(--line)" : "var(--ink)", boxShadow: sel ? "inset 0 0 0 2px var(--ink)" : "none" }}
-                  aria-label={`${fmtDayLong(iso)}: ${fmtEUR(v)}`}>
-                  {Number(iso.slice(8))}
-                </button>
+                  aria-label={`${fmtDayLong(iso)}: ${fmtEUR(v)}`}>{Number(iso.slice(8))}</button>
               );
             })}
           </div>
         </div>
         <p className="text-sm muted mt-2 num">
-          {heatDay
-            ? (heat.days[heatDay] ? `${cap(fmtDayLong(heatDay))}: ${fmtEUR(heat.days[heatDay].tot)} in ${heat.days[heatDay].n} ${heat.days[heatDay].n === 1 ? "spesa" : "spese"}.` : `${cap(fmtDayLong(heatDay))}: nessuna spesa.`)
+          {heatDay ? (heat.days[heatDay] ? `${cap(fmtDayLong(heatDay))}: ${fmtEUR(heat.days[heatDay].tot)} in ${heat.days[heatDay].n} ${heat.days[heatDay].n === 1 ? "spesa" : "spese"}.` : `${cap(fmtDayLong(heatDay))}: nessuna spesa.`)
             : heat.max > 0 ? "Più il giorno è scuro, più hai speso. Toccalo per vedere l'importo." : `Nessuna uscita a ${monthName(anMonth)}.`}
         </p>
       </Section>
@@ -2519,11 +2798,10 @@ function App() {
         {donut.length ? (
           <>
             {RC && (
-              <div className="relative" style={{ height: 190 }}>
-                <RC.ResponsiveContainer width="100%" height={190}>
+              <div className="relative" style={{ height: 200 }}>
+                <RC.ResponsiveContainer width="100%" height={200}>
                   <RC.PieChart>
-                    <RC.Pie data={donut} dataKey="cur" nameKey="label" innerRadius={58} outerRadius={84} paddingAngle={1.5} stroke="none"
-                      onClick={(_, i) => setSelCat(selCat === donut[i].id ? null : donut[i].id)}>
+                    <RC.Pie data={donut} dataKey="cur" nameKey="label" innerRadius={60} outerRadius={88} paddingAngle={1.5} stroke="none" onClick={(_, i) => setSelCat(selCat === donut[i].id ? null : donut[i].id)}>
                       {donut.map((d) => <RC.Cell key={d.id} fill={d.color} fillOpacity={!selCat || selCat === d.id ? 1 : 0.28} />)}
                     </RC.Pie>
                   </RC.PieChart>
@@ -2543,10 +2821,7 @@ function App() {
                     <span className="block text-[15px] truncate">{r.label}</span>
                     <span className="block text-xs muted num">{anAgg.exp > 0 ? `${((r.cur / anAgg.exp) * 100).toFixed(0)}% delle uscite` : ""}{r.prev > 0 ? `${anAgg.exp > 0 ? ", " : ""}prima ${fmtEUR(r.prev)}` : ""}</span>
                   </span>
-                  <span className="text-right shrink-0">
-                    <span className="block num text-[15px] font-medium">{fmtEUR(r.cur)}</span>
-                    <Delta cur={r.cur} prev={r.prev} upIsGood={false} />
-                  </span>
+                  <span className="text-right shrink-0"><span className="block num text-[15px] font-medium">{fmtEUR(r.cur)}</span><Delta cur={r.cur} prev={r.prev} upIsGood={false} /></span>
                 </button>
               ))}
             </Rows>
@@ -2574,19 +2849,14 @@ function App() {
             )}
             {!selRow && <p className="text-xs muted mt-2">Tocca una categoria per vederne l'andamento nel tempo.</p>}
           </>
-        ) : (
-          <p className="text-sm muted">Nessuna uscita registrata a {monthName(anMonth)}.</p>
-        )}
+        ) : <p className="text-sm muted">Nessuna uscita registrata a {monthName(anMonth)}.</p>}
       </Section>
     </>
   );
 
   const renderAnalysisHabits = () => (
     <>
-      <div className="flex gap-2 mt-5">
-        {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
-      </div>
-
+      <div className="mt-5"><PeriodChips /></div>
       <Section title="Esercenti più frequenti" className="mt-4">
         <div className="seg mb-3">
           <button className={merchSort === "total" ? "on" : ""} onClick={() => setMerchSort("total")}>Per spesa</button>
@@ -2602,31 +2872,28 @@ function App() {
                     <span className="text-[15px] truncate">{m.name}</span>
                     <span className="num text-[15px] font-medium shrink-0">{merchSort === "total" ? fmtEUR(m.tot) : `${m.n} volte`}</span>
                   </div>
-                  <div className="bar mt-1.5"><div style={{ width: `${merchants.maxV ? (v / merchants.maxV) * 100 : 0}%`, background: catMeta("expense", m.cat).color }} /></div>
+                  <div className="bar mt-1.5" style={{ height: 8 }}><div style={{ width: `${merchants.maxV ? (v / merchants.maxV) * 100 : 0}%`, background: catMeta("expense", m.cat).color }} /></div>
                   <div className="text-xs muted mt-1 num">{merchSort === "total" ? `${m.n} ${m.n === 1 ? "volta" : "volte"}` : fmtEUR(m.tot)}, in media {fmtEUR(m.tot / m.n)}</div>
                 </button>
               );
             })}
           </Rows>
-        ) : (
-          <p className="text-sm muted">Le spese con una descrizione compaiono qui raggruppate per nome.</p>
-        )}
+        ) : <p className="text-sm muted">Le spese con una descrizione compaiono qui raggruppate per nome.</p>}
       </Section>
 
       <Section title="Il giorno più caro della settimana">
         <div className="panel p-4">
-          <div className="flex items-end justify-between gap-1.5" style={{ height: 96 }}>
+          <div className="flex items-end justify-between gap-1.5" style={{ height: 110 }}>
             {weekdayAvg.avgs.map((v, i) => (
               <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-                <div className="w-full rounded-md" style={{ height: `${weekdayAvg.max ? Math.max(4, (v / weekdayAvg.max) * 80) : 4}px`, background: i === weekdayAvg.top && v > 0 ? "var(--red)" : "var(--surface2)" }} />
+                <span className="text-[10px] num muted mb-1">{v > 0 ? Math.round(v) : ""}</span>
+                <div className="w-full rounded-md" style={{ height: `${weekdayAvg.max ? Math.max(4, (v / weekdayAvg.max) * 76) : 4}px`, background: i === weekdayAvg.top && v > 0 ? "var(--red)" : "color-mix(in srgb, var(--red) 28%, var(--surface2))" }} />
                 <span className="text-xs muted mt-1.5">{WEEKDAYS[i].slice(0, 3)}</span>
               </div>
             ))}
           </div>
         </div>
-        <p className="text-sm muted mt-2 num">
-          {weekdayAvg.max > 0 ? `In media spendi di più il ${WEEKDAYS[weekdayAvg.top]}: ${fmtEUR(weekdayAvg.max)} al giorno, contro ${fmtEUR(weekdayAvg.avgs.reduce((s, v) => s + v, 0) / 7)} della media settimanale.` : "Servono alcune spese per calcolarlo."}
-        </p>
+        <p className="text-sm muted mt-2 num">{weekdayAvg.max > 0 ? `In media spendi di più il ${WEEKDAYS[weekdayAvg.top]}: ${fmtEUR(weekdayAvg.max)} al giorno, contro ${fmtEUR(weekdayAvg.avgs.reduce((s, v) => s + v, 0) / 7)} della media settimanale.` : "Servono alcune spese per calcolarlo."}</p>
       </Section>
 
       <Section title="Etichette">
@@ -2635,20 +2902,12 @@ function App() {
             {tagStats.map((t) => (
               <button key={t.name} onClick={() => { setTagFilter(t.name); setSearch(""); setTypeFilter("all"); setCatFilter(null); setTab("movements"); }} className="w-full flex items-center gap-3 py-3 text-left">
                 <span className="muted"><Tag size={16} /></span>
-                <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] truncate">#{t.name}</span>
-                  <span className="block text-xs muted num">{t.n} movimenti, dal {fmtDateShort(t.first)} al {fmtDateShort(t.last)}</span>
-                </span>
-                <span className="text-right shrink-0">
-                  <span className="block num text-[15px] font-medium">{fmtEUR(t.exp)}</span>
-                  {t.inc > 0 && <span className="block num text-xs c-green">+{fmtEUR(t.inc)}</span>}
-                </span>
+                <span className="flex-1 min-w-0"><span className="block text-[15px] truncate">#{t.name}</span><span className="block text-xs muted num">{t.n} movimenti, dal {fmtDateShort(t.first)} al {fmtDateShort(t.last)}</span></span>
+                <span className="text-right shrink-0"><span className="block num text-[15px] font-medium">{fmtEUR(t.exp)}</span>{t.inc > 0 && <span className="block num text-xs c-green">+{fmtEUR(t.inc)}</span>}</span>
               </button>
             ))}
           </Rows>
-        ) : (
-          <p className="text-sm muted">Aggiungi un'etichetta a un movimento, per esempio "Erasmus", per vedere qui quanto ti costa in tutto.</p>
-        )}
+        ) : <p className="text-sm muted">Aggiungi un'etichetta a un movimento, per esempio "Erasmus", per vedere qui quanto ti costa in tutto.</p>}
       </Section>
     </>
   );
@@ -2668,39 +2927,92 @@ function App() {
   );
 
   /* ================= Conti ================= */
-  const positiveTotal = accounts.reduce((s, a) => s + Math.max(0, a.balance), 0);
+  const positiveCash = cashAccs.reduce((s, a) => s + Math.max(0, a.balance), 0);
   const sharedSorted = useMemo(() => [...shared].sort((a, b) => b.date.localeCompare(a.date)), [shared]);
   const personName = (id) => people.find((p) => p.id === id)?.name || "persona eliminata";
+
+  const investSeries = useMemo(() => {
+    if (!investAccs.length) return [];
+    let first = curKey;
+    flows.forEach((f) => f.eff.forEach(([id]) => { if (investIds.has(id) && monthKeyOf(f.date) < first) first = monthKeyOf(f.date); }));
+    investAccs.forEach((a) => (a.valuations || []).forEach((v) => { if (monthKeyOf(v.date) < first) first = monthKeyOf(v.date); }));
+    const out = [];
+    let k = first < shiftMonth(curKey, -35) ? shiftMonth(curKey, -35) : first;
+    if (k === curKey) k = shiftMonth(curKey, -1);
+    let guard = 0;
+    while (k <= curKey && guard < 40) {
+      const d = minISO(monthEndISO(k), todayISO);
+      const versato = bookAt(d, investIds);
+      const valore = round2(investAccs.reduce((s, a) => s + valueAt(a, d), 0));
+      out.push({ key: k, label: shortMonthYear(k), Versato: versato, Valore: valore });
+      k = shiftMonth(k, 1);
+      guard++;
+    }
+    return out;
+  }, [flows, accounts, curKey, todayISO]);
+
+  const simStart = investValue;
+  const simMonthlyVal = simMonthly != null ? simMonthly : pacMonthly || 20;
+  const simRate = investSettings.rate;
+  const simYears = investSettings.years;
+  const simSeries = useMemo(() => {
+    const out = [];
+    for (let y = 0; y <= simYears; y++) {
+      const versato = round2(simStart + simMonthlyVal * 12 * y);
+      const valore = round2(futureValue(simStart, simMonthlyVal, simRate, y * 12));
+      out.push({ label: y === 0 ? "oggi" : `${y}a`, Versato: versato, Rendimento: round2(Math.max(0, valore - versato)), valore });
+    }
+    return out;
+  }, [simStart, simMonthlyVal, simRate, simYears]);
+  const simEnd = simSeries[simSeries.length - 1];
 
   const renderAccountsMain = () => (
     <>
       <div className="mt-5">
-        <div className="text-sm muted">Totale</div>
-        <div className={`serif num text-[40px] leading-tight ${totalAccounts < 0 ? "c-red" : ""}`}>{fmtEUR(totalAccounts)}</div>
+        <div className="text-sm muted">{investAccs.length ? "Patrimonio" : "Totale"}</div>
+        <div className={`serif num text-[40px] leading-tight ${netWorth < 0 ? "c-red" : ""}`}>{fmtEUR(netWorth)}</div>
+        {investAccs.length > 0 && <div className="text-sm muted num mt-0.5">Liquidità {fmtEUR(liquidity)}, investimenti {fmtEUR(investValue)}</div>}
       </div>
-      {positiveTotal > 0 && accounts.length > 1 && (
-        <div className="flex mt-3 rounded-full overflow-hidden" style={{ height: 8, background: "var(--surface2)" }}>
-          {accounts.map((a, i) => a.balance > 0 && <div key={a.id} style={{ width: `${(a.balance / positiveTotal) * 100}%`, background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />)}
+      {(positiveCash > 0 || investValue > 0) && accounts.length > 1 && (
+        <div className="flex mt-3 rounded-full overflow-hidden" style={{ height: 10, background: "var(--surface2)", gap: 2 }}>
+          {accounts.map((a, i) => { const v = Math.max(0, accountValue(a)); const tot = positiveCash + Math.max(0, investValue); return v > 0 && tot > 0 ? <div key={a.id} style={{ width: `${(v / tot) * 100}%`, background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} /> : null; })}
         </div>
       )}
-      <div className="mt-5">
-        {accounts.length ? (
+      <Section title="Conti e carte" className="mt-6">
+        {cashAccs.length ? (
           <Rows>
-            {accounts.map((a, i) => (
-              <button key={a.id} onClick={() => setAccModal({ acc: a })} className="w-full flex items-center gap-3 py-3.5 text-left">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
-                <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] truncate">{a.name}</span>
-                  {positiveTotal > 0 && a.balance > 0 && <span className="block text-xs muted num">{((a.balance / positiveTotal) * 100).toFixed(0)}% del totale</span>}
-                </span>
-                <span className={`num text-[15px] font-semibold ${a.balance < 0 ? "c-red" : ""}`}>{fmtEUR(a.balance)}</span>
-              </button>
-            ))}
+            {cashAccs.map((a) => {
+              const i = accounts.indexOf(a);
+              return (
+                <button key={a.id} onClick={() => setAccModal({ acc: a })} className="w-full flex items-center gap-3 py-3.5 text-left">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] truncate">{a.name}</span>
+                    {positiveCash > 0 && a.balance > 0 && <span className="block text-xs muted num">{((a.balance / positiveCash) * 100).toFixed(0)}% della liquidità</span>}
+                  </span>
+                  <span className={`num text-[15px] font-semibold ${a.balance < 0 ? "c-red" : ""}`}>{fmtEUR(a.balance)}</span>
+                </button>
+              );
+            })}
           </Rows>
-        ) : (
-          <p className="text-[15px] muted">Nessun conto. Aggiungine uno con il saldo di oggi per far partire i calcoli.</p>
-        )}
-      </div>
+        ) : <p className="text-[15px] muted">Nessun conto. Aggiungine uno con il saldo di oggi per far partire i calcoli.</p>}
+      </Section>
+      {investAccs.length > 0 && (
+        <Section title="Investimenti" action={<button onClick={() => setAccTab("invest")} className="text-sm c-blue">Dettagli</button>}>
+          <Rows>
+            {investAccs.map((a) => {
+              const val = accountValue(a), g = val - a.balance;
+              return (
+                <button key={a.id} onClick={() => setAccModal({ acc: a })} className="w-full flex items-center gap-3 py-3.5 text-left">
+                  <span className="c-blue"><InvestIcon size={16} /></span>
+                  <span className="flex-1 min-w-0"><span className="block text-[15px] truncate">{a.name}</span><span className="block text-xs muted num">versati {fmtEUR(a.balance)}</span></span>
+                  <span className="text-right"><span className="block num text-[15px] font-semibold">{fmtEUR(val)}</span>{Math.abs(g) > 0.004 && <span className={`block num text-xs ${g >= 0 ? "c-green" : "c-red"}`}>{fmtSigned(g)}</span>}</span>
+                </button>
+              );
+            })}
+          </Rows>
+        </Section>
+      )}
       <div className="grid grid-cols-2 gap-2 mt-3">
         <button onClick={() => setAccModal({ acc: null })} className="btn btn-ghost">Nuovo conto</button>
         <button onClick={() => setTrModal({ tx: null })} className="btn btn-ghost">Giroconto</button>
@@ -2716,72 +3028,187 @@ function App() {
           <button onClick={() => setGuide(true)} className="btn btn-ghost mt-3">Guida alla configurazione</button>
         </div>
       </Section>
-
-      <Section title="Backup">
-        <BackupSection data={data} onImport={(d) => { setData(d); setNote("Backup ripristinato"); }} />
-      </Section>
-
+      <Section title="Backup"><BackupSection data={data} onImport={(d) => { setData(d); setNote("Backup ripristinato"); }} /></Section>
       <Section title="Dati">
         <div className="panel p-4">
-          <p className="text-sm muted">Cancella conti, movimenti, scadenze, obiettivi e spese condivise da questo telefono. L'operazione non si può annullare.</p>
+          <p className="text-sm muted">Cancella conti, movimenti, scadenze, obiettivi, investimenti e spese condivise da questo telefono. L'operazione non si può annullare.</p>
           <DeleteButton label="Cancella tutti i dati" onConfirm={() => { setData({ ...EMPTY_DATA }); setNote("Dati cancellati"); }} />
         </div>
       </Section>
     </>
   );
 
+  const renderInvest = () => {
+    if (!investAccs.length) {
+      return (
+        <div className="mt-6">
+          <div className="relative overflow-hidden p-5" style={{ background: "var(--inv)", color: "var(--note-ink)", borderRadius: 22 }}>
+            <Guilloche color="var(--inv-line)" />
+            <div className="relative">
+              <div className="serif text-[24px] leading-tight">Segui i tuoi investimenti</div>
+              <p className="text-sm mt-2" style={{ color: "var(--inv-soft)" }}>Crea un conto di tipo Investimenti, per esempio la carta da cui investi. I versamenti verso quel conto non contano come spese e l'app calcola quanto rendono.</p>
+              <button onClick={() => setAccModal({ acc: null, presetType: "invest" })} className="mt-4 px-4 py-2.5 rounded-xl font-semibold text-sm" style={{ background: "var(--note-ink)", color: "var(--inv)" }}>Aggiungi conto investimenti</button>
+            </div>
+          </div>
+          <p className="text-sm muted mt-4">Se il conto che usi per investire è già nell'elenco, aprilo da Conti e cambia il tipo in Investimenti.</p>
+        </div>
+      );
+    }
+    const pct = investBook > 0 ? (investGain / investBook) * 100 : 0;
+    const lastVals = investAccs.map(lastValuation).filter(Boolean);
+    const lastValDate = lastVals.length ? lastVals.map((v) => v.date).sort().pop() : null;
+    return (
+      <>
+        <div className="relative overflow-hidden mt-5" style={{ background: "var(--inv)", color: "var(--note-ink)", borderRadius: 22 }}>
+          <Guilloche color="var(--inv-line)" />
+          <div className="relative p-5">
+            <div className="text-sm" style={{ color: "var(--inv-soft)" }}>Valore attuale</div>
+            <div className="serif num mt-1" style={{ fontSize: 40, lineHeight: 1.05 }}>{fmtEUR(investValue)}</div>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="num text-sm font-semibold px-2 py-0.5 rounded-full" style={{ background: investGain >= 0 ? "rgba(109,190,145,.25)" : "rgba(236,128,150,.25)" }}>{fmtSigned(investGain)} ({fmtPct(pct)})</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-5">
+              <div><div className="text-xs" style={{ color: "var(--inv-soft)" }}>Versato in totale</div><div className="num text-lg font-semibold mt-0.5">{fmtEUR(investBook)}</div></div>
+              <div><div className="text-xs" style={{ color: "var(--inv-soft)" }}>Versamento automatico</div><div className="num text-lg font-semibold mt-0.5">{pacMonthly > 0 ? `${fmtEUR(pacMonthly)}/mese` : "nessuno"}</div></div>
+            </div>
+            <div className="text-xs mt-4" style={{ color: "var(--inv-soft)" }}>{lastValDate ? `Valore aggiornato il ${fmtDateShort(lastValDate)}` : "Valore non ancora aggiornato: per ora coincide con il versato"}</div>
+          </div>
+        </div>
+        <button onClick={() => setValModal({ id: investAccs[0].id })} className="btn btn-ink mt-3">Aggiorna il valore</button>
+
+        <Section title="Versato e valore nel tempo">
+          <div className="panel pt-4 pr-2 pb-1">
+            {!RC ? noCharts : (
+              <RC.ResponsiveContainer width="100%" height={210}>
+                <RC.AreaChart data={investSeries} margin={{ top: 4, right: 6, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gVal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.blue} stopOpacity={0.5} /><stop offset="100%" stopColor={theme.blue} stopOpacity={0.05} /></linearGradient>
+                  </defs>
+                  <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                  <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} minTickGap={20} />
+                  <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} tickFormatter={compactEUR} />
+                  <RC.Tooltip content={<ChartTip />} />
+                  <RC.Area type="monotone" dataKey="Valore" stroke={theme.blue} strokeWidth={2.2} fill="url(#gVal)" />
+                  <RC.Area type="stepAfter" dataKey="Versato" stroke={theme.muted} strokeDasharray="4 4" strokeWidth={1.6} fill="none" />
+                </RC.AreaChart>
+              </RC.ResponsiveContainer>
+            )}
+          </div>
+          <p className="text-xs muted mt-2">La linea tratteggiata è quanto hai versato; l'area è quanto vale. Più aggiorni il valore, più il grafico è preciso.</p>
+        </Section>
+
+        <Section title="Versamenti automatici">
+          {pacItems.length ? (
+            <Rows>
+              {pacItems.map((r) => {
+                const rs = recurringSorted.find((x) => x.id === r.id);
+                return (
+                  <button key={r.id} onClick={() => setRecModal({ item: r })} className="w-full flex items-center gap-3 py-3 text-left">
+                    <span className="c-blue"><RefreshCw size={16} /></span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-[15px] truncate">{r.name}</span>
+                      <span className="block text-xs muted">{FREQ_LABEL[r.frequency]}, da {accById[r.accountId]?.name || "?"}{rs?.nextISO ? `, prossimo ${fmtDateShort(rs.nextISO)}` : ""}</span>
+                    </span>
+                    <span className="num text-[15px] font-semibold c-blue">{fmtEUR(r.amount)}</span>
+                  </button>
+                );
+              })}
+            </Rows>
+          ) : (
+            <div className="panel p-4">
+              <p className="text-sm muted">Imposta il trasferimento mensile dalla carta principale a quella degli investimenti: l'app lo registrerà da sola, senza contarlo come spesa.</p>
+            </div>
+          )}
+          <button onClick={() => setRecModal({ item: null, preset: newPacPreset() })} className="btn btn-ghost mt-3">{pacItems.length ? "Aggiungi un altro versamento" : "Imposta versamento automatico"}</button>
+        </Section>
+
+        <Section title="Simulatore">
+          <div className="panel p-4">
+            <Slider label="Versamento mensile" value={simMonthlyVal} min={0} max={500} step={5} onChange={setSimMonthly} display={(v) => fmtEUR0(v)} />
+            <Slider label="Rendimento annuo ipotizzato" value={simRate} min={0} max={10} step={0.5} onChange={(v) => setInvestSetting("rate", v)} display={(v) => `${String(v).replace(".", ",")}%`} />
+            <Slider label="Durata" value={simYears} min={1} max={40} step={1} onChange={(v) => setInvestSetting("years", v)} display={(v) => `${v} ${v === 1 ? "anno" : "anni"}`} />
+            {RC && (
+              <RC.ResponsiveContainer width="100%" height={190}>
+                <RC.AreaChart data={simSeries} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gSimV" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.muted} stopOpacity={0.35} /><stop offset="100%" stopColor={theme.muted} stopOpacity={0.1} /></linearGradient>
+                    <linearGradient id="gSimR" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={theme.green} stopOpacity={0.6} /><stop offset="100%" stopColor={theme.green} stopOpacity={0.15} /></linearGradient>
+                  </defs>
+                  <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                  <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} minTickGap={16} />
+                  <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} tickFormatter={compactEUR} />
+                  <RC.Tooltip content={<ChartTip />} />
+                  <RC.Area type="monotone" dataKey="Versato" stackId="s" stroke={theme.muted} fill="url(#gSimV)" strokeWidth={1.5} />
+                  <RC.Area type="monotone" dataKey="Rendimento" stackId="s" stroke={theme.green} fill="url(#gSimR)" strokeWidth={2} />
+                </RC.AreaChart>
+              </RC.ResponsiveContainer>
+            )}
+            <div className="grid grid-cols-3 gap-2 mt-3 text-center">
+              <div><div className="text-xs muted">Valore finale</div><div className="num text-[15px] font-semibold">{fmtEUR0(simEnd.valore)}</div></div>
+              <div><div className="text-xs muted">Versato</div><div className="num text-[15px] font-semibold">{fmtEUR0(simEnd.Versato)}</div></div>
+              <div><div className="text-xs muted">Interessi composti</div><div className="num text-[15px] font-semibold c-green">{fmtEUR0(simEnd.Rendimento)}</div></div>
+            </div>
+          </div>
+          <p className="text-xs muted mt-2">Stima con rendimento costante, partendo dal valore di oggi. I mercati oscillano e i rendimenti passati non garantiscono quelli futuri; tasse e commissioni non sono incluse.</p>
+        </Section>
+      </>
+    );
+  };
+
   const renderGoals = () => (
     <>
-      <div className="mt-5 panel p-4">
-        <div className="text-sm muted">Accantonato in tutto</div>
-        <div className="serif num text-[32px] leading-tight">{fmtEUR(goalsSaved)}</div>
-        <div className="text-sm muted num mt-1">Liberi sui conti: {fmtEUR(totalAccounts - goalsSaved)}</div>
-        {totalAccounts - goalsSaved < 0 && <p className="text-sm c-red mt-2">Hai accantonato più di quanto c'è sui conti: rivedi le cifre degli obiettivi.</p>}
+      <div className="mt-5 panel p-4 flex items-center gap-4">
+        <Ring value={goals.length ? goals.reduce((s, g) => s + Math.min(g.saved, g.target), 0) / Math.max(1, goals.reduce((s, g) => s + g.target, 0)) : 0} size={84} stroke={9} color="var(--green)">
+          <Target size={22} className="c-green" />
+        </Ring>
+        <div className="min-w-0">
+          <div className="text-sm muted">Accantonato in tutto</div>
+          <div className="serif num text-[28px] leading-tight">{fmtEUR(goalsSaved)}</div>
+          <div className="text-sm muted num">su {fmtEUR(goals.reduce((s, g) => s + g.target, 0))} di obiettivi</div>
+          <div className="text-xs muted num mt-1">Liquidità libera: {fmtEUR(liquidity - goalsSaved)}</div>
+        </div>
       </div>
-      <div className="mt-5">
-        {goals.length ? (
-          <Rows>{goals.map((g) => <GoalRow key={g.id} g={g} todayISO={todayISO} onOpen={() => setGoalModal({ goal: g })} onMove={() => setGoalMove({ goal: g })} />)}</Rows>
-        ) : (
-          <p className="text-[15px] muted">Nessun obiettivo. Crea il primo: una vacanza, il viaggio di Natale, un fondo per gli imprevisti.</p>
-        )}
-      </div>
-      <button onClick={() => setGoalModal({ goal: null })} className="btn btn-ink mt-3">Nuovo obiettivo</button>
-      <p className="text-xs muted mt-3">Gli obiettivi non spostano denaro: segnano quanta parte del saldo è già destinata. Tocca un obiettivo per modificarlo.</p>
+      {liquidity - goalsSaved < 0 && <p className="text-sm c-red mt-2">Hai accantonato più della liquidità disponibile: rivedi le cifre degli obiettivi.</p>}
+      {goals.length ? (
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {goals.map((g) => <GoalCard key={g.id} g={g} todayISO={todayISO} onOpen={() => setGoalOpen(g.id)} />)}
+        </div>
+      ) : <p className="text-[15px] muted mt-4">Nessun obiettivo. Crea il primo: una vacanza, il viaggio di Natale, un fondo per gli imprevisti.</p>}
+      <button onClick={() => setGoalModal({ goal: null })} className="btn btn-ink mt-4">Nuovo obiettivo</button>
+      <p className="text-xs muted mt-3">Gli obiettivi non spostano denaro: segnano quanta parte della liquidità è già destinata.</p>
     </>
   );
 
+  const maxAbsBal = Math.max(0, ...people.map((p) => Math.abs(peopleBal[p.id] || 0)));
   const renderShared = () => (
     <>
       <div className="panel grid grid-cols-2 mt-5">
-        <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
-          <div className="text-sm muted">Ti devono</div>
-          <div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(owedToMe)}</div>
-        </div>
-        <div className="p-4">
-          <div className="text-sm muted">Devi</div>
-          <div className={`num text-[22px] font-semibold mt-0.5 ${iOwe > 0 ? "c-red" : ""}`}>{fmtEUR(iOwe)}</div>
-        </div>
+        <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}><div className="text-sm muted">Ti devono</div><div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(owedToMe)}</div></div>
+        <div className="p-4"><div className="text-sm muted">Devi</div><div className={`num text-[22px] font-semibold mt-0.5 ${iOwe > 0 ? "c-red" : ""}`}>{fmtEUR(iOwe)}</div></div>
       </div>
       <Section title="Persone">
         {people.length ? (
           <Rows>
             {people.map((p) => {
               const b = peopleBal[p.id] || 0;
+              const w = maxAbsBal > 0 ? (Math.abs(b) / maxAbsBal) * 50 : 0;
               return (
-                <button key={p.id} onClick={() => setPersonOpen(p.id)} className="w-full flex items-center gap-3 py-3.5 text-left">
-                  <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold" style={{ background: "var(--surface2)" }}>{p.name.charAt(0).toUpperCase()}</span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] truncate">{p.name}</span>
-                    <span className="block text-xs muted">{b > 0.004 ? "ti deve" : b < -0.004 ? "gli devi" : "siete pari"}</span>
-                  </span>
-                  <span className={`num text-[15px] font-semibold ${b > 0.004 ? "c-green" : b < -0.004 ? "c-red" : "muted"}`}>{Math.abs(b) > 0.004 ? fmtEUR(Math.abs(b)) : ""}</span>
+                <button key={p.id} onClick={() => setPersonOpen(p.id)} className="w-full text-left py-3.5">
+                  <div className="flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold" style={{ background: "var(--surface2)" }}>{p.name.charAt(0).toUpperCase()}</span>
+                    <span className="flex-1 min-w-0"><span className="block text-[15px] truncate">{p.name}</span><span className="block text-xs muted">{b > 0.004 ? "ti deve" : b < -0.004 ? "gli devi" : "siete pari"}</span></span>
+                    <span className={`num text-[15px] font-semibold ${b > 0.004 ? "c-green" : b < -0.004 ? "c-red" : "muted"}`}>{Math.abs(b) > 0.004 ? fmtEUR(Math.abs(b)) : ""}</span>
+                  </div>
+                  <div className="relative mt-2.5" style={{ height: 8, background: "var(--surface2)", borderRadius: 999 }}>
+                    <div style={{ position: "absolute", left: "50%", top: -3, bottom: -3, width: 1.5, background: "var(--muted)", opacity: 0.4 }} />
+                    {w > 0 && <div style={{ position: "absolute", top: 0, bottom: 0, borderRadius: 999, background: b > 0 ? "var(--green)" : "var(--red)", left: b > 0 ? "50%" : `${50 - w}%`, width: `${w}%` }} />}
+                  </div>
                 </button>
               );
             })}
           </Rows>
-        ) : (
-          <p className="text-[15px] muted">Nessuna persona. Si aggiungono direttamente quando registri la prima spesa condivisa.</p>
-        )}
+        ) : <p className="text-[15px] muted">Nessuna persona. Si aggiungono direttamente quando registri la prima spesa condivisa.</p>}
+        {people.length > 0 && <p className="text-xs muted mt-2">A destra del centro chi ti deve soldi, a sinistra chi devi rimborsare.</p>}
         <button onClick={() => setSharedModal(true)} className="btn btn-ink mt-3">Nuova spesa condivisa</button>
       </Section>
       {sharedSorted.length > 0 && (
@@ -2793,9 +3220,7 @@ function App() {
                   <span className="text-[15px] truncate">{e.kind === "settle" ? (e.direction === "in" ? `${personName(e.personId)} ti ha restituito` : `Hai restituito a ${personName(e.personId)}`) : e.description}</span>
                   <span className="num text-[15px] shrink-0">{fmtEUR(e.kind === "settle" ? e.amount : e.total)}</span>
                 </div>
-                <div className="text-xs muted mt-0.5">
-                  {fmtDateShort(e.date)}{e.kind === "expense" ? `, pagato da ${e.payer === "me" ? "te" : personName(e.payer)}, con ${e.participants.map(personName).join(", ")}${e.includeMe ? " e te" : ""}` : ""}
-                </div>
+                <div className="text-xs muted mt-0.5">{fmtDateShort(e.date)}{e.kind === "expense" ? `, pagato da ${e.payer === "me" ? "te" : personName(e.payer)}, con ${e.participants.map(personName).join(", ")}${e.includeMe ? " e te" : ""}` : ""}</div>
               </div>
             ))}
           </Rows>
@@ -2808,12 +3233,14 @@ function App() {
   const renderAccounts = () => (
     <div>
       <h1 className="serif text-[32px] leading-tight mb-3">Conti</h1>
-      <div className="seg">
+      <div className="seg small">
         <button className={accTab === "accounts" ? "on" : ""} onClick={() => setAccTab("accounts")}>Conti</button>
+        <button className={accTab === "invest" ? "on" : ""} onClick={() => setAccTab("invest")}>Investimenti</button>
         <button className={accTab === "goals" ? "on" : ""} onClick={() => setAccTab("goals")}>Obiettivi</button>
         <button className={accTab === "shared" ? "on" : ""} onClick={() => setAccTab("shared")}>Condivise</button>
       </div>
       {accTab === "accounts" && renderAccountsMain()}
+      {accTab === "invest" && renderInvest()}
       {accTab === "goals" && renderGoals()}
       {accTab === "shared" && renderShared()}
     </div>
@@ -2822,6 +3249,7 @@ function App() {
   const views = { overview: renderOverview, movements: renderMovements, schedule: renderSchedule, analysis: renderAnalysis, accounts: renderAccounts };
   const openPerson = people.find((p) => p.id === personOpen);
   const settlePerson = people.find((p) => p.id === settleFor);
+  const openGoal = goals.find((g) => g.id === goalOpen);
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -2833,14 +3261,11 @@ function App() {
 
       {note && (
         <div className="fixed left-4 right-4 z-50 flex justify-center fade" style={{ top: "calc(env(safe-area-inset-top) + 10px)" }}>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium" style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 6px 20px rgba(0,0,0,.18)" }}>
-            <Check size={16} /> {note}
-          </div>
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium" style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 6px 20px rgba(0,0,0,.18)" }}><Check size={16} /> {note}</div>
         </div>
       )}
 
-      <button onClick={() => setAddSheet(true)} aria-label="Aggiungi"
-        className="fixed z-30 flex items-center justify-center active:scale-95"
+      <button onClick={() => setAddSheet(true)} aria-label="Aggiungi" className="fixed z-30 flex items-center justify-center active:scale-95"
         style={{ right: 18, bottom: "calc(env(safe-area-inset-bottom) + 76px)", width: 56, height: 56, borderRadius: 999, background: "var(--ink)", color: "var(--paper)", boxShadow: "0 8px 22px rgba(0,0,0,.22)" }}>
         <Plus size={26} />
       </button>
@@ -2848,8 +3273,7 @@ function App() {
       <nav className="fixed bottom-0 left-0 right-0 z-30" style={{ background: "var(--surface)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="max-w-xl mx-auto flex">
           {TABS.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex flex-col items-center gap-1 pt-2 pb-1.5"
-              style={{ color: tab === t.id ? "var(--ink)" : "var(--muted)" }} aria-current={tab === t.id ? "page" : undefined}>
+            <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex flex-col items-center gap-1 pt-2 pb-1.5" style={{ color: tab === t.id ? "var(--ink)" : "var(--muted)" }} aria-current={tab === t.id ? "page" : undefined}>
               <t.Icon size={21} />
               <span className="text-[11px]" style={{ fontWeight: tab === t.id ? 700 : 500 }}>{t.label}</span>
             </button>
@@ -2860,43 +3284,21 @@ function App() {
       {addSheet && <AddSheet onClose={() => setAddSheet(false)} onPick={pickAdd} />}
       {walletReview && <WalletReviewSheet items={walletReview} accounts={accounts} onClose={() => setWalletReview(null)} onConfirm={confirmWallet} onIgnore={ignoreWallet} />}
       {guide && <GuideSheet onClose={() => setGuide(false)} />}
-      {txModal && (
-        <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} allTags={allTags} todayISO={todayISO}
-          onClose={() => setTxModal(null)} onSave={saveTx} onDelete={deleteTx} />
-      )}
-      {trModal && (
-        <TransferModal tx={trModal.tx} accounts={accounts} todayISO={todayISO}
-          onClose={() => setTrModal(null)} onSave={saveTx} onDelete={deleteTx}
-          onAddAccount={() => { setTrModal(null); setAccModal({ acc: null }); }} />
-      )}
-      {recModal && (
-        <RecurringFormModal item={recModal.item} accounts={accounts} initialKind={recModal.kind || "expense"} todayISO={todayISO}
-          onClose={() => setRecModal(null)} onSave={saveRecurring} onDelete={deleteRecurring} />
-      )}
-      {accModal && <AccountFormModal account={accModal.acc} onClose={() => setAccModal(null)} onSave={saveAccount} onDelete={deleteAccount} />}
-      {budgetModal && (
-        <BudgetModal cat={budgetModal.cat} limit={budgets[budgetModal.cat.id] || 0} spent={curAgg.cat[budgetModal.cat.id] || 0}
-          onClose={() => setBudgetModal(null)} onSave={(v) => setBudget(budgetModal.cat.id, v)} onRemove={() => setBudget(budgetModal.cat.id, 0)} />
-      )}
+      {txModal && <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} allTags={allTags} todayISO={todayISO} onClose={() => setTxModal(null)} onSave={saveTx} onDelete={deleteTx} />}
+      {trModal && <TransferModal tx={trModal.tx} accounts={accounts} todayISO={todayISO} onClose={() => setTrModal(null)} onSave={saveTx} onDelete={deleteTx} onAddAccount={() => { setTrModal(null); setAccModal({ acc: null }); }} />}
+      {recModal && <RecurringFormModal item={recModal.item} preset={recModal.preset} accounts={accounts} todayISO={todayISO} onClose={() => setRecModal(null)} onSave={saveRecurring} onDelete={deleteRecurring} />}
+      {accModal && <AccountFormModal account={accModal.acc} presetType={accModal.presetType} onClose={() => setAccModal(null)} onSave={saveAccount} onDelete={deleteAccount} />}
+      {valModal && <ValuationModal accounts={investAccs} initialId={valModal.id} todayISO={todayISO} onClose={() => setValModal(null)} onSave={saveValuation} />}
+      {budgetModal && <BudgetModal cat={budgetModal.cat} limit={budgets[budgetModal.cat.id] || 0} spent={curAgg.cat[budgetModal.cat.id] || 0} onClose={() => setBudgetModal(null)} onSave={(v) => setBudget(budgetModal.cat.id, v)} onRemove={() => setBudget(budgetModal.cat.id, 0)} />}
+      {openGoal && !goalModal && <GoalDetailSheet goal={openGoal} todayISO={todayISO} theme={theme} onClose={() => setGoalOpen(null)} onMove={(delta) => moveGoal(openGoal.id, delta)} onEdit={() => setGoalModal({ goal: openGoal })} />}
       {goalModal && <GoalModal goal={goalModal.goal} colorIndex={goals.length} onClose={() => setGoalModal(null)} onSave={saveGoal} onDelete={deleteGoal} />}
-      {goalMove && <GoalMoveModal goal={goals.find((g) => g.id === goalMove.goal.id) || goalMove.goal} onClose={() => setGoalMove(null)} onSave={(delta) => moveGoal(goalMove.goal.id, delta)} />}
-      {sharedModal && (
-        <SharedExpenseModal people={people} accounts={accounts} todayISO={todayISO}
-          onClose={() => setSharedModal(false)} onSave={saveShared} onAddPerson={addPerson} />
-      )}
+      {sharedModal && <SharedExpenseModal people={people} accounts={accounts} todayISO={todayISO} onClose={() => setSharedModal(false)} onSave={saveShared} onAddPerson={addPerson} />}
       {openPerson && !settlePerson && (
         <PersonSheet person={openPerson} balance={peopleBal[openPerson.id] || 0}
           entries={sharedSorted.map((e) => ({ e, eff: round2(entryEffectFor(e, openPerson.id)) })).filter(({ e, eff }) => Math.abs(eff) > 0.004 || (e.kind === "expense" && (e.participants.includes(openPerson.id) || e.payer === openPerson.id)))}
-          onClose={() => setPersonOpen(null)}
-          onSettle={() => setSettleFor(openPerson.id)}
-          onRename={(n) => renamePerson(openPerson.id, n)}
-          onDelete={() => deletePerson(openPerson.id)}
-          onDeleteEntry={deleteShared} />
+          onClose={() => setPersonOpen(null)} onSettle={() => setSettleFor(openPerson.id)} onRename={(n) => renamePerson(openPerson.id, n)} onDelete={() => deletePerson(openPerson.id)} onDeleteEntry={deleteShared} />
       )}
-      {settlePerson && (
-        <SettleModal person={settlePerson} balance={peopleBal[settlePerson.id] || 0} accounts={accounts} todayISO={todayISO}
-          onClose={() => setSettleFor(null)} onSave={saveShared} />
-      )}
+      {settlePerson && <SettleModal person={settlePerson} balance={peopleBal[settlePerson.id] || 0} accounts={accounts} todayISO={todayISO} onClose={() => setSettleFor(null)} onSave={saveShared} />}
     </div>
   );
 }
