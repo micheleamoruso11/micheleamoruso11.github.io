@@ -38,6 +38,7 @@
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
   .inp { width: 100%; box-sizing: border-box; background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; color: var(--ink); font: inherit; font-size: 16px; min-height: 46px; -webkit-appearance: none; appearance: none; }
   .inp:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  .inp.bad { border-color: var(--red); }
   .lbl { display: block; font-size: 13px; color: var(--muted); margin: 0 0 6px; }
   .chip { border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 7px 13px; font-size: 13px; white-space: nowrap; }
   .chip-on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -52,12 +53,27 @@
   .seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .noscroll::-webkit-scrollbar { display: none; }
   .noscroll { scrollbar-width: none; }
+
+  .wallet-btn { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 16px 16px 12px; border-radius: 20px; background: var(--ink); color: var(--paper); overflow: hidden; text-align: left; transition: transform .12s ease; }
+  .wallet-btn:active { transform: scale(.98); }
+  .wallet-sub { color: color-mix(in srgb, var(--paper) 62%, transparent); }
+  .wallet-stack { position: relative; width: 58px; height: 46px; flex-shrink: 0; }
+  .wallet-card { position: absolute; left: 9px; top: 10px; width: 42px; height: 27px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.28); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+  .wallet-card.c1 { background: #C2862B; transform: translate(-5px, 5px) rotate(-11deg); }
+  .wallet-card.c2 { background: #A63249; transform: translate(-1px, 2px) rotate(-4deg); }
+  .wallet-card.c3 { background: #2E6A4E; transform: translate(4px, -3px) rotate(5deg); }
+  .wallet-btn.fan .c1 { transform: translate(-13px, 8px) rotate(-26deg); }
+  .wallet-btn.fan .c2 { transform: translate(-3px, 1px) rotate(-9deg); }
+  .wallet-btn.fan .c3 { transform: translate(10px, -9px) rotate(16deg); }
+  .wallet-go { width: 36px; height: 36px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid color-mix(in srgb, var(--paper) 28%, transparent); }
+
   @media (prefers-reduced-motion: no-preference) {
     .sheet { animation: sheetUp .22s ease-out; }
     .fade { animation: fadeIn .18s ease-out; }
     @keyframes sheetUp { from { transform: translateY(28px); opacity: .6; } to { transform: none; opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   }
+  @media (prefers-reduced-motion: reduce) { .wallet-card, .wallet-btn { transition: none; } }
   #boot { color: var(--muted); font-size: 14px; text-align: center; padding: 40vh 24px 0; line-height: 1.5; }
   #boot button { margin-top: 16px; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 10px 20px; font-size: 15px; }
   #boot .err { color: var(--red); font-size: 12px; margin-top: 10px; word-break: break-word; }
@@ -161,6 +177,8 @@ const Search = mkIcon(<><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3"
 const ArrowLeftRight = mkIcon(<><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></>);
 const Utensils = mkIcon(<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></>);
 const Shirt = mkIcon(<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />);
+const ArrowDown = mkIcon(<><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>);
+const Contactless = mkIcon(<><path d="M8.5 9.5a4 4 0 0 1 0 5" /><path d="M12 7a8 8 0 0 1 0 10" /><path d="M15.5 4.5a12 12 0 0 1 0 15" /></>);
 
 /* ---------- Costanti ---------- */
 const STORAGE_KEY = "flussi-economici-v1";
@@ -240,6 +258,15 @@ const catMeta = (type, id) => {
 };
 const dueText = (days) =>
   days < 0 ? `Scaduto da ${-days} ${days === -1 ? "giorno" : "giorni"}` : days === 0 ? "Oggi" : days === 1 ? "Domani" : `Tra ${days} giorni`;
+const relativeDay = (isoTs, todayISO) => {
+  if (!isoTs) return null;
+  const d = localISODate(new Date(isoTs));
+  const diff = daysUntil(isoToDate(d), todayISO);
+  if (diff === 0) return "oggi";
+  if (diff === -1) return "ieri";
+  if (diff > -7) return `${-diff} giorni fa`;
+  return `il ${fmtDateShort(d)}`;
+};
 
 const freqHelpText = (frequency, refDate) => {
   if (!refDate) return "";
@@ -254,6 +281,63 @@ const monthlyEquivalent = (item) => {
   if (item.frequency === "annuale") return item.amount / 12;
   return (item.amount * 52) / 12;
 };
+
+/* ---------- Importazione Wallet ---------- */
+function hashStr(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36) + s.length.toString(36);
+}
+
+function parseWalletAmount(raw) {
+  if (raw == null) return 0;
+  let s = String(raw).replace(/[^\d,.]/g, "");
+  if (!s) return 0;
+  const lc = s.lastIndexOf(","), ld = s.lastIndexOf(".");
+  if (lc > -1 && ld > -1) {
+    const dec = lc > ld ? "," : ".";
+    const th = dec === "," ? "." : ",";
+    s = s.split(th).join("").replace(dec, ".");
+  } else if (lc > -1) {
+    s = s.replace(",", ".");
+  } else if (ld > -1) {
+    const parts = s.split(".");
+    if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) s = parts.join("");
+  }
+  const n = parseFloat(s);
+  return isFinite(n) ? round2(Math.abs(n)) : 0;
+}
+
+function parseWalletDate(raw, todayISO) {
+  const m = String(raw || "").match(/(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2})[:.](\d{2}))?/);
+  if (m) return { date: `${m[1]}-${m[2]}-${m[3]}`, time: m[4] ? `${m[4].padStart(2, "0")}:${m[5]}` : "" };
+  const t = Date.parse(raw);
+  if (!isNaN(t)) {
+    const d = new Date(t);
+    return { date: localISODate(d), time: `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}` };
+  }
+  return { date: todayISO, time: "" };
+}
+
+function parseWalletFile(text, seen, todayISO) {
+  const items = [];
+  const batch = new Set();
+  let valid = 0;
+  String(text).split(/\r?\n/).forEach((rawLine) => {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) return;
+    const parts = line.split("|").map((p) => p.trim());
+    if (parts.length < 3) return;
+    valid++;
+    const hash = hashStr(line);
+    if (seen.has(hash) || batch.has(hash)) return;
+    batch.add(hash);
+    const { date, time } = parseWalletDate(parts[0], todayISO);
+    items.push({ hash, date: date > todayISO ? todayISO : date, time, merchant: parts[1] || "", amount: parseWalletAmount(parts[2]), card: parts[3] || "" });
+  });
+  items.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  return { items, valid };
+}
 
 /* ---------- Ricorrenze ---------- */
 function nextRenewal(item, from) {
@@ -353,14 +437,19 @@ function applyCatchUp(data, todayISO) {
   return { data: { ...data, transactions, recurring, accounts }, count };
 }
 
-const EMPTY_DATA = { transactions: [], recurring: [], accounts: [], budgets: {} };
+const EMPTY_DATA = { transactions: [], recurring: [], accounts: [], budgets: {}, walletSeen: [], merchantMap: {}, cardMap: {}, walletLastImport: null };
 
+const isObj = (o) => o && typeof o === "object" && !Array.isArray(o);
 function normalize(p) {
   return {
     transactions: Array.isArray(p.transactions) ? p.transactions : [],
     recurring: Array.isArray(p.recurring) ? p.recurring : [],
     accounts: Array.isArray(p.accounts) ? p.accounts : [],
-    budgets: p.budgets && typeof p.budgets === "object" && !Array.isArray(p.budgets) ? p.budgets : {},
+    budgets: isObj(p.budgets) ? p.budgets : {},
+    walletSeen: Array.isArray(p.walletSeen) ? p.walletSeen : [],
+    merchantMap: isObj(p.merchantMap) ? p.merchantMap : {},
+    cardMap: isObj(p.cardMap) ? p.cardMap : {},
+    walletLastImport: typeof p.walletLastImport === "string" ? p.walletLastImport : null,
   };
 }
 
@@ -529,6 +618,137 @@ function Guilloche() {
   );
 }
 
+/* ---------- Pulsante Wallet ---------- */
+function WalletButton({ lastLabel, onClick }) {
+  const [fan, setFan] = useState(false);
+  const waves = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 7; i++) {
+      let d = "";
+      for (let x = 0; x <= 200; x += 4) {
+        const y = 8 + i * 11 + 4 * Math.sin(x / 17 + i * 0.7);
+        d += (x === 0 ? "M" : "L") + x + " " + y.toFixed(1);
+      }
+      out.push(d);
+    }
+    return out;
+  }, []);
+  return (
+    <button
+      className={`wallet-btn ${fan ? "fan" : ""}`}
+      onClick={() => { setFan(true); setTimeout(() => setFan(false), 700); onClick(); }}
+      aria-label="Importa i pagamenti fatti con Apple Wallet"
+    >
+      <svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"
+        style={{ position: "absolute", right: 0, top: 0, width: "62%", height: "100%", opacity: 0.1 }}>
+        {waves.map((d, i) => <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="0.8" />)}
+      </svg>
+      <span className="wallet-stack" aria-hidden="true">
+        <span className="wallet-card c1" />
+        <span className="wallet-card c2" />
+        <span className="wallet-card c3">
+          <svg viewBox="0 0 42 27" width="42" height="27">
+            <rect x="6" y="9" width="8" height="6" rx="1.5" fill="rgba(255,255,255,.6)" />
+            <path d="M28 9.5a5 5 0 0 1 0 8" fill="none" stroke="#fff" strokeOpacity=".85" strokeWidth="1.4" strokeLinecap="round" />
+            <path d="M31.5 7a9 9 0 0 1 0 13" fill="none" stroke="#fff" strokeOpacity=".85" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+        </span>
+      </span>
+      <span className="relative flex-1 min-w-0">
+        <span className="block text-[16px] font-semibold">Importa da Wallet</span>
+        <span className="block text-[13px] wallet-sub truncate">{lastLabel}</span>
+      </span>
+      <span className="wallet-go relative"><ArrowDown size={18} /></span>
+    </button>
+  );
+}
+
+function WalletReviewSheet({ items, accounts, onClose, onConfirm, onIgnore }) {
+  const [rows, setRows] = useState(() => items.map((it) => ({
+    ...it, include: true,
+    amountStr: it.amount > 0 ? String(it.amount).replace(".", ",") : "",
+  })));
+  const upd = (i, patch) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const parsedRows = rows.map((r) => ({ ...r, amount: round2(parseAmount(r.amountStr) || 0) }));
+  const included = parsedRows.filter((r) => r.include);
+  const invalid = included.some((r) => !(r.amount > 0));
+  const total = included.reduce((s, r) => s + (r.amount > 0 ? r.amount : 0), 0);
+  const n = included.length;
+
+  return (
+    <Sheet title={items.length === 1 ? "1 nuovo pagamento" : `${items.length} nuovi pagamenti`} onClose={onClose}>
+      <p className="text-sm muted mb-4">Controlla importi, categorie e conti. L'app ricorda le tue scelte per esercente e carta e le propone in automatico la prossima volta.</p>
+      <div className="space-y-2.5">
+        {rows.map((r, i) => {
+          const bad = r.include && !(parseAmount(r.amountStr) > 0);
+          return (
+            <div key={r.hash} className="panel p-3" style={{ opacity: r.include ? 1 : 0.5 }}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[15px] font-semibold truncate">{r.merchant || "Esercente sconosciuto"}</div>
+                  <div className="text-xs muted truncate">{cap(fmtDayShortW(r.date))}{r.time ? `, ore ${r.time}` : ""}{r.card ? `, ${r.card}` : ""}</div>
+                </div>
+                <Toggle checked={r.include} onChange={(v) => upd(i, { include: v })} label="Includi" />
+              </div>
+              {r.include && (
+                <div className="grid gap-2 mt-3" style={{ gridTemplateColumns: "0.9fr 1.3fr" }}>
+                  <input className={`inp num ${bad ? "bad" : ""}`} type="text" inputMode="decimal" value={r.amountStr}
+                    onChange={(e) => upd(i, { amountStr: e.target.value })} placeholder="Importo" />
+                  <select className="inp" value={r.category} onChange={(e) => upd(i, { category: e.target.value })}>
+                    {EXPENSE_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                  </select>
+                  <select className="inp" style={{ gridColumn: "1 / -1" }} value={r.accountId} onChange={(e) => upd(i, { accountId: e.target.value })}>
+                    <option value="">Nessun conto</option>
+                    {accounts.map((a) => <option key={a.id} value={a.id}>Da {a.name}</option>)}
+                  </select>
+                  {bad && <p className="text-xs c-red" style={{ gridColumn: "1 / -1" }}>Importo mancante: Wallet non l'ha trasmesso, inseriscilo a mano.</p>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <button disabled={!n || invalid} onClick={() => onConfirm(parsedRows)} className="btn btn-ink mt-5">
+        {n ? `Registra ${n} ${n === 1 ? "pagamento" : "pagamenti"} (${fmtEUR(total)})` : "Nessun pagamento selezionato"}
+      </button>
+      <button onClick={onIgnore} className="btn mt-2 muted" style={{ fontWeight: 500 }}>Li avevo già registrati, ignora tutti</button>
+    </Sheet>
+  );
+}
+
+function WalletGuideSheet({ onClose }) {
+  const steps = [
+    ["Crea l'automazione", "Apri Comandi Rapidi, scheda Automazione, tocca + e scegli Wallet."],
+    ["Scegli cosa la attiva", "Seleziona tutte le carte e tutte le categorie, imposta Esegui immediatamente e tocca Avanti."],
+    ["Comando nuovo", "Tocca Nuovo comando rapido vuoto."],
+    ["Componi la riga", "Aggiungi l'azione Testo e inserisci, in quest'ordine: la variabile Data attuale, il simbolo |, Input comando rapido (proprietà Esercente), |, Input comando rapido (proprietà Importo), |, Input comando rapido (proprietà Nome)."],
+    ["Formato della data", "Tocca la variabile Data attuale, scegli Formato data Personalizzato e scrivi yyyy-MM-dd HH:mm"],
+    ["Salva nel file", "Aggiungi l'azione Aggiungi al file di testo, come percorso scrivi wallet.txt e attiva Crea nuova riga. Tocca Fine."],
+    ["Prova e importa", "Paga una volta con l'iPhone, poi qui tocca Importa da Wallet e apri iCloud Drive, cartella Shortcuts, file wallet.txt."],
+  ];
+  return (
+    <Sheet title="Configura Comandi Rapidi" onClose={onClose}>
+      <p className="text-sm muted mb-4">Si fa una volta sola. I nomi delle voci possono variare leggermente con la versione di iOS.</p>
+      <ol className="space-y-4">
+        {steps.map(([t, d], i) => (
+          <li key={i} className="flex gap-3">
+            <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-semibold num" style={{ background: "var(--surface2)" }}>{i + 1}</span>
+            <span>
+              <span className="block text-[15px] font-medium">{t}</span>
+              <span className="block text-sm muted mt-0.5">{d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-5 p-3 rounded-xl text-sm" style={{ background: "var(--surface2)" }}>
+        <div className="muted text-xs mb-1">Ogni pagamento diventa una riga così:</div>
+        <div className="num font-medium" style={{ wordBreak: "break-all" }}>2026-11-18 13:42|Conad City|12,40 €|Carta Visa</div>
+      </div>
+      <button onClick={onClose} className="btn btn-ink mt-5">Ho capito</button>
+    </Sheet>
+  );
+}
+
 /* ---------- Righe ---------- */
 function TxRow({ tx, accounts, onClick }) {
   const isT = tx.type === "transfer";
@@ -543,8 +763,13 @@ function TxRow({ tx, accounts, onClick }) {
   const Icon = meta.Icon;
   return (
     <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
-      <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: `${meta.color}22`, color: meta.color }}>
+      <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 relative" style={{ background: `${meta.color}22`, color: meta.color }}>
         <Icon size={16} />
+        {tx.source === "wallet" && (
+          <span className="absolute flex items-center justify-center rounded-full" style={{ right: -3, bottom: -3, width: 16, height: 16, background: "var(--ink)", color: "var(--paper)" }}>
+            <Contactless size={11} />
+          </span>
+        )}
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] truncate">{tx.description || meta.label}</span>
@@ -853,6 +1078,7 @@ function AddSheet({ onClose, onPick }) {
   const opts = [
     { id: "expense", label: "Uscita", text: "Una spesa appena fatta", Icon: ShoppingCart, color: "var(--red)" },
     { id: "income", label: "Entrata", text: "Denaro ricevuto", Icon: TrendingUp, color: "var(--green)" },
+    { id: "wallet", label: "Da Wallet", text: "Importa i pagamenti fatti con l'iPhone", Icon: Contactless, color: "var(--ink)" },
     { id: "transfer", label: "Giroconto", text: "Sposta denaro tra due conti", Icon: ArrowLeftRight, color: "var(--blue)" },
     { id: "rec-expense", label: "Spesa fissa", text: "Abbonamento, affitto, rata", Icon: RefreshCw, color: "var(--ochre)" },
     { id: "rec-income", label: "Entrata fissa", text: "Stipendio, borsa di studio", Icon: CalendarIcon, color: "var(--ochre)" },
@@ -882,7 +1108,7 @@ function BackupSection({ data, onImport }) {
   const markDone = () => { const now = new Date().toISOString(); try { localStorage.setItem(BACKUP_KEY, now); } catch (e) {} setLast(now); };
 
   const doExport = async () => {
-    const json = JSON.stringify({ app: "flussi-economici", version: 2, exportedAt: new Date().toISOString(), ...data }, null, 2);
+    const json = JSON.stringify({ app: "flussi-economici", version: 3, exportedAt: new Date().toISOString(), ...data }, null, 2);
     const name = `flussi-backup-${localISODate()}.json`;
     try {
       const file = new File([json], name, { type: "application/json" });
@@ -922,7 +1148,7 @@ function BackupSection({ data, onImport }) {
         <button onClick={doExport} className="btn btn-ink flex items-center justify-center gap-2"><Download size={16} /> Esporta</button>
         <button onClick={() => fileRef.current && fileRef.current.click()} className="btn btn-ghost flex items-center justify-center gap-2"><Upload size={16} /> Importa</button>
       </div>
-      <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" style={{ display: "none" }} onChange={onFile} />
+      <input ref={fileRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={onFile} />
     </div>
   );
 }
@@ -949,7 +1175,10 @@ function App() {
   const [accModal, setAccModal] = useState(null);
   const [budgetModal, setBudgetModal] = useState(null);
   const [addSheet, setAddSheet] = useState(false);
+  const [walletReview, setWalletReview] = useState(null);
+  const [walletGuide, setWalletGuide] = useState(false);
   const [note, setNote] = useState(null);
+  const walletRef = useRef(null);
 
   const { transactions, recurring, accounts, budgets } = data;
   const curKey = monthKeyOf(todayISO);
@@ -1098,9 +1327,61 @@ function App() {
     setBudgetModal(null);
   };
 
+  /* Wallet */
+  const openWalletPicker = () => { if (walletRef.current) walletRef.current.click(); };
+  const onWalletFile = async (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    let text = "";
+    try { text = await f.text(); } catch (err) { window.alert("Impossibile leggere il file scelto."); return; }
+    const { items, valid } = parseWalletFile(text, new Set(data.walletSeen), todayISO);
+    if (!valid) {
+      window.alert("Il file non contiene pagamenti nel formato previsto. Controlla il comando rapido: ogni riga deve essere data|esercente|importo|carta.");
+      return;
+    }
+    if (!items.length) {
+      setData((d) => ({ ...d, walletLastImport: new Date().toISOString() }));
+      setNote("Nessun nuovo pagamento da importare");
+      return;
+    }
+    const enriched = items.map((it) => ({
+      ...it,
+      category: data.merchantMap[it.merchant.toLowerCase()] || "altro-u",
+      accountId: (it.card && data.cardMap[it.card] && accounts.some((a) => a.id === data.cardMap[it.card])) ? data.cardMap[it.card] : accounts.length === 1 ? accounts[0].id : "",
+    }));
+    setWalletReview(enriched);
+  };
+  const confirmWallet = (rows) => {
+    const inc = rows.filter((r) => r.include && r.amount > 0);
+    setData((d) => {
+      let txs = [...d.transactions];
+      let acc = d.accounts;
+      const mm = { ...d.merchantMap }, cm = { ...d.cardMap };
+      inc.forEach((r) => {
+        const tx = { id: uid("t"), type: "expense", amount: r.amount, category: r.category, description: r.merchant || "Pagamento con Wallet", date: r.date, accountId: r.accountId || null, source: "wallet" };
+        txs.push(tx);
+        acc = applyBalance(acc, tx.accountId, -tx.amount);
+        if (r.merchant) mm[r.merchant.toLowerCase()] = r.category;
+        if (r.card && r.accountId) cm[r.card] = r.accountId;
+      });
+      return { ...d, transactions: txs, accounts: acc, merchantMap: mm, cardMap: cm, walletSeen: [...d.walletSeen, ...rows.map((r) => r.hash)], walletLastImport: new Date().toISOString() };
+    });
+    setWalletReview(null);
+    setNote(inc.length === 1 ? "1 pagamento importato da Wallet" : `${inc.length} pagamenti importati da Wallet`);
+  };
+  const ignoreWallet = () => {
+    const hashes = walletReview.map((r) => r.hash);
+    setData((d) => ({ ...d, walletSeen: [...d.walletSeen, ...hashes], walletLastImport: new Date().toISOString() }));
+    setWalletReview(null);
+    setNote("Pagamenti segnati come già registrati");
+  };
+  const walletLastLabel = data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}` : "Pagamenti con iPhone, in un tocco";
+
   const pickAdd = (id) => {
     setAddSheet(false);
     if (id === "expense" || id === "income") setTxModal({ tx: null, type: id });
+    else if (id === "wallet") openWalletPicker();
     else if (id === "transfer") setTrModal({ tx: null });
     else if (id === "rec-expense") setRecModal({ item: null, kind: "expense" });
     else if (id === "rec-income") setRecModal({ item: null, kind: "income" });
@@ -1143,6 +1424,13 @@ function App() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-3">
+        <WalletButton lastLabel={walletLastLabel} onClick={openWalletPicker} />
+        {!data.walletLastImport && (
+          <button onClick={() => setWalletGuide(true)} className="text-sm c-blue mt-2 px-1">Come si configura</button>
+        )}
       </div>
 
       {showSteps && (
@@ -1434,7 +1722,7 @@ function App() {
       if (d <= pdim) cb += b[d];
       rows.push({ day: d, cur: d <= curLen ? round2(ca) : null, prev: d <= pdim ? round2(cb) : null });
     }
-    return { rows, curLen, curTot: round2(ca), atDayCur: rows[curLen - 1]?.cur ?? 0, atDayPrev: rows[Math.min(curLen, pdim) - 1]?.prev ?? 0 };
+    return { rows, curLen, atDayCur: rows[curLen - 1]?.cur ?? 0, atDayPrev: rows[Math.min(curLen, pdim) - 1]?.prev ?? 0 };
   }, [transactions, anMonth, curKey, dayNum]);
 
   const catRows = useMemo(() => {
@@ -1557,7 +1845,7 @@ function App() {
             )}
             <Rows>
               {catRows.map((r) => (
-                <button key={r.id} onClick={() => setSelCat(selCat === r.id ? null : r.id)} className="w-full flex items-center gap-3 py-3 text-left"
+                <button key={r.id} onClick={() => setSelCat(selCat === r.id ? null : r.id)} className="flex items-center gap-3 text-left"
                   style={{ background: selCat === r.id ? "var(--surface2)" : "transparent", margin: "0 -16px", padding: "12px 16px", width: "calc(100% + 32px)" }}>
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: r.color }} />
                   <span className="flex-1 min-w-0">
@@ -1649,6 +1937,17 @@ function App() {
         <button onClick={() => setTrModal({ tx: null })} className="btn btn-ghost">Giroconto</button>
       </div>
 
+      <Section title="Pagamenti con Wallet">
+        <div className="panel p-4">
+          <p className="text-sm muted">
+            {data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}. ` : "Nessuna importazione finora. "}
+            {Object.keys(data.cardMap).length > 0 && `Carte abbinate a un conto: ${Object.keys(data.cardMap).length}. `}
+            {Object.keys(data.merchantMap).length > 0 && `Esercenti riconosciuti: ${Object.keys(data.merchantMap).length}.`}
+          </p>
+          <button onClick={() => setWalletGuide(true)} className="btn btn-ghost mt-3">Guida alla configurazione</button>
+        </div>
+      </Section>
+
       <Section title="Backup">
         <BackupSection data={data} onImport={(d) => { setData(d); setNote("Backup ripristinato"); }} />
       </Section>
@@ -1669,6 +1968,8 @@ function App() {
       <main className="max-w-xl mx-auto px-4" style={{ paddingTop: "calc(env(safe-area-inset-top) + 18px)", paddingBottom: "calc(env(safe-area-inset-bottom) + 150px)" }}>
         {views[tab]()}
       </main>
+
+      <input ref={walletRef} type="file" accept=".txt,text/plain" style={{ display: "none" }} onChange={onWalletFile} />
 
       {note && (
         <div className="fixed left-4 right-4 z-50 flex justify-center fade" style={{ top: "calc(env(safe-area-inset-top) + 10px)" }}>
@@ -1697,6 +1998,11 @@ function App() {
       </nav>
 
       {addSheet && <AddSheet onClose={() => setAddSheet(false)} onPick={pickAdd} />}
+      {walletReview && (
+        <WalletReviewSheet items={walletReview} accounts={accounts}
+          onClose={() => setWalletReview(null)} onConfirm={confirmWallet} onIgnore={ignoreWallet} />
+      )}
+      {walletGuide && <WalletGuideSheet onClose={() => setWalletGuide(false)} />}
       {txModal && (
         <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} todayISO={todayISO}
           onClose={() => setTxModal(null)} onSave={saveTx} onDelete={deleteTx} />
