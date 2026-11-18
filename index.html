@@ -30,6 +30,7 @@
   html, body { background: var(--paper); color: var(--ink); margin: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: "Schibsted Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+  button:disabled { cursor: default; }
   button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
   .serif { font-family: "Young Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
   .num { font-variant-numeric: tabular-nums; }
@@ -46,6 +47,7 @@
   .btn-ink { background: var(--ink); color: var(--paper); }
   .btn-ink:disabled { opacity: .3; }
   .btn-ghost { border: 1px solid var(--line); }
+  .btn-ghost:disabled { opacity: .4; }
   .btn-danger { color: var(--red); }
   .btn-danger-on { color: var(--red); background: color-mix(in srgb, var(--red) 14%, transparent); }
   .seg { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; gap: 3px; }
@@ -53,6 +55,8 @@
   .seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .noscroll::-webkit-scrollbar { display: none; }
   .noscroll { scrollbar-width: none; }
+  .bar { height: 6px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 999px; }
 
   .wallet-btn { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 16px 16px 12px; border-radius: 20px; background: var(--ink); color: var(--paper); overflow: hidden; text-align: left; transition: transform .12s ease; }
   .wallet-btn:active { transform: scale(.98); }
@@ -144,7 +148,7 @@
 const { useState, useEffect, useMemo, useRef } = React;
 const RC = window.Recharts || null;
 
-/* ---------- Icone ---------- */
+/* ================= Icone ================= */
 const mkIcon = (children) => ({ size = 24, className = "", style }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
     strokeLinecap="round" strokeLinejoin="round" className={className} style={style} aria-hidden="true">
@@ -179,8 +183,13 @@ const Utensils = mkIcon(<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><pa
 const Shirt = mkIcon(<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />);
 const ArrowDown = mkIcon(<><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>);
 const Contactless = mkIcon(<><path d="M8.5 9.5a4 4 0 0 1 0 5" /><path d="M12 7a8 8 0 0 1 0 10" /><path d="M15.5 4.5a12 12 0 0 1 0 15" /></>);
+const Mic = mkIcon(<><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><path d="M12 19v3" /></>);
+const Target = mkIcon(<><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>);
+const Users = mkIcon(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>);
+const Tag = mkIcon(<><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /><circle cx="7.5" cy="7.5" r=".6" fill="currentColor" /></>);
+const Bulb = mkIcon(<><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></>);
 
-/* ---------- Costanti ---------- */
+/* ================= Costanti ================= */
 const STORAGE_KEY = "flussi-economici-v1";
 const BACKUP_KEY = "flussi-economici-last-backup";
 
@@ -196,14 +205,12 @@ const EXPENSE_CATEGORIES = [
   { id: "abbonamenti", label: "Abbonamenti", color: "#6E5BA0", Icon: RefreshCw },
   { id: "altro-u", label: "Altro", color: "#7A8580", Icon: MoreHorizontal },
 ];
-
 const INCOME_CATEGORIES = [
   { id: "stipendio", label: "Stipendio", color: "#2E6A4E", Icon: Wallet },
   { id: "extra", label: "Extra e lavoretti", color: "#4E9A72", Icon: TrendingUp },
   { id: "regalo", label: "Regali", color: "#3E8A99", Icon: Gift },
   { id: "altro-e", label: "Altro", color: "#7A8580", Icon: MoreHorizontal },
 ];
-
 const SUB_CATEGORIES = [
   { id: "streaming", label: "Streaming" },
   { id: "palestra", label: "Palestra e sport" },
@@ -212,9 +219,10 @@ const SUB_CATEGORIES = [
   { id: "affitto", label: "Affitto e utenze" },
   { id: "altro-s", label: "Altro" },
 ];
-
 const FREQ_LABEL = { settimanale: "Settimanale", mensile: "Mensile", annuale: "Annuale" };
 const ACCOUNT_COLORS = ["var(--green)", "var(--blue)", "var(--ochre)", "#8E4A84", "#3E8A99", "#B4495B"];
+const GOAL_COLORS = ["#2E6A4E", "#2C5C8A", "#B07A1A", "#8E4A84", "#3E8A99", "#B4495B"];
+const WEEKDAYS = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"];
 
 const TABS = [
   { id: "overview", label: "Oggi", Icon: Home },
@@ -224,7 +232,7 @@ const TABS = [
   { id: "accounts", label: "Conti", Icon: Landmark },
 ];
 
-/* ---------- Utilità ---------- */
+/* ================= Utilità ================= */
 const fmtEUR = (n) => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(n || 0);
 const fmtSigned = (n) => (n > 0.004 ? "+" : n < -0.004 ? "−" : "") + fmtEUR(Math.abs(n));
 const round2 = (n) => Math.round(n * 100) / 100;
@@ -246,12 +254,14 @@ const monthLabel = (key) => intl({ month: "long", year: "numeric" }).format(keyT
 const monthName = (key) => intl({ month: "long" }).format(keyToDate(key));
 const shortMonth = (key) => intl({ month: "short" }).format(keyToDate(key)).replace(".", "");
 const fmtDateShort = (iso) => intl({ day: "numeric", month: "short" }).format(isoToDate(iso));
+const fmtDateYear = (iso) => intl({ day: "numeric", month: "short", year: "numeric" }).format(isoToDate(iso));
 const fmtDayLong = (iso) => intl({ weekday: "long", day: "numeric", month: "long" }).format(isoToDate(iso));
 const fmtDayShortW = (iso) => intl({ weekday: "short", day: "numeric", month: "short" }).format(isoToDate(iso));
 const weekdayShort = (iso) => intl({ weekday: "short" }).format(isoToDate(iso)).replace(".", "");
 const parseAmount = (s) => parseFloat(String(s).replace(/\s/g, "").replace(",", "."));
 const uid = (p) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 const daysUntil = (date, todayISO) => Math.round((date - isoToDate(todayISO)) / 86400000);
+const sameTag = (a, b) => a.toLowerCase() === b.toLowerCase();
 const catMeta = (type, id) => {
   const list = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   return list.find((c) => c.id === id) || list[list.length - 1];
@@ -267,7 +277,6 @@ const relativeDay = (isoTs, todayISO) => {
   if (diff > -7) return `${-diff} giorni fa`;
   return `il ${fmtDateShort(d)}`;
 };
-
 const freqHelpText = (frequency, refDate) => {
   if (!refDate) return "";
   const d = isoToDate(refDate);
@@ -275,20 +284,25 @@ const freqHelpText = (frequency, refDate) => {
   if (frequency === "mensile") return `Si ripete ogni mese il giorno ${d.getDate()}`;
   return `Si ripete ogni anno il ${intl({ day: "numeric", month: "long" }).format(d)}`;
 };
-
 const monthlyEquivalent = (item) => {
   if (item.frequency === "mensile") return item.amount;
   if (item.frequency === "annuale") return item.amount / 12;
   return (item.amount * 52) / 12;
 };
+const goalMonthly = (g, todayISO) => {
+  if (!g.deadline) return null;
+  const days = daysUntil(isoToDate(g.deadline), todayISO);
+  if (days < 0) return null;
+  const months = Math.max(1, Math.ceil(days / 30.44));
+  return round2(Math.max(0, g.target - g.saved) / months);
+};
 
-/* ---------- Importazione Wallet ---------- */
+/* ================= Importazione Wallet / Siri ================= */
 function hashStr(s) {
   let h = 5381;
   for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
   return (h >>> 0).toString(36) + s.length.toString(36);
 }
-
 function parseWalletAmount(raw) {
   if (raw == null) return 0;
   let s = String(raw).replace(/[^\d,.]/g, "");
@@ -307,7 +321,6 @@ function parseWalletAmount(raw) {
   const n = parseFloat(s);
   return isFinite(n) ? round2(Math.abs(n)) : 0;
 }
-
 function parseWalletDate(raw, todayISO) {
   const m = String(raw || "").match(/(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2})[:.](\d{2}))?/);
   if (m) return { date: `${m[1]}-${m[2]}-${m[3]}`, time: m[4] ? `${m[4].padStart(2, "0")}:${m[5]}` : "" };
@@ -318,7 +331,6 @@ function parseWalletDate(raw, todayISO) {
   }
   return { date: todayISO, time: "" };
 }
-
 function parseWalletFile(text, seen, todayISO) {
   const items = [];
   const batch = new Set();
@@ -339,7 +351,7 @@ function parseWalletFile(text, seen, todayISO) {
   return { items, valid };
 }
 
-/* ---------- Ricorrenze ---------- */
+/* ================= Ricorrenze ================= */
 function nextRenewal(item, from) {
   const ref = isoToDate(item.refDate);
   const start = new Date(from);
@@ -369,13 +381,11 @@ function nextRenewal(item, from) {
   }
   return cand;
 }
-
 function occurrenceAfter(item, date) {
   const next = new Date(date);
   next.setDate(next.getDate() + 1);
   return nextRenewal(item, next);
 }
-
 function occurrencesInRange(item, fromISO, toISO) {
   const out = [];
   if (fromISO > toISO) return out;
@@ -385,7 +395,6 @@ function occurrencesInRange(item, fromISO, toISO) {
   while (d <= end && guard < 400) { out.push(localISODate(d)); d = occurrenceAfter(item, d); guard++; }
   return out;
 }
-
 function nextDue(item, todayISO) {
   let startISO = todayISO;
   if (item.processedThrough) {
@@ -395,9 +404,9 @@ function nextDue(item, todayISO) {
   return nextRenewal(item, isoToDate(startISO));
 }
 
-/* ---------- Saldi ---------- */
+/* ================= Saldi ================= */
 function applyBalance(accounts, accountId, delta) {
-  if (!accountId) return accounts;
+  if (!accountId || !delta) return accounts;
   return accounts.map((a) => (a.id === accountId ? { ...a, balance: round2(a.balance + delta) } : a));
 }
 function txEffects(t) {
@@ -408,6 +417,23 @@ function applyEffects(accounts, effects, sign) {
   return effects.reduce((acc, [id, delta]) => applyBalance(acc, id, sign * delta), accounts);
 }
 
+/* ================= Spese condivise ================= */
+const sharedShare = (e) => e.total / Math.max(1, (e.participants?.length || 0) + (e.includeMe ? 1 : 0));
+const myShareOf = (e) => (e.includeMe ? round2(sharedShare(e)) : 0);
+function sharedExtraEffects(e) {
+  if (e.kind === "settle") return [[e.accountId, e.direction === "in" ? e.amount : -e.amount]];
+  if (e.payer === "me") return [[e.accountId, -round2(e.total - myShareOf(e))]];
+  return [];
+}
+function entryEffectFor(e, personId) {
+  if (e.kind === "settle") return e.personId === personId ? (e.direction === "in" ? -e.amount : e.amount) : 0;
+  const s = sharedShare(e);
+  if (e.payer === "me") return e.participants.includes(personId) ? s : 0;
+  if (e.payer === personId && e.includeMe) return -s;
+  return 0;
+}
+
+/* ================= Ricorrenti automatici ================= */
 function applyCatchUp(data, todayISO) {
   let count = 0;
   let transactions = data.transactions;
@@ -424,7 +450,7 @@ function applyCatchUp(data, todayISO) {
       transactions = [...transactions, {
         id: uid("t"), type: item.kind, amount: item.amount,
         category: isIncome ? item.category : "abbonamenti",
-        description: item.name, date: localISODate(occ), accountId: item.accountId || null,
+        description: item.name, date: localISODate(occ), accountId: item.accountId || null, tags: [],
       }];
       accounts = applyBalance(accounts, item.accountId, isIncome ? item.amount : -item.amount);
       count++;
@@ -437,22 +463,29 @@ function applyCatchUp(data, todayISO) {
   return { data: { ...data, transactions, recurring, accounts }, count };
 }
 
-const EMPTY_DATA = { transactions: [], recurring: [], accounts: [], budgets: {}, walletSeen: [], merchantMap: {}, cardMap: {}, walletLastImport: null };
-
+/* ================= Dati ================= */
+const EMPTY_DATA = {
+  transactions: [], recurring: [], accounts: [], budgets: {},
+  walletSeen: [], merchantMap: {}, cardMap: {}, walletLastImport: null,
+  goals: [], people: [], shared: [],
+};
 const isObj = (o) => o && typeof o === "object" && !Array.isArray(o);
+const arr = (v) => (Array.isArray(v) ? v : []);
 function normalize(p) {
   return {
-    transactions: Array.isArray(p.transactions) ? p.transactions : [],
-    recurring: Array.isArray(p.recurring) ? p.recurring : [],
-    accounts: Array.isArray(p.accounts) ? p.accounts : [],
+    transactions: arr(p.transactions),
+    recurring: arr(p.recurring),
+    accounts: arr(p.accounts),
     budgets: isObj(p.budgets) ? p.budgets : {},
-    walletSeen: Array.isArray(p.walletSeen) ? p.walletSeen : [],
+    walletSeen: arr(p.walletSeen),
     merchantMap: isObj(p.merchantMap) ? p.merchantMap : {},
     cardMap: isObj(p.cardMap) ? p.cardMap : {},
     walletLastImport: typeof p.walletLastImport === "string" ? p.walletLastImport : null,
+    goals: arr(p.goals),
+    people: arr(p.people),
+    shared: arr(p.shared),
   };
 }
-
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -461,7 +494,7 @@ function loadData() {
   return { ...EMPTY_DATA };
 }
 
-/* ---------- Tema per i grafici ---------- */
+/* ================= Tema per i grafici ================= */
 function readTheme() {
   const s = getComputedStyle(document.documentElement);
   const g = (n) => s.getPropertyValue(n).trim();
@@ -478,14 +511,12 @@ function useTheme() {
   return t;
 }
 
-/* ---------- Componenti base ---------- */
+/* ================= Componenti base ================= */
 function Toggle({ checked, onChange, label }) {
   return (
-    <button
-      role="switch" aria-checked={checked} aria-label={label}
+    <button role="switch" aria-checked={checked} aria-label={label}
       onClick={(e) => { e.stopPropagation(); onChange(!checked); }}
-      style={{ position: "relative", width: 44, height: 26, borderRadius: 999, flexShrink: 0, background: checked ? "var(--green)" : "var(--line)", transition: "background .15s" }}
-    >
+      style={{ position: "relative", width: 44, height: 26, borderRadius: 999, flexShrink: 0, background: checked ? "var(--green)" : "var(--line)", transition: "background .15s" }}>
       <span style={{ position: "absolute", top: 3, left: 3, width: 20, height: 20, borderRadius: 999, background: "#fff", transform: checked ? "translateX(18px)" : "none", transition: "transform .15s" }} />
     </button>
   );
@@ -543,11 +574,9 @@ function MonthNav({ monthKey, onChange, max }) {
 function Sheet({ title, onClose, children }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center fade" style={{ background: "rgba(10,18,18,.45)" }} onClick={onClose}>
-      <div
-        className="sheet w-full sm:max-w-md px-5 pt-3 overflow-y-auto sm:rounded-3xl"
+      <div className="sheet w-full sm:max-w-md px-5 pt-3 overflow-y-auto sm:rounded-3xl"
         style={{ background: "var(--surface)", borderRadius: "22px 22px 0 0", maxHeight: "92vh", paddingBottom: "calc(env(safe-area-inset-bottom) + 20px)" }}
-        onClick={(e) => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-3 rounded-full" style={{ width: 36, height: 4, background: "var(--line)" }} />
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">{title}</h3>
@@ -588,7 +617,55 @@ function ChartTip({ active, payload, label, labelPrefix = "" }) {
   );
 }
 
-/* ---------- Elemento distintivo: il biglietto ---------- */
+function Insights({ items }) {
+  return (
+    <Rows>
+      {items.map((it, i) => (
+        <div key={i} className="flex gap-3 py-3">
+          <span className="mt-1.5 shrink-0" style={{ width: 8, height: 8, borderRadius: 9, background: it.tone === "bad" ? "var(--red)" : it.tone === "good" ? "var(--green)" : "var(--ochre)" }} />
+          <p className="text-[15px] leading-snug">{it.text}</p>
+        </div>
+      ))}
+    </Rows>
+  );
+}
+
+function TagInput({ tags, onChange, suggestions }) {
+  const [v, setV] = useState("");
+  const add = (t) => {
+    const s = t.trim().replace(/^#/, "").replace(/,$/, "");
+    if (!s) return;
+    if (!tags.some((x) => sameTag(x, s))) onChange([...tags, s]);
+    setV("");
+  };
+  const sugg = suggestions.filter((s) => !tags.some((t) => sameTag(t, s)) && (!v || s.toLowerCase().includes(v.toLowerCase()))).slice(0, 6);
+  return (
+    <div>
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {tags.map((t) => (
+            <button key={t} onClick={() => onChange(tags.filter((x) => x !== t))} className="chip chip-on flex items-center gap-1" aria-label={`Rimuovi ${t}`}>
+              {t} <X size={12} />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input className="inp" value={v} onChange={(e) => setV(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(v); } }}
+          placeholder="Es. Erasmus, sessione estiva" />
+        <button onClick={() => add(v)} disabled={!v.trim()} className="btn btn-ghost" style={{ width: "auto", padding: "0 16px" }}>Aggiungi</button>
+      </div>
+      {sugg.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {sugg.map((s) => <button key={s} onClick={() => add(s)} className="chip">{s}</button>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================= Biglietto e pulsante Wallet ================= */
 function Guilloche() {
   const paths = useMemo(() => {
     const out = [];
@@ -618,7 +695,6 @@ function Guilloche() {
   );
 }
 
-/* ---------- Pulsante Wallet ---------- */
 function WalletButton({ lastLabel, onClick }) {
   const [fan, setFan] = useState(false);
   const waves = useMemo(() => {
@@ -634,11 +710,9 @@ function WalletButton({ lastLabel, onClick }) {
     return out;
   }, []);
   return (
-    <button
-      className={`wallet-btn ${fan ? "fan" : ""}`}
+    <button className={`wallet-btn ${fan ? "fan" : ""}`}
       onClick={() => { setFan(true); setTimeout(() => setFan(false), 700); onClick(); }}
-      aria-label="Importa i pagamenti fatti con Apple Wallet"
-    >
+      aria-label="Importa i pagamenti da Wallet e Siri">
       <svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"
         style={{ position: "absolute", right: 0, top: 0, width: "62%", height: "100%", opacity: 0.1 }}>
         {waves.map((d, i) => <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="0.8" />)}
@@ -655,7 +729,7 @@ function WalletButton({ lastLabel, onClick }) {
         </span>
       </span>
       <span className="relative flex-1 min-w-0">
-        <span className="block text-[16px] font-semibold">Importa da Wallet</span>
+        <span className="block text-[16px] font-semibold">Importa pagamenti</span>
         <span className="block text-[13px] wallet-sub truncate">{lastLabel}</span>
       </span>
       <span className="wallet-go relative"><ArrowDown size={18} /></span>
@@ -664,29 +738,29 @@ function WalletButton({ lastLabel, onClick }) {
 }
 
 function WalletReviewSheet({ items, accounts, onClose, onConfirm, onIgnore }) {
-  const [rows, setRows] = useState(() => items.map((it) => ({
-    ...it, include: true,
-    amountStr: it.amount > 0 ? String(it.amount).replace(".", ",") : "",
-  })));
+  const [rows, setRows] = useState(() => items.map((it) => ({ ...it, include: true, amountStr: it.amount > 0 ? String(it.amount).replace(".", ",") : "" })));
   const upd = (i, patch) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const parsedRows = rows.map((r) => ({ ...r, amount: round2(parseAmount(r.amountStr) || 0) }));
   const included = parsedRows.filter((r) => r.include);
   const invalid = included.some((r) => !(r.amount > 0));
   const total = included.reduce((s, r) => s + (r.amount > 0 ? r.amount : 0), 0);
   const n = included.length;
-
   return (
     <Sheet title={items.length === 1 ? "1 nuovo pagamento" : `${items.length} nuovi pagamenti`} onClose={onClose}>
-      <p className="text-sm muted mb-4">Controlla importi, categorie e conti. L'app ricorda le tue scelte per esercente e carta e le propone in automatico la prossima volta.</p>
+      <p className="text-sm muted mb-4">Controlla importi, categorie e conti. L'app ricorda le scelte per esercente e carta e le propone in automatico la volta successiva.</p>
       <div className="space-y-2.5">
         {rows.map((r, i) => {
           const bad = r.include && !(parseAmount(r.amountStr) > 0);
+          const voice = r.card && r.card.toLowerCase() === "contanti";
           return (
             <div key={r.hash} className="panel p-3" style={{ opacity: r.include ? 1 : 0.5 }}>
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[15px] font-semibold truncate">{r.merchant || "Esercente sconosciuto"}</div>
-                  <div className="text-xs muted truncate">{cap(fmtDayShortW(r.date))}{r.time ? `, ore ${r.time}` : ""}{r.card ? `, ${r.card}` : ""}</div>
+                <div className="min-w-0 flex items-start gap-2">
+                  <span className="muted mt-0.5">{voice ? <Mic size={15} /> : <Contactless size={15} />}</span>
+                  <div className="min-w-0">
+                    <div className="text-[15px] font-semibold truncate">{r.merchant || "Esercente sconosciuto"}</div>
+                    <div className="text-xs muted truncate">{cap(fmtDayShortW(r.date))}{r.time ? `, ore ${r.time}` : ""}{r.card ? `, ${r.card}` : ""}</div>
+                  </div>
                 </div>
                 <Toggle checked={r.include} onChange={(v) => upd(i, { include: v })} label="Includi" />
               </div>
@@ -701,7 +775,7 @@ function WalletReviewSheet({ items, accounts, onClose, onConfirm, onIgnore }) {
                     <option value="">Nessun conto</option>
                     {accounts.map((a) => <option key={a.id} value={a.id}>Da {a.name}</option>)}
                   </select>
-                  {bad && <p className="text-xs c-red" style={{ gridColumn: "1 / -1" }}>Importo mancante: Wallet non l'ha trasmesso, inseriscilo a mano.</p>}
+                  {bad && <p className="text-xs c-red" style={{ gridColumn: "1 / -1" }}>Importo mancante: inseriscilo a mano.</p>}
                 </div>
               )}
             </div>
@@ -716,19 +790,31 @@ function WalletReviewSheet({ items, accounts, onClose, onConfirm, onIgnore }) {
   );
 }
 
-function WalletGuideSheet({ onClose }) {
-  const steps = [
-    ["Crea l'automazione", "Apri Comandi Rapidi, scheda Automazione, tocca + e scegli Wallet."],
-    ["Scegli cosa la attiva", "Seleziona tutte le carte e tutte le categorie, imposta Esegui immediatamente e tocca Avanti."],
-    ["Comando nuovo", "Tocca Nuovo comando rapido vuoto."],
-    ["Componi la riga", "Aggiungi l'azione Testo e inserisci, in quest'ordine: la variabile Data attuale, il simbolo |, Input comando rapido (proprietà Esercente), |, Input comando rapido (proprietà Importo), |, Input comando rapido (proprietà Nome)."],
-    ["Formato della data", "Tocca la variabile Data attuale, scegli Formato data Personalizzato e scrivi yyyy-MM-dd HH:mm"],
-    ["Salva su Dropbox", "Aggiungi l'azione Aggiungi al file di testo, tocca il servizio e scegli Dropbox, come percorso scrivi /wallet.txt e attiva Crea nuova riga. Tocca Fine."],
-    ["Prova e importa", "Paga una volta con l'iPhone, poi qui tocca Importa da Wallet, apri Dropbox e scegli wallet.txt. Se non lo vedi, cercalo per nome nella finestra dei file."],
+function GuideSheet({ onClose }) {
+  const [tab, setTab] = useState("wallet");
+  const wallet = [
+    ["Crea l'automazione", "Comandi Rapidi, scheda Automazione, + e poi Wallet: quando qualsiasi carta viene avvicinata. Interruttore Automazione attivo."],
+    ["Componi la riga", "Aggiungi l'azione Testo e inserisci in quest'ordine: Data attuale | Esercente | Importo | Nome. Le parole sono variabili da toccare, le barre si scrivono."],
+    ["Formato della data", "Tocca Data attuale, Formato data, Personalizzato: yyyy-MM-dd HH:mm"],
+    ["Salva su Dropbox", "Aggiungi l'azione Aggiungi al file di testo, servizio Dropbox, percorso /wallet.txt, Crea nuova riga attivo."],
+    ["Importa", "Dopo un pagamento, tocca Importa pagamenti, apri Dropbox e scegli wallet.txt."],
   ];
+  const voice = [
+    ["Nuovo comando", "Comandi Rapidi, scheda Comandi, +. Chiamalo Spesa in contanti: è la frase che dirai a Siri."],
+    ["Prima domanda", "Aggiungi l'azione Chiedi input, tipo Numero, testo della domanda: Quanto hai speso?"],
+    ["Seconda domanda", "Aggiungi un'altra azione Chiedi input, tipo Testo, domanda: Dove?"],
+    ["Componi la riga", "Aggiungi l'azione Testo: Data attuale | risposta alla seconda domanda | risposta alla prima | Contanti. Le risposte si inseriscono con Seleziona variabile toccando il blocco Chiedi input corrispondente. La parola Contanti va scritta."],
+    ["Formato della data", "Come per Wallet: Data attuale, Formato data, Personalizzato, yyyy-MM-dd HH:mm"],
+    ["Stesso file", "Aggiungi l'azione Aggiungi al file di testo: Dropbox, /wallet.txt, Crea nuova riga attivo."],
+    ["Usalo", "Di' «Ehi Siri, spesa in contanti». La spesa arriva con la prossima importazione. La prima volta abbina Contanti al tuo conto dei contanti: poi lo farà da sola."],
+  ];
+  const steps = tab === "wallet" ? wallet : voice;
   return (
     <Sheet title="Configura Comandi Rapidi" onClose={onClose}>
-      <p className="text-sm muted mb-4">Si fa una volta sola. I nomi delle voci possono variare leggermente con la versione di iOS.</p>
+      <div className="seg mb-4">
+        <button className={tab === "wallet" ? "on" : ""} onClick={() => setTab("wallet")}>Pagamenti Wallet</button>
+        <button className={tab === "voice" ? "on" : ""} onClick={() => setTab("voice")}>Contanti a voce</button>
+      </div>
       <ol className="space-y-4">
         {steps.map(([t, d], i) => (
           <li key={i} className="flex gap-3">
@@ -741,15 +827,17 @@ function WalletGuideSheet({ onClose }) {
         ))}
       </ol>
       <div className="mt-5 p-3 rounded-xl text-sm" style={{ background: "var(--surface2)" }}>
-        <div className="muted text-xs mb-1">Ogni pagamento diventa una riga così:</div>
-        <div className="num font-medium" style={{ wordBreak: "break-all" }}>2026-11-18 13:42|Conad City|12,40 €|Carta Visa</div>
+        <div className="muted text-xs mb-1">Ogni spesa diventa una riga così:</div>
+        <div className="num font-medium" style={{ wordBreak: "break-all" }}>
+          {tab === "wallet" ? "2026-11-18 13:42|Conad City|12,40 €|Carta Visa" : "2026-11-18 19:05|Bar dell'università|1.5|Contanti"}
+        </div>
       </div>
       <button onClick={onClose} className="btn btn-ink mt-5">Ho capito</button>
     </Sheet>
   );
 }
 
-/* ---------- Righe ---------- */
+/* ================= Righe ================= */
 function TxRow({ tx, accounts, onClick }) {
   const isT = tx.type === "transfer";
   const meta = isT ? { label: "Giroconto", color: "#2C5C8A", Icon: ArrowLeftRight } : catMeta(tx.type, tx.category);
@@ -760,20 +848,28 @@ function TxRow({ tx, accounts, onClick }) {
     const a = accName(tx.accountId);
     sub = a ? `${meta.label}, ${tx.type === "income" ? "su" : "da"} ${a}` : meta.label;
   }
+  if (tx.sharedId) sub += ", quota condivisa";
   const Icon = meta.Icon;
+  const Badge = tx.source === "voice" ? Mic : tx.source === "wallet" ? Contactless : null;
+  const tags = tx.tags || [];
   return (
     <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left">
       <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 relative" style={{ background: `${meta.color}22`, color: meta.color }}>
         <Icon size={16} />
-        {tx.source === "wallet" && (
+        {Badge && (
           <span className="absolute flex items-center justify-center rounded-full" style={{ right: -3, bottom: -3, width: 16, height: 16, background: "var(--ink)", color: "var(--paper)" }}>
-            <Contactless size={11} />
+            <Badge size={10} />
           </span>
         )}
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] truncate">{tx.description || meta.label}</span>
         <span className="block text-xs muted truncate">{sub}</span>
+        {tags.length > 0 && (
+          <span className="flex gap-1 mt-1 overflow-hidden">
+            {tags.slice(0, 3).map((t) => <span key={t} className="text-[11px] px-1.5 rounded" style={{ background: "var(--surface2)", color: "var(--muted)" }}>#{t}</span>)}
+          </span>
+        )}
       </span>
       <span className={`num text-[15px] font-medium shrink-0 ${isT ? "c-blue" : tx.type === "income" ? "c-green" : ""}`}>
         {isT ? "" : tx.type === "income" ? "+" : "−"}{fmtEUR(tx.amount)}
@@ -853,9 +949,7 @@ function BudgetRow({ r, onClick }) {
       </div>
       {has && (
         <>
-          <div className="mt-2 rounded-full overflow-hidden" style={{ height: 6, background: "var(--surface2)" }}>
-            <div style={{ width: `${Math.min(100, ratio * 100)}%`, height: "100%", background: color, borderRadius: 999 }} />
-          </div>
+          <div className="bar mt-2"><div style={{ width: `${Math.min(100, ratio * 100)}%`, background: color }} /></div>
           <div className="text-xs mt-1" style={{ color: ratio >= 1 ? "var(--red)" : "var(--muted)" }}>
             {ratio >= 1 ? `Superato di ${fmtEUR(r.spent - r.limit)}` : `Restano ${fmtEUR(r.limit - r.spent)}`}
           </div>
@@ -865,25 +959,51 @@ function BudgetRow({ r, onClick }) {
   );
 }
 
-/* ---------- Moduli ---------- */
-function TxFormModal({ tx, initialType, accounts, todayISO, onClose, onSave, onDelete }) {
+function GoalRow({ g, todayISO, onOpen, onMove }) {
+  const ratio = g.target > 0 ? Math.min(1, g.saved / g.target) : 0;
+  const done = g.saved >= g.target;
+  const need = goalMonthly(g, todayISO);
+  const late = g.deadline && daysUntil(isoToDate(g.deadline), todayISO) < 0 && !done;
+  let meta;
+  if (done) meta = "Obiettivo raggiunto";
+  else if (late) meta = `Scadenza superata, mancano ${fmtEUR(g.target - g.saved)}`;
+  else if (need != null) meta = `${fmtEUR(need)} al mese fino al ${fmtDateShort(g.deadline)}`;
+  else meta = `Mancano ${fmtEUR(g.target - g.saved)}`;
+  return (
+    <div className="py-3">
+      <button onClick={onOpen} className="w-full text-left">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-[15px] font-medium truncate">{g.name}</span>
+          <span className="num text-sm shrink-0">{fmtEUR(g.saved)} <span className="muted">di {fmtEUR(g.target)}</span></span>
+        </div>
+        <div className="bar mt-2" style={{ height: 8 }}><div style={{ width: `${ratio * 100}%`, background: g.color }} /></div>
+      </button>
+      <div className="flex items-center justify-between mt-1.5 gap-3">
+        <span className={`text-xs ${done ? "c-green" : late ? "c-red" : "muted"}`}>{meta}</span>
+        {onMove && <button onClick={onMove} className="text-xs c-blue font-medium shrink-0">Aggiungi o togli</button>}
+      </div>
+    </div>
+  );
+}
+
+/* ================= Moduli ================= */
+function TxFormModal({ tx, initialType, accounts, allTags, todayISO, onClose, onSave, onDelete }) {
   const [type, setType] = useState(tx?.type || initialType || "expense");
   const [amount, setAmount] = useState(tx ? String(tx.amount).replace(".", ",") : "");
   const [category, setCategory] = useState(tx?.category || (type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)[0].id);
   const [description, setDescription] = useState(tx?.description || "");
   const [date, setDate] = useState(tx?.date || todayISO);
   const [accountId, setAccountId] = useState(tx ? tx.accountId || "" : accounts.length === 1 ? accounts[0].id : "");
+  const [tags, setTags] = useState(tx?.tags || []);
   const skip = useRef(true);
   const cats = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   useEffect(() => { if (skip.current) { skip.current = false; return; } setCategory(cats[0].id); }, [type]);
-
   const parsed = parseAmount(amount);
   const valid = parsed > 0 && date;
   const submit = () => {
     if (!valid) return;
-    onSave({ ...(tx || {}), id: tx?.id || uid("t"), type, amount: round2(parsed), category, description: description.trim(), date, accountId: accountId || null }, tx);
+    onSave({ ...(tx || {}), id: tx?.id || uid("t"), type, amount: round2(parsed), category, description: description.trim(), date, accountId: accountId || null, tags }, tx);
   };
-
   return (
     <Sheet title={tx ? "Modifica movimento" : type === "income" ? "Nuova entrata" : "Nuova uscita"} onClose={onClose}>
       <div className="seg mb-4">
@@ -904,7 +1024,7 @@ function TxFormModal({ tx, initialType, accounts, todayISO, onClose, onSave, onD
       </div>
       <label className="lbl">Descrizione</label>
       <input className="inp mb-4" type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={type === "income" ? "Es. Ripetizioni" : "Es. Spesa settimanale"} />
-      <div className="grid grid-cols-2 gap-3 mb-5">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <div>
           <label className="lbl">Data</label>
           <input className="inp" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
@@ -917,6 +1037,8 @@ function TxFormModal({ tx, initialType, accounts, todayISO, onClose, onSave, onD
           </select>
         </div>
       </div>
+      <label className="lbl">Etichette</label>
+      <div className="mb-5"><TagInput tags={tags} onChange={setTags} suggestions={allTags} /></div>
       <button onClick={submit} disabled={!valid} className="btn btn-ink">{tx ? "Salva modifiche" : "Registra"}</button>
       {tx && <DeleteButton onConfirm={() => onDelete(tx)} />}
     </Sheet>
@@ -931,7 +1053,6 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
   const [description, setDescription] = useState(tx?.description || "");
   const parsed = parseAmount(amount);
   const valid = from && to && from !== to && parsed > 0 && date;
-
   if (accounts.length < 2 && !tx) {
     return (
       <Sheet title="Giroconto" onClose={onClose}>
@@ -940,7 +1061,6 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
       </Sheet>
     );
   }
-
   return (
     <Sheet title={tx ? "Modifica giroconto" : "Giroconto"} onClose={onClose}>
       <label className="lbl">Importo in euro</label>
@@ -965,7 +1085,7 @@ function TransferModal({ tx, accounts, todayISO, onClose, onSave, onDelete, onAd
         </div>
       </div>
       <button disabled={!valid} className="btn btn-ink"
-        onClick={() => valid && onSave({ id: tx?.id || uid("t"), type: "transfer", amount: round2(parsed), accountId: from, toAccountId: to, date, description: description.trim(), category: null }, tx)}>
+        onClick={() => valid && onSave({ id: tx?.id || uid("t"), type: "transfer", amount: round2(parsed), accountId: from, toAccountId: to, date, description: description.trim(), category: null, tags: [] }, tx)}>
         {tx ? "Salva modifiche" : "Sposta denaro"}
       </button>
       {tx && <DeleteButton onConfirm={() => onDelete(tx)} />}
@@ -985,12 +1105,10 @@ function RecurringFormModal({ item, accounts, initialKind, todayISO, onClose, on
   const skip = useRef(true);
   const cats = kind === "income" ? INCOME_CATEGORIES : SUB_CATEGORIES;
   useEffect(() => { if (skip.current) { skip.current = false; return; } setCategory(cats[0].id); }, [kind]);
-
   const parsed = parseAmount(amount);
   const valid = name.trim() && parsed > 0 && refDate;
-
   return (
-    <Sheet title={item ? "Modifica" : kind === "income" ? "Nuova entrata fissa" : "Nuovo abbonamento"} onClose={onClose}>
+    <Sheet title={item ? "Modifica" : kind === "income" ? "Nuova entrata fissa" : "Nuova spesa fissa"} onClose={onClose}>
       <div className="seg mb-4">
         <button className={kind === "expense" ? "on" : ""} onClick={() => setKind("expense")}>Spesa fissa</button>
         <button className={kind === "income" ? "on" : ""} onClick={() => setKind("income")}>Entrata fissa</button>
@@ -1062,15 +1180,257 @@ function AccountFormModal({ account, onClose, onSave, onDelete }) {
 function BudgetModal({ cat, limit, spent, onClose, onSave, onRemove }) {
   const [amount, setAmount] = useState(limit ? String(limit).replace(".", ",") : "");
   const parsed = parseAmount(amount);
-  const valid = parsed > 0;
   return (
     <Sheet title={`Budget: ${cat.label}`} onClose={onClose}>
       <p className="text-sm muted mb-4">Speso questo mese: <span className="num" style={{ color: "var(--ink)" }}>{fmtEUR(spent)}</span></p>
       <label className="lbl">Limite mensile in euro</label>
       <input className="inp num mb-5" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" />
-      <button disabled={!valid} className="btn btn-ink" onClick={() => valid && onSave(round2(parsed))}>Salva limite</button>
+      <button disabled={!(parsed > 0)} className="btn btn-ink" onClick={() => parsed > 0 && onSave(round2(parsed))}>Salva limite</button>
       {limit > 0 && <button onClick={onRemove} className="btn btn-danger mt-2">Rimuovi limite</button>}
     </Sheet>
+  );
+}
+
+function GoalModal({ goal, colorIndex, onClose, onSave, onDelete }) {
+  const [name, setName] = useState(goal?.name || "");
+  const [target, setTarget] = useState(goal ? String(goal.target).replace(".", ",") : "");
+  const [deadline, setDeadline] = useState(goal?.deadline || "");
+  const [saved, setSaved] = useState(goal ? String(goal.saved).replace(".", ",") : "");
+  const t = parseAmount(target);
+  const s = saved === "" ? 0 : parseAmount(saved);
+  const valid = name.trim() && t > 0 && !isNaN(s) && s >= 0;
+  return (
+    <Sheet title={goal ? "Modifica obiettivo" : "Nuovo obiettivo"} onClose={onClose}>
+      <label className="lbl">Nome</label>
+      <input className="inp mb-4" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Viaggio di Natale, Fondo emergenze" />
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className="lbl">Cifra da raggiungere</label>
+          <input className="inp num" type="text" inputMode="decimal" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="0,00" />
+        </div>
+        <div>
+          <label className="lbl">Già messo da parte</label>
+          <input className="inp num" type="text" inputMode="decimal" value={saved} onChange={(e) => setSaved(e.target.value)} placeholder="0,00" />
+        </div>
+      </div>
+      <label className="lbl">Entro il (facoltativo)</label>
+      <div className="flex gap-2 mb-1.5">
+        <input className="inp" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+        {deadline && <button onClick={() => setDeadline("")} className="btn btn-ghost" style={{ width: "auto", padding: "0 14px" }}>Togli</button>}
+      </div>
+      <p className="text-xs muted mb-5">Con una scadenza l'app calcola quanto mettere da parte ogni mese. Gli obiettivi non spostano soldi tra i conti: indicano quanta parte del saldo è già impegnata.</p>
+      <button disabled={!valid} className="btn btn-ink"
+        onClick={() => valid && onSave({ id: goal?.id || uid("g"), name: name.trim(), target: round2(t), saved: round2(s), deadline: deadline || null, color: goal?.color || GOAL_COLORS[colorIndex % GOAL_COLORS.length] })}>
+        {goal ? "Salva modifiche" : "Crea obiettivo"}
+      </button>
+      {goal && <DeleteButton label="Elimina obiettivo" onConfirm={() => onDelete(goal.id)} />}
+    </Sheet>
+  );
+}
+
+function GoalMoveModal({ goal, onClose, onSave }) {
+  const [dir, setDir] = useState("add");
+  const [amount, setAmount] = useState("");
+  const a = parseAmount(amount);
+  const valid = a > 0 && (dir === "add" || a <= goal.saved + 0.004);
+  return (
+    <Sheet title={goal.name} onClose={onClose}>
+      <p className="text-sm muted mb-4 num">Messi da parte {fmtEUR(goal.saved)} di {fmtEUR(goal.target)}.</p>
+      <div className="seg mb-4">
+        <button className={dir === "add" ? "on" : ""} onClick={() => setDir("add")}>Aggiungi</button>
+        <button className={dir === "remove" ? "on" : ""} onClick={() => setDir("remove")}>Togli</button>
+      </div>
+      <label className="lbl">Importo in euro</label>
+      <input className="inp num mb-1.5" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
+      {dir === "remove" && a > goal.saved + 0.004 && <p className="text-xs c-red">Non puoi togliere più di quanto hai messo da parte.</p>}
+      <button disabled={!valid} className="btn btn-ink mt-4" onClick={() => valid && onSave(round2(dir === "add" ? a : -a))}>
+        {dir === "add" ? "Metti da parte" : "Togli dall'obiettivo"}
+      </button>
+    </Sheet>
+  );
+}
+
+function SharedExpenseModal({ people, accounts, todayISO, onClose, onSave, onAddPerson }) {
+  const [description, setDescription] = useState("");
+  const [total, setTotal] = useState("");
+  const [date, setDate] = useState(todayISO);
+  const [payer, setPayer] = useState("me");
+  const [parts, setParts] = useState(() => people.map((p) => p.id));
+  const [includeMe, setIncludeMe] = useState(true);
+  const [category, setCategory] = useState("casa");
+  const [accountId, setAccountId] = useState(accounts.length === 1 ? accounts[0].id : "");
+  const [newName, setNewName] = useState("");
+  const prevCount = useRef(people.length);
+  useEffect(() => {
+    if (people.length > prevCount.current) {
+      const added = people[people.length - 1];
+      setParts((ps) => (ps.includes(added.id) ? ps : [...ps, added.id]));
+    }
+    prevCount.current = people.length;
+  }, [people]);
+  const effParts = payer !== "me" && !parts.includes(payer) ? [...parts, payer] : parts;
+  const amt = parseAmount(total);
+  const n = effParts.length + (includeMe ? 1 : 0);
+  const share = amt > 0 && n > 0 ? amt / n : 0;
+  const payerName = people.find((p) => p.id === payer)?.name;
+  const valid = description.trim() && amt > 0 && effParts.length > 0 && (payer === "me" || includeMe);
+  let preview = "";
+  if (amt > 0 && effParts.length) {
+    if (payer === "me") preview = includeMe ? `${fmtEUR(share)} a testa. La tua quota va tra le uscite, il resto ({x}) ti verrà restituito.`.replace("{x}", fmtEUR(share * effParts.length)) : `Prestito: ti devono ${fmtEUR(share * effParts.length)} in tutto.`;
+    else preview = includeMe ? `Devi ${fmtEUR(share)} a ${payerName}. La tua quota va tra le uscite; il conto si aggiorna quando salderai.` : "Se non hai pagato e non partecipi, la spesa non ti riguarda.";
+  }
+  const toggle = (id) => setParts((ps) => (ps.includes(id) ? ps.filter((x) => x !== id) : [...ps, id]));
+  return (
+    <Sheet title="Spesa condivisa" onClose={onClose}>
+      <label className="lbl">Persone con cui dividi</label>
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {people.map((p) => (
+          <button key={p.id} onClick={() => toggle(p.id)} className={`chip ${effParts.includes(p.id) ? "chip-on" : ""}`}>{p.name}</button>
+        ))}
+      </div>
+      <div className="flex gap-2 mb-4">
+        <input className="inp" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={people.length ? "Aggiungi un'altra persona" : "Nome del coinquilino o amico"} />
+        <button disabled={!newName.trim()} onClick={() => { onAddPerson(newName.trim()); setNewName(""); }} className="btn btn-ghost" style={{ width: "auto", padding: "0 16px" }}>Aggiungi</button>
+      </div>
+      <label className="lbl">Descrizione</label>
+      <input className="inp mb-4" type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Es. Bolletta luce, spesa di casa" />
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className="lbl">Totale in euro</label>
+          <input className="inp num" type="text" inputMode="decimal" value={total} onChange={(e) => setTotal(e.target.value)} placeholder="0,00" />
+        </div>
+        <div>
+          <label className="lbl">Data</label>
+          <input className="inp" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
+        </div>
+      </div>
+      <label className="lbl">Chi ha pagato</label>
+      <select className="inp mb-4" value={payer} onChange={(e) => setPayer(e.target.value)}>
+        <option value="me">Io</option>
+        {people.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+      <div className="flex items-center justify-between rounded-xl p-3 mb-4" style={{ background: "var(--surface2)" }}>
+        <div className="pr-3">
+          <div className="text-[15px] font-medium">Partecipo anch'io</div>
+          <div className="text-xs muted">Spegnilo per un prestito: hai pagato tu, ma la spesa non è tua.</div>
+        </div>
+        <Toggle checked={includeMe} onChange={setIncludeMe} label="Partecipo anch'io" />
+      </div>
+      {(includeMe || payer === "me") && (
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {includeMe && (
+            <div style={payer === "me" ? null : { gridColumn: "1 / -1" }}>
+              <label className="lbl">Categoria</label>
+              <select className="inp" value={category} onChange={(e) => setCategory(e.target.value)}>
+                {EXPENSE_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+            </div>
+          )}
+          {payer === "me" && (
+            <div style={includeMe ? null : { gridColumn: "1 / -1" }}>
+              <label className="lbl">Pagato dal conto</label>
+              <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+                <option value="">Nessuno</option>
+                {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+      {preview && <p className="text-sm mb-5 num" style={{ color: payer !== "me" && !includeMe ? "var(--red)" : "var(--muted)" }}>{preview}</p>}
+      <button disabled={!valid} className="btn btn-ink"
+        onClick={() => valid && onSave({ id: uid("s"), kind: "expense", description: description.trim(), total: round2(amt), date, payer, participants: effParts, includeMe, category, accountId: payer === "me" ? accountId || null : null })}>
+        Registra spesa condivisa
+      </button>
+    </Sheet>
+  );
+}
+
+function SettleModal({ person, balance, accounts, todayISO, onClose, onSave }) {
+  const [direction, setDirection] = useState(balance >= 0 ? "in" : "out");
+  const [amount, setAmount] = useState(Math.abs(balance) > 0 ? String(Math.abs(balance)).replace(".", ",") : "");
+  const [date, setDate] = useState(todayISO);
+  const [accountId, setAccountId] = useState(accounts.length === 1 ? accounts[0].id : "");
+  const a = parseAmount(amount);
+  return (
+    <Sheet title={`Saldo con ${person.name}`} onClose={onClose}>
+      <p className="text-sm muted mb-4 num">{balance > 0 ? `${person.name} ti deve ${fmtEUR(balance)}.` : balance < 0 ? `Devi ${fmtEUR(-balance)} a ${person.name}.` : "Siete pari."}</p>
+      <div className="seg mb-4">
+        <button className={direction === "in" ? "on" : ""} onClick={() => setDirection("in")}>Mi ha pagato</button>
+        <button className={direction === "out" ? "on" : ""} onClick={() => setDirection("out")}>Ho pagato io</button>
+      </div>
+      <label className="lbl">Importo in euro</label>
+      <input className="inp num mb-4" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" style={{ fontSize: 22, fontWeight: 600 }} />
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div>
+          <label className="lbl">Data</label>
+          <input className="inp" type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO} />
+        </div>
+        <div>
+          <label className="lbl">{direction === "in" ? "Ricevuto su" : "Pagato da"}</label>
+          <select className="inp" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+            <option value="">Nessun conto</option>
+            {accounts.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+          </select>
+        </div>
+      </div>
+      <button disabled={!(a > 0)} className="btn btn-ink"
+        onClick={() => a > 0 && onSave({ id: uid("s"), kind: "settle", personId: person.id, direction, amount: round2(a), date, accountId: accountId || null })}>
+        Registra saldo
+      </button>
+      <p className="text-xs muted mt-3">Un saldo sposta denaro sul conto ma non conta come entrata o uscita: è la restituzione di un anticipo.</p>
+    </Sheet>
+  );
+}
+
+function PersonSheet({ person, balance, entries, onClose, onSettle, onRename, onDelete, onDeleteEntry }) {
+  const [name, setName] = useState(person.name);
+  return (
+    <Sheet title={person.name} onClose={onClose}>
+      <div className="mb-4">
+        <div className="text-sm muted">{balance > 0.004 ? "Ti deve" : balance < -0.004 ? "Gli devi" : "Saldo"}</div>
+        <div className={`serif num text-[34px] leading-tight ${balance > 0.004 ? "c-green" : balance < -0.004 ? "c-red" : ""}`}>{Math.abs(balance) > 0.004 ? fmtEUR(Math.abs(balance)) : "Siete pari"}</div>
+      </div>
+      <button onClick={onSettle} className="btn btn-ink mb-5">Registra un saldo</button>
+      {entries.length > 0 && (
+        <>
+          <div className="text-[15px] font-semibold mb-2">Storico</div>
+          <Rows>
+            {entries.map(({ e, eff }) => (
+              <EntryRow key={e.id} e={e} eff={eff} person={person} onDelete={() => onDeleteEntry(e)} />
+            ))}
+          </Rows>
+        </>
+      )}
+      <label className="lbl mt-6">Nome</label>
+      <div className="flex gap-2">
+        <input className="inp" value={name} onChange={(e) => setName(e.target.value)} />
+        <button disabled={!name.trim() || name.trim() === person.name} onClick={() => onRename(name.trim())} className="btn btn-ghost" style={{ width: "auto", padding: "0 16px" }}>Salva</button>
+      </div>
+      {entries.length === 0 ? (
+        <DeleteButton label="Elimina persona" onConfirm={onDelete} />
+      ) : (
+        <p className="text-xs muted mt-3">Per eliminare la persona elimina prima le voci dello storico.</p>
+      )}
+    </Sheet>
+  );
+}
+
+function EntryRow({ e, eff, person, onDelete }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
+  const title = e.kind === "settle" ? (e.direction === "in" ? `${person.name} ti ha restituito` : `Hai restituito a ${person.name}`) : e.description;
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <div className="flex-1 min-w-0">
+        <div className="text-[15px] truncate">{title}</div>
+        <div className="text-xs muted num">{fmtDateShort(e.date)}{e.kind === "expense" ? `, totale ${fmtEUR(e.total)}` : ""}</div>
+      </div>
+      <span className={`num text-sm font-medium ${eff > 0 ? "c-green" : eff < 0 ? "c-red" : "muted"}`}>{fmtSigned(eff)}</span>
+      <button onClick={() => (armed ? onDelete() : setArmed(true))} className="text-xs px-2 py-1 rounded-lg" style={{ color: "var(--red)", background: armed ? "color-mix(in srgb, var(--red) 14%, transparent)" : "transparent" }}>
+        {armed ? "Conferma" : <X size={14} />}
+      </button>
+    </div>
   );
 }
 
@@ -1078,10 +1438,12 @@ function AddSheet({ onClose, onPick }) {
   const opts = [
     { id: "expense", label: "Uscita", text: "Una spesa appena fatta", Icon: ShoppingCart, color: "var(--red)" },
     { id: "income", label: "Entrata", text: "Denaro ricevuto", Icon: TrendingUp, color: "var(--green)" },
-    { id: "wallet", label: "Da Wallet", text: "Importa i pagamenti fatti con l'iPhone", Icon: Contactless, color: "var(--ink)" },
+    { id: "wallet", label: "Importa pagamenti", text: "Da Wallet e dai contanti dettati a Siri", Icon: Contactless, color: "var(--ink)" },
+    { id: "shared", label: "Spesa condivisa", text: "Bollette, spesa di casa, cene divise", Icon: Users, color: "var(--blue)" },
     { id: "transfer", label: "Giroconto", text: "Sposta denaro tra due conti", Icon: ArrowLeftRight, color: "var(--blue)" },
     { id: "rec-expense", label: "Spesa fissa", text: "Abbonamento, affitto, rata", Icon: RefreshCw, color: "var(--ochre)" },
     { id: "rec-income", label: "Entrata fissa", text: "Stipendio, borsa di studio", Icon: CalendarIcon, color: "var(--ochre)" },
+    { id: "goal", label: "Obiettivo di risparmio", text: "Una cifra da raggiungere entro una data", Icon: Target, color: "var(--green)" },
     { id: "account", label: "Conto", text: "Banca, carta prepagata, contanti", Icon: Landmark, color: "var(--muted)" },
   ];
   return (
@@ -1106,9 +1468,8 @@ function BackupSection({ data, onImport }) {
   const fileRef = useRef(null);
   const [last, setLast] = useState(() => { try { return localStorage.getItem(BACKUP_KEY); } catch (e) { return null; } });
   const markDone = () => { const now = new Date().toISOString(); try { localStorage.setItem(BACKUP_KEY, now); } catch (e) {} setLast(now); };
-
   const doExport = async () => {
-    const json = JSON.stringify({ app: "flussi-economici", version: 3, exportedAt: new Date().toISOString(), ...data }, null, 2);
+    const json = JSON.stringify({ app: "flussi-economici", version: 4, exportedAt: new Date().toISOString(), ...data }, null, 2);
     const name = `flussi-backup-${localISODate()}.json`;
     try {
       const file = new File([json], name, { type: "application/json" });
@@ -1125,7 +1486,6 @@ function BackupSection({ data, onImport }) {
     setTimeout(() => URL.revokeObjectURL(url), 2000);
     markDone();
   };
-
   const onFile = async (e) => {
     const f = e.target.files && e.target.files[0];
     e.target.value = "";
@@ -1136,7 +1496,6 @@ function BackupSection({ data, onImport }) {
       if (window.confirm("Sostituire tutti i dati attuali con quelli del backup?")) onImport(normalize(p));
     } catch (err) { window.alert("Il file scelto non è un backup di Flussi Economici."); }
   };
-
   const stale = !last || (Date.now() - new Date(last).getTime()) / 86400000 > 30;
   return (
     <div className="panel p-4">
@@ -1153,7 +1512,7 @@ function BackupSection({ data, onImport }) {
   );
 }
 
-/* ---------- App ---------- */
+/* ================= App ================= */
 function App() {
   const theme = useTheme();
   const [data, setData] = useState(loadData);
@@ -1163,30 +1522,41 @@ function App() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [catFilter, setCatFilter] = useState(null);
+  const [tagFilter, setTagFilter] = useState(null);
   const [calMonth, setCalMonth] = useState(() => monthKeyOf(localISODate()));
   const [selDay, setSelDay] = useState(() => localISODate());
   const [recView, setRecView] = useState("expense");
+  const [anTab, setAnTab] = useState("trend");
   const [anPeriod, setAnPeriod] = useState(6);
   const [anMonth, setAnMonth] = useState(() => monthKeyOf(localISODate()));
   const [selCat, setSelCat] = useState(null);
+  const [forecastDays, setForecastDays] = useState(60);
+  const [heatDay, setHeatDay] = useState(null);
+  const [merchSort, setMerchSort] = useState("total");
+  const [accTab, setAccTab] = useState("accounts");
   const [txModal, setTxModal] = useState(null);
   const [trModal, setTrModal] = useState(null);
   const [recModal, setRecModal] = useState(null);
   const [accModal, setAccModal] = useState(null);
   const [budgetModal, setBudgetModal] = useState(null);
+  const [goalModal, setGoalModal] = useState(null);
+  const [goalMove, setGoalMove] = useState(null);
+  const [sharedModal, setSharedModal] = useState(false);
+  const [settleFor, setSettleFor] = useState(null);
+  const [personOpen, setPersonOpen] = useState(null);
   const [addSheet, setAddSheet] = useState(false);
   const [walletReview, setWalletReview] = useState(null);
-  const [walletGuide, setWalletGuide] = useState(false);
+  const [guide, setGuide] = useState(false);
   const [note, setNote] = useState(null);
   const walletRef = useRef(null);
 
-  const { transactions, recurring, accounts, budgets } = data;
+  const { transactions, recurring, accounts, budgets, goals, people, shared } = data;
   const curKey = monthKeyOf(todayISO);
   const prevKey = shiftMonth(curKey, -1);
   const dayNum = isoToDate(todayISO).getDate();
   const yesterdayISO = addDaysISO(todayISO, -1);
 
-  /* persistenza, data corrente, automatismi */
+  /* persistenza, data, automatismi */
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }, [data]);
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === "visible") setTodayISO(localISODate()); };
@@ -1202,10 +1572,11 @@ function App() {
     }
   }, [data.recurring, todayISO]);
   useEffect(() => { if (!note) return; const t = setTimeout(() => setNote(null), 5000); return () => clearTimeout(t); }, [note]);
-  useEffect(() => { window.scrollTo(0, 0); }, [tab]);
+  useEffect(() => { window.scrollTo(0, 0); }, [tab, anTab, accTab]);
 
   /* aggregati */
   const totalAccounts = useMemo(() => round2(accounts.reduce((s, a) => s + a.balance, 0)), [accounts]);
+  const goalsSaved = useMemo(() => round2(goals.reduce((s, g) => s + g.saved, 0)), [goals]);
 
   const agg = useMemo(() => {
     const m = {};
@@ -1259,6 +1630,94 @@ function App() {
   const budgetRows = EXPENSE_CATEGORIES.map((c) => ({ ...c, limit: budgets[c.id] || 0, spent: curAgg.cat[c.id] || 0 }));
   const budgetAlerts = budgetRows.filter((r) => r.limit > 0 && r.spent >= r.limit * 0.8);
 
+  const allTags = useMemo(() => {
+    const m = {};
+    transactions.forEach((t) => (t.tags || []).forEach((tag) => { const k = tag.toLowerCase(); m[k] = m[k] || { name: tag, n: 0 }; m[k].n++; }));
+    return Object.values(m).sort((a, b) => b.n - a.n).map((x) => x.name);
+  }, [transactions]);
+
+  const peopleBal = useMemo(() => {
+    const b = {};
+    people.forEach((p) => { b[p.id] = 0; });
+    shared.forEach((e) => people.forEach((p) => { b[p.id] += entryEffectFor(e, p.id); }));
+    Object.keys(b).forEach((k) => { b[k] = round2(b[k]); });
+    return b;
+  }, [people, shared]);
+  const owedToMe = round2(Object.values(peopleBal).filter((v) => v > 0).reduce((s, v) => s + v, 0));
+  const iOwe = round2(-Object.values(peopleBal).filter((v) => v < 0).reduce((s, v) => s + v, 0));
+
+  /* osservazioni automatiche */
+  const insights = useMemo(() => {
+    const out = [];
+    const exps = transactions.filter((t) => t.type === "expense");
+    if (exps.length) {
+      const firstDate = exps.reduce((m, t) => (t.date < m ? t.date : m), exps[0].date);
+      const histDays = -daysUntil(isoToDate(firstDate), todayISO);
+      if (histDays >= 21) {
+        const weeksPrior = Math.max(1, Math.min(8, Math.floor((histDays - 7) / 7)));
+        const start7 = addDaysISO(todayISO, -6);
+        const priorStart = addDaysISO(todayISO, -6 - 7 * weeksPrior);
+        const cur = {}, prior = {};
+        exps.forEach((t) => {
+          if (t.date >= start7 && t.date <= todayISO) cur[t.category] = (cur[t.category] || 0) + t.amount;
+          else if (t.date >= priorStart && t.date < start7) prior[t.category] = (prior[t.category] || 0) + t.amount;
+        });
+        let up = null, down = null;
+        Object.keys({ ...cur, ...prior }).forEach((c) => {
+          const a = (prior[c] || 0) / weeksPrior;
+          const v = cur[c] || 0;
+          if (a < 10) return;
+          const r = v / a;
+          if (v >= 20 && r >= 1.4 && (!up || r > up.r)) up = { c, v, a, r };
+          if (a >= 20 && r <= 0.5 && (!down || r < down.r)) down = { c, v, a, r };
+        });
+        if (up) out.push({ tone: "bad", text: `Negli ultimi 7 giorni in ${catMeta("expense", up.c).label.toLowerCase()} hai speso ${fmtEUR(up.v)}, il ${Math.round((up.r - 1) * 100)}% in più della tua media settimanale (${fmtEUR(up.a)}).` });
+        else if (down) out.push({ tone: "good", text: `Negli ultimi 7 giorni in ${catMeta("expense", down.c).label.toLowerCase()} hai speso ${fmtEUR(down.v)}, meno della metà della tua media settimanale (${fmtEUR(down.a)}).` });
+      }
+      const sorted = [...exps].sort((a, b) => a.date.localeCompare(b.date));
+      const sums = {}, counts = {};
+      const recentFrom = addDaysISO(todayISO, -13);
+      let unusual = null;
+      sorted.forEach((t) => {
+        const n = counts[t.category] || 0;
+        if (n >= 3 && t.date >= recentFrom && t.amount >= 15) {
+          const avg = sums[t.category] / n;
+          if (t.amount >= avg * 2.5) unusual = { t, ratio: t.amount / avg };
+        }
+        sums[t.category] = (sums[t.category] || 0) + t.amount;
+        counts[t.category] = n + 1;
+      });
+      if (unusual) {
+        const lbl = catMeta("expense", unusual.t.category).label.toLowerCase();
+        out.push({ tone: "bad", text: `Spesa insolita il ${fmtDateShort(unusual.t.date)}: ${fmtEUR(unusual.t.amount)} per ${unusual.t.description || lbl}, circa ${Math.round(unusual.ratio)} volte la tua spesa media in ${lbl}.` });
+      }
+      const lastMonths = [1, 2, 3].map((i) => shiftMonth(curKey, -i)).filter((k) => agg[k] && agg[k].exp > 0);
+      if (dayNum >= 5 && lastMonths.length) {
+        const avgM = lastMonths.reduce((s, k) => s + agg[k].exp, 0) / lastMonths.length;
+        const proj = (expMTD / dayNum) * daysInMonth(curKey);
+        const p = ((proj - avgM) / avgM) * 100;
+        const per = lastMonths.length === 1 ? "del mese scorso" : `media degli ultimi ${lastMonths.length} mesi`;
+        if (p >= 15) out.push({ tone: "bad", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(p)}% in più ${lastMonths.length === 1 ? per : `della ${per}`} (${fmtEUR(avgM)}).` });
+        else if (p <= -15) out.push({ tone: "good", text: `Al ritmo attuale chiuderai ${monthName(curKey)} con circa ${fmtEUR(proj)} di uscite, il ${Math.round(-p)}% in meno ${lastMonths.length === 1 ? per : `della ${per}`} (${fmtEUR(avgM)}).` });
+      }
+      const over = EXPENSE_CATEGORIES.filter((c) => budgets[c.id] > 0 && (curAgg.cat[c.id] || 0) > budgets[c.id]);
+      if (over.length === 1) out.push({ tone: "bad", text: `Hai superato il budget di ${over[0].label.toLowerCase()} di ${fmtEUR(curAgg.cat[over[0].id] - budgets[over[0].id])}.` });
+      else if (over.length > 1) out.push({ tone: "bad", text: `Questo mese hai superato il budget in ${over.length} categorie: ${over.map((c) => c.label.toLowerCase()).join(", ")}.` });
+      const mm = {};
+      exps.filter((t) => monthKeyOf(t.date) === curKey && t.description).forEach((t) => {
+        const k = t.description.toLowerCase();
+        mm[k] = mm[k] || { name: t.description, n: 0, tot: 0 };
+        mm[k].n++; mm[k].tot += t.amount;
+      });
+      const topM = Object.values(mm).sort((a, b) => b.tot - a.tot)[0];
+      if (topM && topM.n >= 3) out.push({ tone: "info", text: `Il posto dove hai speso di più a ${monthName(curKey)} è ${topM.name}: ${fmtEUR(topM.tot)} in ${topM.n} volte.` });
+    }
+    const g = goals.find((x) => x.deadline && x.saved < x.target && goalMonthly(x, todayISO) != null);
+    if (g) out.push({ tone: "info", text: `Per ${g.name} servono ${fmtEUR(goalMonthly(g, todayISO))} al mese fino al ${fmtDateShort(g.deadline)}.` });
+    if (owedToMe > 0) out.push({ tone: "info", text: `Dalle spese condivise devi ricevere in tutto ${fmtEUR(owedToMe)}.` });
+    return out;
+  }, [transactions, todayISO, agg, budgets, goals, owedToMe]);
+
   /* azioni sui dati */
   const saveTx = (tx, old) => {
     setData((d) => {
@@ -1305,7 +1764,7 @@ function App() {
     const date = item.nextISO < todayISO ? item.nextISO : todayISO;
     setData((d) => ({
       ...d,
-      transactions: [...d.transactions, { id: uid("t"), type: item.kind, amount: item.amount, category: isIncome ? item.category : "abbonamenti", description: item.name, date, accountId: item.accountId || null }],
+      transactions: [...d.transactions, { id: uid("t"), type: item.kind, amount: item.amount, category: isIncome ? item.category : "abbonamenti", description: item.name, date, accountId: item.accountId || null, tags: [] }],
       accounts: applyBalance(d.accounts, item.accountId, isIncome ? item.amount : -item.amount),
       recurring: d.recurring.map((r) => (r.id === item.id ? { ...r, processedThrough: item.nextISO } : r)),
     }));
@@ -1319,15 +1778,58 @@ function App() {
   const deleteAccount = (id) => { setData((d) => ({ ...d, accounts: d.accounts.filter((a) => a.id !== id) })); setAccModal(null); };
 
   const setBudget = (catId, value) => {
-    setData((d) => {
-      const b = { ...d.budgets };
-      if (value > 0) b[catId] = value; else delete b[catId];
-      return { ...d, budgets: b };
-    });
+    setData((d) => { const b = { ...d.budgets }; if (value > 0) b[catId] = value; else delete b[catId]; return { ...d, budgets: b }; });
     setBudgetModal(null);
   };
 
-  /* Wallet */
+  const saveGoal = (g) => {
+    setData((d) => ({ ...d, goals: d.goals.some((x) => x.id === g.id) ? d.goals.map((x) => (x.id === g.id ? g : x)) : [...d.goals, g] }));
+    setGoalModal(null);
+    setNote("Obiettivo salvato");
+  };
+  const deleteGoal = (id) => { setData((d) => ({ ...d, goals: d.goals.filter((x) => x.id !== id) })); setGoalModal(null); };
+  const moveGoal = (id, delta) => {
+    setData((d) => ({ ...d, goals: d.goals.map((x) => (x.id === id ? { ...x, saved: round2(Math.max(0, x.saved + delta)) } : x)) }));
+    setGoalMove(null);
+    setNote(delta > 0 ? "Messo da parte" : "Tolto dall'obiettivo");
+  };
+
+  const addPerson = (name) => setData((d) => ({ ...d, people: [...d.people, { id: uid("p"), name }] }));
+  const renamePerson = (id, name) => setData((d) => ({ ...d, people: d.people.map((p) => (p.id === id ? { ...p, name } : p)) }));
+  const deletePerson = (id) => { setData((d) => ({ ...d, people: d.people.filter((p) => p.id !== id) })); setPersonOpen(null); };
+
+  const saveShared = (entry) => {
+    setData((d) => {
+      let txs = d.transactions;
+      let acc = d.accounts;
+      const e = { ...entry };
+      const my = e.kind === "expense" ? myShareOf(e) : 0;
+      if (my > 0) {
+        const tx = { id: uid("t"), type: "expense", amount: my, category: e.category, description: e.description, date: e.date, accountId: e.payer === "me" ? e.accountId || null : null, sharedId: e.id, tags: [] };
+        txs = [...txs, tx];
+        acc = applyEffects(acc, txEffects(tx), 1);
+        e.txId = tx.id;
+      }
+      acc = applyEffects(acc, sharedExtraEffects(e), 1);
+      return { ...d, transactions: txs, accounts: acc, shared: [...d.shared, e] };
+    });
+    setSharedModal(false);
+    setSettleFor(null);
+    setNote(entry.kind === "settle" ? "Saldo registrato" : "Spesa condivisa registrata");
+  };
+  const deleteShared = (e) => {
+    setData((d) => {
+      let txs = d.transactions;
+      let acc = d.accounts;
+      const tx = e.txId ? txs.find((t) => t.id === e.txId) : null;
+      if (tx) { txs = txs.filter((t) => t.id !== tx.id); acc = applyEffects(acc, txEffects(tx), -1); }
+      acc = applyEffects(acc, sharedExtraEffects(e), -1);
+      return { ...d, transactions: txs, accounts: acc, shared: d.shared.filter((x) => x.id !== e.id) };
+    });
+    setNote("Voce eliminata");
+  };
+
+  /* Wallet e Siri */
   const openWalletPicker = () => { if (walletRef.current) walletRef.current.click(); };
   const onWalletFile = async (e) => {
     const f = e.target.files && e.target.files[0];
@@ -1337,29 +1839,30 @@ function App() {
     try { text = await f.text(); } catch (err) { window.alert("Impossibile leggere il file scelto."); return; }
     const { items, valid } = parseWalletFile(text, new Set(data.walletSeen), todayISO);
     if (!valid) {
-      window.alert("Il file non contiene pagamenti nel formato previsto. Controlla il comando rapido: ogni riga deve essere data|esercente|importo|carta.");
+      window.alert("Il file non contiene spese nel formato previsto. Ogni riga deve essere data|esercente|importo|carta: controlla il comando rapido.");
       return;
     }
     if (!items.length) {
       setData((d) => ({ ...d, walletLastImport: new Date().toISOString() }));
-      setNote("Nessun nuovo pagamento da importare");
+      setNote("Nessuna nuova spesa da importare");
       return;
     }
     const enriched = items.map((it) => ({
       ...it,
       category: data.merchantMap[it.merchant.toLowerCase()] || "altro-u",
-      accountId: (it.card && data.cardMap[it.card] && accounts.some((a) => a.id === data.cardMap[it.card])) ? data.cardMap[it.card] : accounts.length === 1 ? accounts[0].id : "",
+      accountId: it.card && data.cardMap[it.card] && accounts.some((a) => a.id === data.cardMap[it.card]) ? data.cardMap[it.card] : accounts.length === 1 ? accounts[0].id : "",
     }));
     setWalletReview(enriched);
   };
   const confirmWallet = (rows) => {
     const inc = rows.filter((r) => r.include && r.amount > 0);
     setData((d) => {
-      let txs = [...d.transactions];
+      const txs = [...d.transactions];
       let acc = d.accounts;
       const mm = { ...d.merchantMap }, cm = { ...d.cardMap };
       inc.forEach((r) => {
-        const tx = { id: uid("t"), type: "expense", amount: r.amount, category: r.category, description: r.merchant || "Pagamento con Wallet", date: r.date, accountId: r.accountId || null, source: "wallet" };
+        const voice = r.card && r.card.toLowerCase() === "contanti";
+        const tx = { id: uid("t"), type: "expense", amount: r.amount, category: r.category, description: r.merchant || (voice ? "Spesa in contanti" : "Pagamento con Wallet"), date: r.date, accountId: r.accountId || null, source: voice ? "voice" : "wallet", tags: [] };
         txs.push(tx);
         acc = applyBalance(acc, tx.accountId, -tx.amount);
         if (r.merchant) mm[r.merchant.toLowerCase()] = r.category;
@@ -1368,27 +1871,30 @@ function App() {
       return { ...d, transactions: txs, accounts: acc, merchantMap: mm, cardMap: cm, walletSeen: [...d.walletSeen, ...rows.map((r) => r.hash)], walletLastImport: new Date().toISOString() };
     });
     setWalletReview(null);
-    setNote(inc.length === 1 ? "1 pagamento importato da Wallet" : `${inc.length} pagamenti importati da Wallet`);
+    setNote(inc.length === 1 ? "1 spesa importata" : `${inc.length} spese importate`);
   };
   const ignoreWallet = () => {
     const hashes = walletReview.map((r) => r.hash);
     setData((d) => ({ ...d, walletSeen: [...d.walletSeen, ...hashes], walletLastImport: new Date().toISOString() }));
     setWalletReview(null);
-    setNote("Pagamenti segnati come già registrati");
+    setNote("Spese segnate come già registrate");
   };
-  const walletLastLabel = data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}` : "Pagamenti con iPhone, in un tocco";
+  const walletLastLabel = data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}` : "Da Wallet e dai contanti dettati a Siri";
 
   const pickAdd = (id) => {
     setAddSheet(false);
     if (id === "expense" || id === "income") setTxModal({ tx: null, type: id });
     else if (id === "wallet") openWalletPicker();
+    else if (id === "shared") setSharedModal(true);
     else if (id === "transfer") setTrModal({ tx: null });
     else if (id === "rec-expense") setRecModal({ item: null, kind: "expense" });
     else if (id === "rec-income") setRecModal({ item: null, kind: "income" });
+    else if (id === "goal") setGoalModal({ goal: null });
     else if (id === "account") setAccModal({ acc: null });
   };
+  const goTo = (t, sub) => { setTab(t); if (t === "analysis" && sub) setAnTab(sub); if (t === "accounts" && sub) setAccTab(sub); };
 
-  /* ---------- Oggi ---------- */
+  /* ================= Oggi ================= */
   const steps = [
     { done: accounts.length > 0, title: "Aggiungi i tuoi conti", text: "Con il saldo di oggi: banca, carta, contanti.", go: () => setAccModal({ acc: null }) },
     { done: recurring.length > 0, title: "Inserisci le spese e le entrate fisse", text: "Affitto, abbonamenti, borsa di studio. Si registrano da sole.", go: () => setRecModal({ item: null, kind: "expense" }) },
@@ -1413,6 +1919,9 @@ function App() {
           ) : (
             <button onClick={() => setAccModal({ acc: null })} className="serif text-[26px] mt-1 text-left underline underline-offset-4">Aggiungi un conto</button>
           )}
+          {goalsSaved > 0 && (
+            <div className="text-xs mt-1 num" style={{ color: "var(--note-soft)" }}>di cui {fmtEUR(goalsSaved)} accantonati negli obiettivi, liberi {fmtEUR(totalAccounts - goalsSaved)}</div>
+          )}
           <div className="grid grid-cols-2 gap-4 mt-6">
             <div>
               <div className="text-xs" style={{ color: "var(--note-soft)" }}>Previsto a fine {monthName(curKey)}</div>
@@ -1428,9 +1937,7 @@ function App() {
 
       <div className="mt-3">
         <WalletButton lastLabel={walletLastLabel} onClick={openWalletPicker} />
-        {!data.walletLastImport && (
-          <button onClick={() => setWalletGuide(true)} className="text-sm c-blue mt-2 px-1">Come si configura</button>
-        )}
+        {!data.walletLastImport && <button onClick={() => setGuide(true)} className="text-sm c-blue mt-2 px-1">Come si configura</button>}
       </div>
 
       {showSteps && (
@@ -1452,6 +1959,12 @@ function App() {
         </Section>
       )}
 
+      {insights.length > 0 && (
+        <Section title="Da notare" action={insights.length > 3 && <button onClick={() => goTo("analysis", "trend")} className="text-sm c-blue">Tutte</button>}>
+          <Insights items={insights.slice(0, 3)} />
+        </Section>
+      )}
+
       <Section title="Questo mese, fino a oggi">
         <div className="panel grid grid-cols-2">
           <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
@@ -1470,8 +1983,29 @@ function App() {
       </Section>
 
       {budgetAlerts.length > 0 && (
-        <Section title="Budget quasi esauriti" action={<button onClick={() => setTab("analysis")} className="text-sm c-blue">Tutti i budget</button>}>
+        <Section title="Budget quasi esauriti" action={<button onClick={() => goTo("analysis", "trend")} className="text-sm c-blue">Tutti i budget</button>}>
           <Rows>{budgetAlerts.map((r) => <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />)}</Rows>
+        </Section>
+      )}
+
+      {goals.length > 0 && (
+        <Section title="Obiettivi" action={<button onClick={() => goTo("accounts", "goals")} className="text-sm c-blue">Gestisci</button>}>
+          <Rows>{goals.slice(0, 3).map((g) => <GoalRow key={g.id} g={g} todayISO={todayISO} onOpen={() => setGoalModal({ goal: g })} onMove={() => setGoalMove({ goal: g })} />)}</Rows>
+        </Section>
+      )}
+
+      {(owedToMe > 0 || iOwe > 0) && (
+        <Section title="Spese condivise" action={<button onClick={() => goTo("accounts", "shared")} className="text-sm c-blue">Dettagli</button>}>
+          <div className="panel grid grid-cols-2">
+            <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
+              <div className="text-sm muted">Ti devono</div>
+              <div className="num text-[20px] font-semibold mt-0.5 c-green">{fmtEUR(owedToMe)}</div>
+            </div>
+            <div className="p-4">
+              <div className="text-sm muted">Devi</div>
+              <div className={`num text-[20px] font-semibold mt-0.5 ${iOwe > 0 ? "c-red" : ""}`}>{fmtEUR(iOwe)}</div>
+            </div>
+          </div>
         </Section>
       )}
 
@@ -1493,18 +2027,20 @@ function App() {
     </div>
   );
 
-  /* ---------- Movimenti ---------- */
+  /* ================= Movimenti ================= */
   const q = search.trim().toLowerCase();
-  const movBase = useMemo(() => (q ? transactions : transactions.filter((t) => monthKeyOf(t.date) === movMonth)), [transactions, movMonth, q]);
+  const globalMode = !!q || !!tagFilter;
+  const movBase = useMemo(() => (globalMode ? transactions : transactions.filter((t) => monthKeyOf(t.date) === movMonth)), [transactions, movMonth, globalMode]);
   const movFiltered = useMemo(() => movBase
     .filter((t) => typeFilter === "all" || t.type === typeFilter)
     .filter((t) => !catFilter || t.category === catFilter)
+    .filter((t) => !tagFilter || (t.tags || []).some((x) => sameTag(x, tagFilter)))
     .filter((t) => {
       if (!q) return true;
       const label = t.type === "transfer" ? "giroconto" : catMeta(t.type, t.category).label.toLowerCase();
-      return (t.description || "").toLowerCase().includes(q) || label.includes(q);
+      return (t.description || "").toLowerCase().includes(q) || label.includes(q) || (t.tags || []).some((x) => x.toLowerCase().includes(q));
     })
-    .sort((a, b) => b.date.localeCompare(a.date)), [movBase, typeFilter, catFilter, q]);
+    .sort((a, b) => b.date.localeCompare(a.date)), [movBase, typeFilter, catFilter, tagFilter, q]);
   const movGroups = useMemo(() => {
     const g = [];
     movFiltered.forEach((t) => {
@@ -1514,12 +2050,13 @@ function App() {
     return g;
   }, [movFiltered]);
   const movAgg = getAgg(movMonth);
+  const filteredTotals = useMemo(() => movFiltered.reduce((s, t) => ({ inc: s.inc + (t.type === "income" ? t.amount : 0), exp: s.exp + (t.type === "expense" ? t.amount : 0) }), { inc: 0, exp: 0 }), [movFiltered]);
 
   const renderMovements = () => (
     <div>
       <h1 className="serif text-[32px] leading-tight mb-2">Movimenti</h1>
-      {!q && <MonthNav monthKey={movMonth} onChange={setMovMonth} max={curKey} />}
-      {!q && (
+      {!globalMode && <MonthNav monthKey={movMonth} onChange={setMovMonth} max={curKey} />}
+      {!globalMode && (
         <div className="panel grid grid-cols-3 mt-2">
           {[["Entrate", fmtEUR(movAgg.inc), "c-green"], ["Uscite", fmtEUR(movAgg.exp), ""], ["Saldo", fmtSigned(movAgg.inc - movAgg.exp), movAgg.inc - movAgg.exp < 0 ? "c-red" : ""]].map(([l, v, c], i) => (
             <div key={l} className="py-3 px-3" style={i ? { borderLeft: "1px solid var(--line)" } : null}>
@@ -1545,13 +2082,25 @@ function App() {
           ))}
         </div>
       )}
-      {q && <p className="text-xs muted mt-3">{movFiltered.length} risultati in tutti i mesi</p>}
+      {allTags.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto noscroll mt-2 -mx-4 px-4 items-center">
+          <span className="muted shrink-0"><Tag size={15} /></span>
+          {allTags.map((t) => (
+            <button key={t} onClick={() => setTagFilter(tagFilter && sameTag(tagFilter, t) ? null : t)} className={`chip ${tagFilter && sameTag(tagFilter, t) ? "chip-on" : ""}`}>#{t}</button>
+          ))}
+        </div>
+      )}
+      {globalMode && (
+        <p className="text-xs muted mt-3 num">
+          {movFiltered.length} risultati in tutti i mesi{filteredTotals.exp > 0 ? `, uscite ${fmtEUR(filteredTotals.exp)}` : ""}{filteredTotals.inc > 0 ? `, entrate ${fmtEUR(filteredTotals.inc)}` : ""}
+        </p>
+      )}
       {movGroups.length ? movGroups.map((g) => {
         const net = g.items.reduce((s, t) => s + (t.type === "income" ? t.amount : t.type === "expense" ? -t.amount : 0), 0);
         return (
           <div key={g.date} className="mt-5">
             <div className="flex justify-between text-sm muted mb-1.5 px-1">
-              <span>{cap(fmtDayLong(g.date))}{q ? ` ${g.date.slice(0, 4)}` : ""}</span>
+              <span>{cap(fmtDayLong(g.date))}{globalMode ? ` ${g.date.slice(0, 4)}` : ""}</span>
               <span className="num">{Math.abs(net) > 0.004 ? fmtSigned(net) : ""}</span>
             </div>
             <Rows>{g.items.map((t) => <TxRow key={t.id} tx={t} accounts={accounts} onClick={() => openTx(t)} />)}</Rows>
@@ -1560,16 +2109,15 @@ function App() {
       }) : (
         <div className="mt-8 text-center">
           <p className="text-[15px] muted">{movBase.length ? "Nessun movimento corrisponde ai filtri." : `Nessun movimento a ${monthName(movMonth)}.`}</p>
-          {!movBase.length && !q && <button onClick={() => setTxModal({ tx: null, type: "expense" })} className="btn btn-ghost mt-4 mx-auto" style={{ width: "auto", display: "inline-block" }}>Registra una spesa</button>}
+          {!movBase.length && !globalMode && <button onClick={() => setTxModal({ tx: null, type: "expense" })} className="btn btn-ghost mt-4 mx-auto" style={{ width: "auto", display: "inline-block" }}>Registra una spesa</button>}
         </div>
       )}
     </div>
   );
 
-  /* ---------- Scadenze ---------- */
+  /* ================= Scadenze ================= */
   const calCells = useMemo(() => {
-    const first = keyToDate(calMonth);
-    const lead = (first.getDay() + 6) % 7;
+    const lead = (keyToDate(calMonth).getDay() + 6) % 7;
     const cells = Array(lead).fill(null);
     for (let d = 1; d <= daysInMonth(calMonth); d++) cells.push(`${calMonth}-${String(d).padStart(2, "0")}`);
     return cells;
@@ -1665,9 +2213,7 @@ function App() {
           <button className={recView === "income" ? "on" : ""} onClick={() => setRecView("income")}>Entrate fisse</button>
         </div>
         {recList.length > 0 && (
-          <p className="text-sm muted mt-3 num">
-            {recList.filter((r) => r.active).length} attive: {fmtEUR(recMonthly)} al mese, {fmtEUR(recMonthly * 12)} all'anno
-          </p>
+          <p className="text-sm muted mt-3 num">{recList.filter((r) => r.active).length} attive: {fmtEUR(recMonthly)} al mese, {fmtEUR(recMonthly * 12)} all'anno</p>
         )}
         <div className="space-y-2.5 mt-3">
           {recList.map((r) => (
@@ -1686,19 +2232,46 @@ function App() {
     </div>
   );
 
-  /* ---------- Analisi ---------- */
+  /* ================= Analisi ================= */
   const series = useMemo(() => {
-    const arr = [];
+    const out = [];
     for (let i = anPeriod - 1; i >= 0; i--) {
       const k = shiftMonth(curKey, -i);
       const a = getAgg(k);
-      arr.push({ key: k, label: shortMonth(k), Entrate: round2(a.inc), Uscite: round2(a.exp), Saldo: round2(a.inc - a.exp) });
+      out.push({ key: k, label: shortMonth(k), Entrate: round2(a.inc), Uscite: round2(a.exp), Saldo: round2(a.inc - a.exp) });
     }
-    return arr;
+    return out;
   }, [agg, anPeriod, curKey]);
   const completeMonths = series.filter((s) => s.key < curKey);
   const avgBase = completeMonths.length ? completeMonths : series;
   const avg = (f) => avgBase.reduce((s, x) => s + x[f], 0) / avgBase.length;
+  const periodStart = monthStartISO(shiftMonth(curKey, -(anPeriod - 1)));
+
+  const forecast = useMemo(() => {
+    const end = addDaysISO(todayISO, forecastDays);
+    const sched = scheduledBetween("1970-01-01", end);
+    const from90 = addDaysISO(todayISO, -89);
+    const exps = transactions.filter((t) => t.type === "expense");
+    const firstDate = exps.length ? exps.reduce((m, t) => (t.date < m ? t.date : m), exps[0].date) : todayISO;
+    const span = Math.max(1, Math.min(90, -daysUntil(isoToDate(firstDate), todayISO) + 1));
+    const varSum = exps.filter((t) => t.category !== "abbonamenti" && !t.sharedId && t.date >= from90 && t.date <= todayISO).reduce((s, t) => s + t.amount, 0);
+    const daily = exps.length ? varSum / span : 0;
+    const rows = [];
+    let bal = totalAccounts;
+    let idx = 0;
+    let minRow = null;
+    for (let d = 0; d <= forecastDays; d++) {
+      const iso = addDaysISO(todayISO, d);
+      while (idx < sched.length && sched[idx].date <= iso) {
+        bal += sched[idx].item.kind === "income" ? sched[idx].item.amount : -sched[idx].item.amount;
+        idx++;
+      }
+      const row = { iso, label: fmtDateShort(iso), scad: round2(bal), stima: round2(bal - daily * d) };
+      rows.push(row);
+      if (!minRow || row.stima < minRow.stima) minRow = row;
+    }
+    return { rows, daily, minRow, last: rows[rows.length - 1] };
+  }, [transactions, recurring, todayISO, forecastDays, totalAccounts]);
 
   const anAgg = getAgg(anMonth);
   const anPrevKey = shiftMonth(anMonth, -1);
@@ -1708,9 +2281,9 @@ function App() {
 
   const pace = useMemo(() => {
     const daily = (key) => {
-      const arr = new Array(32).fill(0);
-      transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === key) arr[isoToDate(t.date).getDate()] += t.amount; });
-      return arr;
+      const a = new Array(32).fill(0);
+      transactions.forEach((t) => { if (t.type === "expense" && monthKeyOf(t.date) === key) a[isoToDate(t.date).getDate()] += t.amount; });
+      return a;
     };
     const dim = daysInMonth(anMonth), pdim = daysInMonth(anPrevKey);
     const curLen = anMonth === curKey ? dayNum : dim;
@@ -1725,6 +2298,33 @@ function App() {
     return { rows, curLen, atDayCur: rows[curLen - 1]?.cur ?? 0, atDayPrev: rows[Math.min(curLen, pdim) - 1]?.prev ?? 0 };
   }, [transactions, anMonth, curKey, dayNum]);
 
+  const heat = useMemo(() => {
+    const days = {};
+    transactions.forEach((t) => {
+      if (t.type === "expense" && monthKeyOf(t.date) === anMonth) {
+        days[t.date] = days[t.date] || { tot: 0, n: 0 };
+        days[t.date].tot += t.amount; days[t.date].n++;
+      }
+    });
+    const max = Object.values(days).reduce((m, x) => Math.max(m, x.tot), 0);
+    const lead = (keyToDate(anMonth).getDay() + 6) % 7;
+    const cells = Array(lead).fill(null);
+    for (let d = 1; d <= daysInMonth(anMonth); d++) cells.push(`${anMonth}-${String(d).padStart(2, "0")}`);
+    return { days, max, cells };
+  }, [transactions, anMonth]);
+
+  const weekdayAvg = useMemo(() => {
+    const sums = Array(7).fill(0), counts = Array(7).fill(0);
+    let iso = periodStart;
+    let guard = 0;
+    while (iso <= todayISO && guard < 400) { counts[(isoToDate(iso).getDay() + 6) % 7]++; iso = addDaysISO(iso, 1); guard++; }
+    transactions.forEach((t) => { if (t.type === "expense" && t.date >= periodStart && t.date <= todayISO) sums[(isoToDate(t.date).getDay() + 6) % 7] += t.amount; });
+    const avgs = sums.map((s, i) => (counts[i] ? s / counts[i] : 0));
+    const max = Math.max(...avgs);
+    const top = avgs.indexOf(max);
+    return { avgs, max, top };
+  }, [transactions, periodStart, todayISO]);
+
   const catRows = useMemo(() => {
     const ids = new Set([...Object.keys(anAgg.cat), ...Object.keys(anPrev.cat)]);
     return [...ids].map((id) => {
@@ -1737,17 +2337,74 @@ function App() {
   const catSeries = useMemo(() => (selCat ? series.map((s) => ({ label: s.label, key: s.key, value: round2(getAgg(s.key).cat[selCat] || 0) })) : []), [selCat, series]);
   const catAvg = catSeries.length ? catSeries.reduce((s, x) => s + x.value, 0) / catSeries.length : 0;
 
+  const merchants = useMemo(() => {
+    const m = {};
+    transactions.forEach((t) => {
+      if (t.type !== "expense" || !t.description || t.date < periodStart) return;
+      const k = t.description.trim().toLowerCase();
+      m[k] = m[k] || { name: t.description.trim(), n: 0, tot: 0, cat: t.category };
+      m[k].n++; m[k].tot += t.amount;
+    });
+    const list = Object.values(m).sort((a, b) => (merchSort === "total" ? b.tot - a.tot : b.n - a.n || b.tot - a.tot)).slice(0, 10);
+    const maxV = list.reduce((mx, x) => Math.max(mx, merchSort === "total" ? x.tot : x.n), 0);
+    return { list, maxV };
+  }, [transactions, periodStart, merchSort]);
+
+  const tagStats = useMemo(() => {
+    const m = {};
+    transactions.forEach((t) => (t.tags || []).forEach((tag) => {
+      const k = tag.toLowerCase();
+      m[k] = m[k] || { name: tag, exp: 0, inc: 0, n: 0, first: t.date, last: t.date };
+      if (t.type === "expense") m[k].exp += t.amount;
+      if (t.type === "income") m[k].inc += t.amount;
+      m[k].n++;
+      if (t.date < m[k].first) m[k].first = t.date;
+      if (t.date > m[k].last) m[k].last = t.date;
+    }));
+    return Object.values(m).sort((a, b) => b.exp - a.exp);
+  }, [transactions]);
+
   const tickStyle = { fill: theme.muted, fontSize: 11 };
   const noCharts = <p className="text-sm muted p-4">Grafici non disponibili: la libreria non si è caricata. Ricarica l'app con la connessione attiva.</p>;
+  const heatColor = (v) => (v > 0 && heat.max > 0 ? `color-mix(in srgb, var(--red) ${Math.round(18 + 70 * Math.sqrt(v / heat.max))}%, var(--surface2))` : "var(--surface2)");
 
-  const renderAnalysis = () => (
-    <div>
-      <h1 className="serif text-[32px] leading-tight mb-3">Analisi</h1>
-      <div className="flex gap-2">
+  const renderAnalysisTrend = () => (
+    <>
+      {insights.length > 0 && <Section title="Da notare" className="mt-5"><Insights items={insights} /></Section>}
+
+      <Section title="Previsione del saldo" className={insights.length ? "" : "mt-5"}>
+        <div className="flex gap-2 mb-3">
+          {[30, 60, 90].map((n) => <button key={n} onClick={() => setForecastDays(n)} className={`chip ${forecastDays === n ? "chip-on" : ""}`}>{n} giorni</button>)}
+        </div>
+        <div className="panel pt-4 pr-2 pb-1">
+          {!RC ? noCharts : (
+            <RC.ResponsiveContainer width="100%" height={200}>
+              <RC.ComposedChart data={forecast.rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <RC.CartesianGrid stroke={theme.line} vertical={false} />
+                <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} interval={Math.floor(forecastDays / 5)} />
+                <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} tickFormatter={compactEUR} domain={["auto", "auto"]} />
+                <RC.Tooltip content={<ChartTip />} />
+                <RC.ReferenceLine y={0} stroke={theme.red} strokeDasharray="3 3" />
+                <RC.Area type="stepAfter" dataKey="scad" name="Solo scadenze fisse" stroke={theme.green} fill={theme.green} fillOpacity={0.12} strokeWidth={1.8} dot={false} />
+                <RC.Line type="monotone" dataKey="stima" name="Con le spese abituali" stroke={theme.ink} strokeWidth={2} strokeDasharray="5 4" dot={false} />
+              </RC.ComposedChart>
+            </RC.ResponsiveContainer>
+          )}
+        </div>
+        <p className="text-sm muted mt-2 num">
+          {accounts.length
+            ? `Con le spese abituali (circa ${fmtEUR(forecast.daily)} al giorno oltre alle scadenze) tra ${forecastDays} giorni avresti circa ${fmtEUR(forecast.last.stima)}. Punto più basso: ${fmtEUR(forecast.minRow.stima)} il ${fmtDateShort(forecast.minRow.iso)}.`
+            : "Aggiungi i conti per vedere la previsione."}
+        </p>
+        {forecast.minRow && forecast.minRow.stima < 0 && accounts.length > 0 && (
+          <p className="text-sm c-red mt-1">Al ritmo attuale il saldo andrebbe sotto zero entro il {fmtDateShort(forecast.rows.find((r) => r.stima < 0).iso)}.</p>
+        )}
+      </Section>
+
+      <div className="flex gap-2 mt-8">
         {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
       </div>
-
-      <Section title="Entrate e uscite" className="mt-5">
+      <Section title="Entrate e uscite" className="mt-4">
         <div className="panel pt-4 pr-2 pb-1">
           {!RC ? noCharts : (
             <RC.ResponsiveContainer width="100%" height={230}>
@@ -1756,18 +2413,14 @@ function App() {
                 <RC.XAxis dataKey="label" tick={tickStyle} axisLine={false} tickLine={false} />
                 <RC.YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} tickFormatter={compactEUR} />
                 <RC.Tooltip content={<ChartTip />} cursor={{ fill: theme.line, opacity: 0.35 }} />
-                <RC.Bar dataKey="Entrate" fill={theme.green} radius={[4, 4, 0, 0]} onClick={(_, i) => setAnMonth(series[i].key)}>
-                  {series.map((s) => <RC.Cell key={s.key} fill={theme.green} fillOpacity={s.key === anMonth ? 1 : 0.4} />)}
-                </RC.Bar>
-                <RC.Bar dataKey="Uscite" fill={theme.red} radius={[4, 4, 0, 0]} onClick={(_, i) => setAnMonth(series[i].key)}>
-                  {series.map((s) => <RC.Cell key={s.key} fill={theme.red} fillOpacity={s.key === anMonth ? 1 : 0.4} />)}
-                </RC.Bar>
+                <RC.Bar dataKey="Entrate" fill={theme.green} radius={[4, 4, 0, 0]} onClick={(_, i) => { setAnMonth(series[i].key); setAnTab("month"); }} />
+                <RC.Bar dataKey="Uscite" fill={theme.red} radius={[4, 4, 0, 0]} onClick={(_, i) => { setAnMonth(series[i].key); setAnTab("month"); }} />
                 <RC.Line type="monotone" dataKey="Saldo" stroke={theme.ink} strokeWidth={2} dot={{ r: 2.5, fill: theme.ink, strokeWidth: 0 }} />
               </RC.ComposedChart>
             </RC.ResponsiveContainer>
           )}
         </div>
-        <p className="text-xs muted mt-2">Tocca le barre di un mese per esaminarlo qui sotto. La linea è il saldo tra entrate e uscite.</p>
+        <p className="text-xs muted mt-2">Tocca le barre di un mese per aprirne il dettaglio. La linea è il saldo tra entrate e uscite.</p>
         <div className="panel grid grid-cols-3 mt-3">
           {[["Uscite medie", fmtEUR(avg("Uscite")), ""], ["Entrate medie", fmtEUR(avg("Entrate")), "c-green"], ["Saldo medio", fmtSigned(avg("Saldo")), avg("Saldo") < 0 ? "c-red" : ""]].map(([l, v, c], i) => (
             <div key={l} className="py-3 px-3" style={i ? { borderLeft: "1px solid var(--line)" } : null}>
@@ -1779,9 +2432,19 @@ function App() {
         <p className="text-xs muted mt-1.5">Medie calcolate sui mesi conclusi del periodo.</p>
       </Section>
 
-      <div className="mt-9 pt-2" style={{ borderTop: "1px solid var(--line)" }}>
-        <MonthNav monthKey={anMonth} onChange={(k) => { setAnMonth(k); }} max={curKey} />
-      </div>
+      <Section title="Budget mensili" action={<span className="text-xs muted">{cap(monthLabel(curKey))}</span>}>
+        <Rows>
+          {[...budgetRows].sort((a, b) => (b.limit > 0) - (a.limit > 0) || b.spent - a.spent).map((r) => (
+            <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />
+          ))}
+        </Rows>
+      </Section>
+    </>
+  );
+
+  const renderAnalysisMonth = () => (
+    <>
+      <div className="mt-4"><MonthNav monthKey={anMonth} onChange={(k) => { setAnMonth(k); setHeatDay(null); }} max={curKey} /></div>
 
       <Section title={`Rispetto a ${monthName(anPrevKey)}`} className="mt-3">
         <Rows>
@@ -1821,6 +2484,34 @@ function App() {
           {anMonth === curKey
             ? `Al giorno ${pace.curLen} hai speso ${fmtEUR(pace.atDayCur)}; a ${monthName(anPrevKey)}, nello stesso punto, ${fmtEUR(pace.atDayPrev)}.`
             : `A ${monthName(anMonth)} hai speso ${fmtEUR(anAgg.exp)}, contro ${fmtEUR(anPrev.exp)} a ${monthName(anPrevKey)}.`}
+        </p>
+      </Section>
+
+      <Section title="Mappa delle spese">
+        <div className="panel p-2.5">
+          <div className="grid grid-cols-7 text-center text-xs muted mb-1">
+            {["L", "M", "M", "G", "V", "S", "D"].map((d, i) => <span key={i}>{d}</span>)}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {heat.cells.map((iso, i) => {
+              if (!iso) return <span key={`h${i}`} />;
+              const v = heat.days[iso]?.tot || 0;
+              const strong = v > 0 && heat.max > 0 && Math.sqrt(v / heat.max) > 0.55;
+              const sel = heatDay === iso;
+              return (
+                <button key={iso} onClick={() => setHeatDay(sel ? null : iso)} className="rounded-lg flex items-center justify-center num text-[13px]"
+                  style={{ height: 40, background: heatColor(v), color: strong ? "#fff" : iso > todayISO ? "var(--line)" : "var(--ink)", boxShadow: sel ? "inset 0 0 0 2px var(--ink)" : "none" }}
+                  aria-label={`${fmtDayLong(iso)}: ${fmtEUR(v)}`}>
+                  {Number(iso.slice(8))}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <p className="text-sm muted mt-2 num">
+          {heatDay
+            ? (heat.days[heatDay] ? `${cap(fmtDayLong(heatDay))}: ${fmtEUR(heat.days[heatDay].tot)} in ${heat.days[heatDay].n} ${heat.days[heatDay].n === 1 ? "spesa" : "spese"}.` : `${cap(fmtDayLong(heatDay))}: nessuna spesa.`)
+            : heat.max > 0 ? "Più il giorno è scuro, più hai speso. Toccalo per vedere l'importo." : `Nessuna uscita a ${monthName(anMonth)}.`}
         </p>
       </Section>
 
@@ -1887,31 +2578,109 @@ function App() {
           <p className="text-sm muted">Nessuna uscita registrata a {monthName(anMonth)}.</p>
         )}
       </Section>
+    </>
+  );
 
-      <Section title="Budget mensili" action={<span className="text-xs muted">{cap(monthLabel(curKey))}</span>}>
-        <Rows>
-          {[...budgetRows].sort((a, b) => (b.limit > 0) - (a.limit > 0) || b.spent - a.spent).map((r) => (
-            <BudgetRow key={r.id} r={r} onClick={() => setBudgetModal({ cat: r })} />
-          ))}
-        </Rows>
+  const renderAnalysisHabits = () => (
+    <>
+      <div className="flex gap-2 mt-5">
+        {[3, 6, 12].map((n) => <button key={n} onClick={() => setAnPeriod(n)} className={`chip ${anPeriod === n ? "chip-on" : ""}`}>{n} mesi</button>)}
+      </div>
+
+      <Section title="Esercenti più frequenti" className="mt-4">
+        <div className="seg mb-3">
+          <button className={merchSort === "total" ? "on" : ""} onClick={() => setMerchSort("total")}>Per spesa</button>
+          <button className={merchSort === "count" ? "on" : ""} onClick={() => setMerchSort("count")}>Per frequenza</button>
+        </div>
+        {merchants.list.length ? (
+          <Rows>
+            {merchants.list.map((m) => {
+              const v = merchSort === "total" ? m.tot : m.n;
+              return (
+                <button key={m.name} onClick={() => { setSearch(m.name); setTypeFilter("all"); setCatFilter(null); setTagFilter(null); setTab("movements"); }} className="w-full text-left py-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-[15px] truncate">{m.name}</span>
+                    <span className="num text-[15px] font-medium shrink-0">{merchSort === "total" ? fmtEUR(m.tot) : `${m.n} volte`}</span>
+                  </div>
+                  <div className="bar mt-1.5"><div style={{ width: `${merchants.maxV ? (v / merchants.maxV) * 100 : 0}%`, background: catMeta("expense", m.cat).color }} /></div>
+                  <div className="text-xs muted mt-1 num">{merchSort === "total" ? `${m.n} ${m.n === 1 ? "volta" : "volte"}` : fmtEUR(m.tot)}, in media {fmtEUR(m.tot / m.n)}</div>
+                </button>
+              );
+            })}
+          </Rows>
+        ) : (
+          <p className="text-sm muted">Le spese con una descrizione compaiono qui raggruppate per nome.</p>
+        )}
       </Section>
+
+      <Section title="Il giorno più caro della settimana">
+        <div className="panel p-4">
+          <div className="flex items-end justify-between gap-1.5" style={{ height: 96 }}>
+            {weekdayAvg.avgs.map((v, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+                <div className="w-full rounded-md" style={{ height: `${weekdayAvg.max ? Math.max(4, (v / weekdayAvg.max) * 80) : 4}px`, background: i === weekdayAvg.top && v > 0 ? "var(--red)" : "var(--surface2)" }} />
+                <span className="text-xs muted mt-1.5">{WEEKDAYS[i].slice(0, 3)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="text-sm muted mt-2 num">
+          {weekdayAvg.max > 0 ? `In media spendi di più il ${WEEKDAYS[weekdayAvg.top]}: ${fmtEUR(weekdayAvg.max)} al giorno, contro ${fmtEUR(weekdayAvg.avgs.reduce((s, v) => s + v, 0) / 7)} della media settimanale.` : "Servono alcune spese per calcolarlo."}
+        </p>
+      </Section>
+
+      <Section title="Etichette">
+        {tagStats.length ? (
+          <Rows>
+            {tagStats.map((t) => (
+              <button key={t.name} onClick={() => { setTagFilter(t.name); setSearch(""); setTypeFilter("all"); setCatFilter(null); setTab("movements"); }} className="w-full flex items-center gap-3 py-3 text-left">
+                <span className="muted"><Tag size={16} /></span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[15px] truncate">#{t.name}</span>
+                  <span className="block text-xs muted num">{t.n} movimenti, dal {fmtDateShort(t.first)} al {fmtDateShort(t.last)}</span>
+                </span>
+                <span className="text-right shrink-0">
+                  <span className="block num text-[15px] font-medium">{fmtEUR(t.exp)}</span>
+                  {t.inc > 0 && <span className="block num text-xs c-green">+{fmtEUR(t.inc)}</span>}
+                </span>
+              </button>
+            ))}
+          </Rows>
+        ) : (
+          <p className="text-sm muted">Aggiungi un'etichetta a un movimento, per esempio "Erasmus", per vedere qui quanto ti costa in tutto.</p>
+        )}
+      </Section>
+    </>
+  );
+
+  const renderAnalysis = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight mb-3">Analisi</h1>
+      <div className="seg">
+        <button className={anTab === "trend" ? "on" : ""} onClick={() => setAnTab("trend")}>Andamento</button>
+        <button className={anTab === "month" ? "on" : ""} onClick={() => setAnTab("month")}>Mese</button>
+        <button className={anTab === "habits" ? "on" : ""} onClick={() => setAnTab("habits")}>Abitudini</button>
+      </div>
+      {anTab === "trend" && renderAnalysisTrend()}
+      {anTab === "month" && renderAnalysisMonth()}
+      {anTab === "habits" && renderAnalysisHabits()}
     </div>
   );
 
-  /* ---------- Conti ---------- */
+  /* ================= Conti ================= */
   const positiveTotal = accounts.reduce((s, a) => s + Math.max(0, a.balance), 0);
-  const renderAccounts = () => (
-    <div>
-      <h1 className="serif text-[32px] leading-tight">Conti</h1>
-      <div className="mt-3">
+  const sharedSorted = useMemo(() => [...shared].sort((a, b) => b.date.localeCompare(a.date)), [shared]);
+  const personName = (id) => people.find((p) => p.id === id)?.name || "persona eliminata";
+
+  const renderAccountsMain = () => (
+    <>
+      <div className="mt-5">
         <div className="text-sm muted">Totale</div>
         <div className={`serif num text-[40px] leading-tight ${totalAccounts < 0 ? "c-red" : ""}`}>{fmtEUR(totalAccounts)}</div>
       </div>
       {positiveTotal > 0 && accounts.length > 1 && (
         <div className="flex mt-3 rounded-full overflow-hidden" style={{ height: 8, background: "var(--surface2)" }}>
-          {accounts.map((a, i) => a.balance > 0 && (
-            <div key={a.id} style={{ width: `${(a.balance / positiveTotal) * 100}%`, background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />
-          ))}
+          {accounts.map((a, i) => a.balance > 0 && <div key={a.id} style={{ width: `${(a.balance / positiveTotal) * 100}%`, background: ACCOUNT_COLORS[i % ACCOUNT_COLORS.length] }} />)}
         </div>
       )}
       <div className="mt-5">
@@ -1937,14 +2706,14 @@ function App() {
         <button onClick={() => setTrModal({ tx: null })} className="btn btn-ghost">Giroconto</button>
       </div>
 
-      <Section title="Pagamenti con Wallet">
+      <Section title="Importazione da Wallet e Siri">
         <div className="panel p-4">
           <p className="text-sm muted">
             {data.walletLastImport ? `Ultima importazione ${relativeDay(data.walletLastImport, todayISO)}. ` : "Nessuna importazione finora. "}
             {Object.keys(data.cardMap).length > 0 && `Carte abbinate a un conto: ${Object.keys(data.cardMap).length}. `}
             {Object.keys(data.merchantMap).length > 0 && `Esercenti riconosciuti: ${Object.keys(data.merchantMap).length}.`}
           </p>
-          <button onClick={() => setWalletGuide(true)} className="btn btn-ghost mt-3">Guida alla configurazione</button>
+          <button onClick={() => setGuide(true)} className="btn btn-ghost mt-3">Guida alla configurazione</button>
         </div>
       </Section>
 
@@ -1954,14 +2723,105 @@ function App() {
 
       <Section title="Dati">
         <div className="panel p-4">
-          <p className="text-sm muted">Cancella conti, movimenti, scadenze e budget da questo telefono. L'operazione non si può annullare.</p>
+          <p className="text-sm muted">Cancella conti, movimenti, scadenze, obiettivi e spese condivise da questo telefono. L'operazione non si può annullare.</p>
           <DeleteButton label="Cancella tutti i dati" onConfirm={() => { setData({ ...EMPTY_DATA }); setNote("Dati cancellati"); }} />
         </div>
       </Section>
+    </>
+  );
+
+  const renderGoals = () => (
+    <>
+      <div className="mt-5 panel p-4">
+        <div className="text-sm muted">Accantonato in tutto</div>
+        <div className="serif num text-[32px] leading-tight">{fmtEUR(goalsSaved)}</div>
+        <div className="text-sm muted num mt-1">Liberi sui conti: {fmtEUR(totalAccounts - goalsSaved)}</div>
+        {totalAccounts - goalsSaved < 0 && <p className="text-sm c-red mt-2">Hai accantonato più di quanto c'è sui conti: rivedi le cifre degli obiettivi.</p>}
+      </div>
+      <div className="mt-5">
+        {goals.length ? (
+          <Rows>{goals.map((g) => <GoalRow key={g.id} g={g} todayISO={todayISO} onOpen={() => setGoalModal({ goal: g })} onMove={() => setGoalMove({ goal: g })} />)}</Rows>
+        ) : (
+          <p className="text-[15px] muted">Nessun obiettivo. Crea il primo: una vacanza, il viaggio di Natale, un fondo per gli imprevisti.</p>
+        )}
+      </div>
+      <button onClick={() => setGoalModal({ goal: null })} className="btn btn-ink mt-3">Nuovo obiettivo</button>
+      <p className="text-xs muted mt-3">Gli obiettivi non spostano denaro: segnano quanta parte del saldo è già destinata. Tocca un obiettivo per modificarlo.</p>
+    </>
+  );
+
+  const renderShared = () => (
+    <>
+      <div className="panel grid grid-cols-2 mt-5">
+        <div className="p-4" style={{ borderRight: "1px solid var(--line)" }}>
+          <div className="text-sm muted">Ti devono</div>
+          <div className="num text-[22px] font-semibold mt-0.5 c-green">{fmtEUR(owedToMe)}</div>
+        </div>
+        <div className="p-4">
+          <div className="text-sm muted">Devi</div>
+          <div className={`num text-[22px] font-semibold mt-0.5 ${iOwe > 0 ? "c-red" : ""}`}>{fmtEUR(iOwe)}</div>
+        </div>
+      </div>
+      <Section title="Persone">
+        {people.length ? (
+          <Rows>
+            {people.map((p) => {
+              const b = peopleBal[p.id] || 0;
+              return (
+                <button key={p.id} onClick={() => setPersonOpen(p.id)} className="w-full flex items-center gap-3 py-3.5 text-left">
+                  <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold" style={{ background: "var(--surface2)" }}>{p.name.charAt(0).toUpperCase()}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] truncate">{p.name}</span>
+                    <span className="block text-xs muted">{b > 0.004 ? "ti deve" : b < -0.004 ? "gli devi" : "siete pari"}</span>
+                  </span>
+                  <span className={`num text-[15px] font-semibold ${b > 0.004 ? "c-green" : b < -0.004 ? "c-red" : "muted"}`}>{Math.abs(b) > 0.004 ? fmtEUR(Math.abs(b)) : ""}</span>
+                </button>
+              );
+            })}
+          </Rows>
+        ) : (
+          <p className="text-[15px] muted">Nessuna persona. Si aggiungono direttamente quando registri la prima spesa condivisa.</p>
+        )}
+        <button onClick={() => setSharedModal(true)} className="btn btn-ink mt-3">Nuova spesa condivisa</button>
+      </Section>
+      {sharedSorted.length > 0 && (
+        <Section title="Ultime voci">
+          <Rows>
+            {sharedSorted.slice(0, 15).map((e) => (
+              <div key={e.id} className="py-3">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-[15px] truncate">{e.kind === "settle" ? (e.direction === "in" ? `${personName(e.personId)} ti ha restituito` : `Hai restituito a ${personName(e.personId)}`) : e.description}</span>
+                  <span className="num text-[15px] shrink-0">{fmtEUR(e.kind === "settle" ? e.amount : e.total)}</span>
+                </div>
+                <div className="text-xs muted mt-0.5">
+                  {fmtDateShort(e.date)}{e.kind === "expense" ? `, pagato da ${e.payer === "me" ? "te" : personName(e.payer)}, con ${e.participants.map(personName).join(", ")}${e.includeMe ? " e te" : ""}` : ""}
+                </div>
+              </div>
+            ))}
+          </Rows>
+          <p className="text-xs muted mt-2">Per eliminare una voce apri la persona coinvolta e usa lo storico.</p>
+        </Section>
+      )}
+    </>
+  );
+
+  const renderAccounts = () => (
+    <div>
+      <h1 className="serif text-[32px] leading-tight mb-3">Conti</h1>
+      <div className="seg">
+        <button className={accTab === "accounts" ? "on" : ""} onClick={() => setAccTab("accounts")}>Conti</button>
+        <button className={accTab === "goals" ? "on" : ""} onClick={() => setAccTab("goals")}>Obiettivi</button>
+        <button className={accTab === "shared" ? "on" : ""} onClick={() => setAccTab("shared")}>Condivise</button>
+      </div>
+      {accTab === "accounts" && renderAccountsMain()}
+      {accTab === "goals" && renderGoals()}
+      {accTab === "shared" && renderShared()}
     </div>
   );
 
   const views = { overview: renderOverview, movements: renderMovements, schedule: renderSchedule, analysis: renderAnalysis, accounts: renderAccounts };
+  const openPerson = people.find((p) => p.id === personOpen);
+  const settlePerson = people.find((p) => p.id === settleFor);
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -1998,13 +2858,10 @@ function App() {
       </nav>
 
       {addSheet && <AddSheet onClose={() => setAddSheet(false)} onPick={pickAdd} />}
-      {walletReview && (
-        <WalletReviewSheet items={walletReview} accounts={accounts}
-          onClose={() => setWalletReview(null)} onConfirm={confirmWallet} onIgnore={ignoreWallet} />
-      )}
-      {walletGuide && <WalletGuideSheet onClose={() => setWalletGuide(false)} />}
+      {walletReview && <WalletReviewSheet items={walletReview} accounts={accounts} onClose={() => setWalletReview(null)} onConfirm={confirmWallet} onIgnore={ignoreWallet} />}
+      {guide && <GuideSheet onClose={() => setGuide(false)} />}
       {txModal && (
-        <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} todayISO={todayISO}
+        <TxFormModal tx={txModal.tx} initialType={txModal.type} accounts={accounts} allTags={allTags} todayISO={todayISO}
           onClose={() => setTxModal(null)} onSave={saveTx} onDelete={deleteTx} />
       )}
       {trModal && (
@@ -2016,14 +2873,29 @@ function App() {
         <RecurringFormModal item={recModal.item} accounts={accounts} initialKind={recModal.kind || "expense"} todayISO={todayISO}
           onClose={() => setRecModal(null)} onSave={saveRecurring} onDelete={deleteRecurring} />
       )}
-      {accModal && (
-        <AccountFormModal account={accModal.acc} onClose={() => setAccModal(null)} onSave={saveAccount} onDelete={deleteAccount} />
-      )}
+      {accModal && <AccountFormModal account={accModal.acc} onClose={() => setAccModal(null)} onSave={saveAccount} onDelete={deleteAccount} />}
       {budgetModal && (
         <BudgetModal cat={budgetModal.cat} limit={budgets[budgetModal.cat.id] || 0} spent={curAgg.cat[budgetModal.cat.id] || 0}
-          onClose={() => setBudgetModal(null)}
-          onSave={(v) => setBudget(budgetModal.cat.id, v)}
-          onRemove={() => setBudget(budgetModal.cat.id, 0)} />
+          onClose={() => setBudgetModal(null)} onSave={(v) => setBudget(budgetModal.cat.id, v)} onRemove={() => setBudget(budgetModal.cat.id, 0)} />
+      )}
+      {goalModal && <GoalModal goal={goalModal.goal} colorIndex={goals.length} onClose={() => setGoalModal(null)} onSave={saveGoal} onDelete={deleteGoal} />}
+      {goalMove && <GoalMoveModal goal={goals.find((g) => g.id === goalMove.goal.id) || goalMove.goal} onClose={() => setGoalMove(null)} onSave={(delta) => moveGoal(goalMove.goal.id, delta)} />}
+      {sharedModal && (
+        <SharedExpenseModal people={people} accounts={accounts} todayISO={todayISO}
+          onClose={() => setSharedModal(false)} onSave={saveShared} onAddPerson={addPerson} />
+      )}
+      {openPerson && !settlePerson && (
+        <PersonSheet person={openPerson} balance={peopleBal[openPerson.id] || 0}
+          entries={sharedSorted.map((e) => ({ e, eff: round2(entryEffectFor(e, openPerson.id)) })).filter(({ e, eff }) => Math.abs(eff) > 0.004 || (e.kind === "expense" && (e.participants.includes(openPerson.id) || e.payer === openPerson.id)))}
+          onClose={() => setPersonOpen(null)}
+          onSettle={() => setSettleFor(openPerson.id)}
+          onRename={(n) => renamePerson(openPerson.id, n)}
+          onDelete={() => deletePerson(openPerson.id)}
+          onDeleteEntry={deleteShared} />
+      )}
+      {settlePerson && (
+        <SettleModal person={settlePerson} balance={peopleBal[settlePerson.id] || 0} accounts={accounts} todayISO={todayISO}
+          onClose={() => setSettleFor(null)} onSave={saveShared} />
       )}
     </div>
   );
